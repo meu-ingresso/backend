@@ -1,0 +1,32 @@
+import { schema } from '@ioc:Adonis/Core/Validator';
+import { HttpContextContract } from '@ioc:Adonis/Core/HttpContext';
+import ReportHandler from './Reporters/ReportHandler';
+
+export default class CreateCategoryValidator {
+  constructor(protected context: HttpContextContract) {}
+
+  public reporter = ReportHandler;
+
+  public schema = schema.create({
+    name: schema.string(),
+    description: schema.string.optional(),
+    is_active: schema.boolean(),
+  });
+
+  public messages = {};
+}
+
+export class UpdateCategoryValidator {
+  constructor(protected context: HttpContextContract) {}
+
+  public reporter = ReportHandler;
+
+  public schema = schema.create({
+    id: schema.string(),
+    name: schema.string.optional(),
+    description: schema.string.optional(),
+    is_active: schema.boolean.optional(),
+  });
+
+  public messages = {};
+}

@@ -2,28 +2,28 @@ import { schema, rules } from '@ioc:Adonis/Core/Validator';
 import { HttpContextContract } from '@ioc:Adonis/Core/HttpContext';
 import ReportHandler from './Reporters/ReportHandler';
 
-export default class CreateRolePermissionValidator {
+export default class CreateCityValidator {
   constructor(protected context: HttpContextContract) {}
 
   public reporter = ReportHandler;
 
   public schema = schema.create({
-    role_id: schema.string({}, [rules.exists({ table: 'roles', column: 'id' })]),
-    permission_id: schema.string({}, [rules.exists({ table: 'permissions', column: 'id' })]),
+    name: schema.string(),
+    state_id: schema.string({}, [rules.exists({ table: 'states', column: 'id' })]),
   });
 
   public messages = {};
 }
 
-export class UpdateRolePermissionValidator {
+export class UpdateCityValidator {
   constructor(protected context: HttpContextContract) {}
 
   public reporter = ReportHandler;
 
   public schema = schema.create({
     id: schema.string(),
-    role_id: schema.string.optional({}, [rules.exists({ table: 'roles', column: 'id' })]),
-    permission_id: schema.string.optional({}, [rules.exists({ table: 'permissions', column: 'id' })]),
+    name: schema.string.optional(),
+    state_id: schema.string.optional({}, [rules.exists({ table: 'states', column: 'id' })]),
   });
 
   public messages = {};

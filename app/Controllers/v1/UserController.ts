@@ -3,7 +3,7 @@ import UserService from 'App/Services/v1/UserService';
 import UserGroupService from 'App/Services/v1/UserGroupService';
 import LoginService from 'App/Services/v1/AuthService';
 import QueryModelValidator from 'App/Validators/v1/QueryModelValidator';
-import { CreateUserValidator, UpdateUserValidator } from 'App/Validators/v1/UserValidator';
+import { CreateUserValidator, UpdateUserValidator } from 'App/Validators/v1/UsersValidator';
 import utils from 'Utils/utils';
 
 export default class UserController {

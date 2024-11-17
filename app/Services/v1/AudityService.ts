@@ -1,5 +1,5 @@
 import Database from '@ioc:Adonis/Lucid/Database';
-import Audity from 'App/Models/Access/Audities';
+import Audity from 'App/Models/Access/AuditLogs';
 
 export default class AudityService {
   public async create(record: Record<string, any>): Promise<Audity> {
