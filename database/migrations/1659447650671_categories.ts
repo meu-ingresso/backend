@@ -1,13 +1,14 @@
 import BaseSchema from '@ioc:Adonis/Lucid/Schema';
 
-export default class NpsSchema extends BaseSchema {
-  protected tableName = 'roles_permissions';
+export default class CategoriesSchema extends BaseSchema {
+  protected tableName = 'categories';
 
   public async up() {
     this.schema.createTable(this.tableName, (table) => {
       table.uuid('id').primary();
-      table.uuid('role_id').nullable();
-      table.uuid('permission_id').nullable();
+      table.string('name', 100).notNullable().unique();
+      table.text('description').nullable();
+      table.boolean('is_active').notNullable().defaultTo(true);
       table.timestamp('created_at', { useTz: true }).defaultTo(this.now());
       table.timestamp('updated_at', { useTz: true }).defaultTo(this.now());
     });

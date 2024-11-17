@@ -1,83 +1,52 @@
-import { v4 as uuidv4 } from 'uuid';
-import Hash from '@ioc:Adonis/Core/Hash';
 import { DateTime } from 'luxon';
-import {
-  BaseModel,
-  beforeCreate,
-  beforeSave,
-  column,
-  hasMany,
-  HasMany,
-  belongsTo,
-  BelongsTo,
-} from '@ioc:Adonis/Lucid/Orm';
-import Tokens from 'App/Models/Access/Tokens';
-import Audity from 'App/Models/Access/Audities';
+import { v4 as uuidv4 } from 'uuid';
+import { BaseModel, column, beforeCreate, belongsTo, BelongsTo, hasMany, HasMany } from '@ioc:Adonis/Lucid/Orm';
 import Roles from './Roles';
+import ApiTokens from './ApiTokens';
+import Events from './Events';
 
 export default class Users extends BaseModel {
   @column({ isPrimary: true })
   public id: string;
 
   @column()
-  public first_name: string;
-
-  @column()
-  public last_name: string;
-
-  @column()
-  public cellphone: string;
-
-  @column()
-  public email: string;
-
-  @column()
-  public id_erp: string;
-
-  @column()
-  public hiring_mode: string;
-
-  @column()
-  public role_id: string;
+  public email: string | null;
 
   @column({ serializeAs: null })
-  public password: string;
+  public password: string | null;
 
   @column()
   public is_active: boolean;
 
+  @column()
+  public role_id: string | null;
+
   @column.dateTime({ autoCreate: true })
-  public created_at: DateTime;
+  public created_at: DateTime | null;
 
   @column.dateTime({ autoCreate: true, autoUpdate: true })
-  public updated_at: DateTime;
+  public updated_at: DateTime | null;
+
+  @column.dateTime()
+  public deleted_at: DateTime | null;
 
   @belongsTo(() => Roles, {
     foreignKey: 'role_id',
   })
   public role: BelongsTo<typeof Roles>;
 
-  @hasMany(() => Tokens, {
+  @hasMany(() => ApiTokens, {
     foreignKey: 'user_id',
   })
-  public tokens: HasMany<typeof Tokens>;
+  public apiTokens: HasMany<typeof ApiTokens>;
 
-  @hasMany(() => Audity, {
-    foreignKey: 'user_id',
+  @hasMany(() => Events, {
+    foreignKey: 'promoter_id',
   })
-  public audities: HasMany<typeof Audity>;
-
-  @beforeSave()
-  public static async hashPassword(user: Users) {
-    if (user.$dirty.password) {
-      user.password = await Hash.make(user.password);
-    }
-  }
+  public events: HasMany<typeof Events>;
 
   @beforeCreate()
-  public static async assignUuid(user: Users) {
-    if (!user.id) {
-      user.id = uuidv4();
-    }
+  public static assignUuid(user: Users) {
+    user.id = uuidv4();
   }
 }

@@ -1,24 +1,23 @@
 import BaseSchema from '@ioc:Adonis/Lucid/Schema';
 
-export default class extends BaseSchema {
+export default class ApiTokensSchema extends BaseSchema {
+  protected tableName = 'api_tokens';
+
   public async up() {
     await this.db.rawQuery('CREATE EXTENSION IF NOT EXISTS "uuid-ossp"');
 
-    await this.db.rawQuery(`
-      CREATE TABLE api_tokens (
-        id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-        user_id UUID REFERENCES users(id) ON DELETE CASCADE,
-        name VARCHAR(255) NOT NULL,
-        type VARCHAR(255) NOT NULL,
-        token VARCHAR(64) NOT NULL UNIQUE,
-        expires_at TIMESTAMPTZ,
-        created_at TIMESTAMPTZ NOT NULL
-      );
-    `);
+    this.schema.createTable(this.tableName, (table) => {
+      table.uuid('id').primary().defaultTo(this.raw('uuid_generate_v4()'));
+      table.uuid('user_id').notNullable().references('id').inTable('users').onDelete('CASCADE');
+      table.string('name', 255).notNullable();
+      table.string('type', 255).notNullable();
+      table.string('token', 64).notNullable().unique();
+      table.timestamp('expires_at', { useTz: true }).nullable();
+      table.timestamp('created_at', { useTz: true }).notNullable().defaultTo(this.now());
+    });
   }
 
   public async down() {
-    await this.db.rawQuery('DROP TABLE IF EXISTS api_tokens');
-    await this.db.rawQuery('DROP EXTENSION IF EXISTS "uuid-ossp"');
+    this.schema.dropTable(this.tableName);
   }
 }

@@ -1,14 +1,18 @@
 import { DateTime } from 'luxon';
 import { v4 as uuidv4 } from 'uuid';
 import { BaseModel, column, beforeCreate, hasMany, HasMany } from '@ioc:Adonis/Lucid/Orm';
-import RolePermissions from './RolePermissions';
+import Events from './Events';
+import Payments from './Payments';
 
-export default class Permissions extends BaseModel {
+export default class Statuses extends BaseModel {
   @column({ isPrimary: true })
   public id: string;
 
   @column()
   public name: string;
+
+  @column()
+  public module: string;
 
   @column()
   public description: string | null;
@@ -19,13 +23,18 @@ export default class Permissions extends BaseModel {
   @column.dateTime({ autoCreate: true, autoUpdate: true })
   public updated_at: DateTime;
 
-  @hasMany(() => RolePermissions, {
-    foreignKey: 'permission_id',
+  @hasMany(() => Events, {
+    foreignKey: 'status_id',
   })
-  public rolePermissions: HasMany<typeof RolePermissions>;
+  public events: HasMany<typeof Events>;
+
+  @hasMany(() => Payments, {
+    foreignKey: 'status_id',
+  })
+  public payments: HasMany<typeof Payments>;
 
   @beforeCreate()
-  public static assignUuid(permission: Permissions) {
-    permission.id = uuidv4();
+  public static assignUuid(status: Statuses) {
+    status.id = uuidv4();
   }
 }

@@ -1,7 +1,7 @@
 import DataAccessService from './DataAccessService';
 import Database from '@ioc:Adonis/Lucid/Database';
 import User from 'App/Models/Access/Users';
-import Tokens from 'App/Models/Access/Tokens';
+import Tokens from 'App/Models/Access/ApiTokens';
 import { ModelObject } from '@ioc:Adonis/Lucid/Orm';
 
 export default class UserService {

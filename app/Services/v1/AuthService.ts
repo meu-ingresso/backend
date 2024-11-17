@@ -1,6 +1,6 @@
 import LoginRequest from 'App/Models/Transfer/LoginRequest';
 import User from 'App/Models/Access/Users';
-import ApiTokens from 'App/Models/Access/Tokens';
+import ApiTokens from 'App/Models/Access/ApiTokens';
 import Hash from '@ioc:Adonis/Core/Hash';
 
 export default class LoginService {

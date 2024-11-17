@@ -28,22 +28,6 @@ const databaseConfig: DatabaseConfig = {
       healthCheck: false,
       debug: false,
     },
-
-    sqlserver: {
-      client: 'mssql',
-      connection: {
-        server: Env.get('MSSQL_HOST'),
-        port: parseInt(Env.get('MSSQL_PORT', '9322')),
-        user: Env.get('MSSQL_USER'),
-        password: Env.get('MSSQL_PASSWORD'),
-        database: Env.get('MSSQL_DB_NAME'),
-        options: {
-          encrypt: true,
-          enableArithAbort: true,
-          trustServerCertificate: true,
-        },
-      },
-    },
   },
 };
 

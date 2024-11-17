@@ -1,4 +1,4 @@
-import Api_tokens from 'App/Models/Access/Tokens';
+import Api_tokens from 'App/Models/Access/ApiTokens';
 
 declare module '@ioc:Adonis/Addons/Auth' {
   interface ProvidersList {

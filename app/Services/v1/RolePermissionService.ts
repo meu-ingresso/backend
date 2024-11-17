@@ -1,6 +1,6 @@
 import DataAccessService from './DataAccessService';
 import Database from '@ioc:Adonis/Lucid/Database';
-import RolePermission from 'App/Models/Access/RolesPermissions';
+import RolePermission from 'App/Models/Access/RolePermissions';
 import { ModelObject } from '@ioc:Adonis/Lucid/Orm';
 
 export default class RoleService {
