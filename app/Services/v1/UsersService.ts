@@ -1,17 +1,21 @@
 import DataAccessService from './DataAccessService';
-import Database from '@ioc:Adonis/Lucid/Database';
 import User from 'App/Models/Access/Users';
-import Tokens from 'App/Models/Access/ApiTokens';
+import Database from '@ioc:Adonis/Lucid/Database';
 import { ModelObject } from '@ioc:Adonis/Lucid/Orm';
+import Hash from '@ioc:Adonis/Core/Hash';
 
 export default class UserService {
   private dataAccessService = new DataAccessService<typeof User>(User);
 
   public async create(record: Record<string, any>): Promise<User> {
-    let user: User = new User().fill(record);
+    const user = new User().fill(record);
 
     await Database.transaction(async (trx) => {
       user.useTransaction(trx);
+
+      if (record.password) {
+        user.password = await Hash.make(record.password);
+      }
 
       await user.save();
     });
@@ -20,10 +24,10 @@ export default class UserService {
   }
 
   public async update(record: Record<string, any>): Promise<User> {
-    let user: User = await User.findOrFail(record.id);
+    const user = await User.findOrFail(record.id);
 
-    if (record && !record.is_active) {
-      await Tokens.query().where('user_id', record.id).delete();
+    if (record.password) {
+      record.password = await Hash.make(record.password);
     }
 
     await Database.transaction(async (trx) => {
@@ -33,7 +37,18 @@ export default class UserService {
 
       await user.save();
     });
+
     return user;
+  }
+
+  public async delete(id: string): Promise<void> {
+    const user = await User.findOrFail(id);
+
+    await Database.transaction(async (trx) => {
+      user.useTransaction(trx);
+
+      await user.delete();
+    });
   }
 
   public async search(query?: any): Promise<{ meta?: any; data: ModelObject[] }> {

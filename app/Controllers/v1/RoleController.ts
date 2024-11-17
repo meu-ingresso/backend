@@ -1,5 +1,5 @@
 import { HttpContextContract } from '@ioc:Adonis/Core/HttpContext';
-import RoleService from 'App/Services/v1/RoleService';
+import RoleService from 'App/Services/v1/RolesService';
 import QueryModelValidator from 'App/Validators/v1/QueryModelValidator';
 import utils from 'Utils/utils';
 

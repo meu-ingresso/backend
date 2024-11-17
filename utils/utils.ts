@@ -1,9 +1,9 @@
 import HttpHeader from 'App/Models/Transfer/HttpHeader';
 import HttpBody from 'App/Models/Transfer/HttpBody';
 import { HttpContextContract } from '@ioc:Adonis/Core/HttpContext';
-import AudityService from 'App/Services/v1/AudityService';
+import AuditLogsService from 'App/Services/v1/AuditLogsService';
 
-const audityService = new AudityService();
+const auditLogsService = new AuditLogsService();
 
 function getHeaders() {
   const headers: HttpHeader[] = [{ key: 'Content-type', value: 'application/json' }];
@@ -32,7 +32,7 @@ async function createAudity(user_id: any, module: string, action: string, conten
       content,
     };
 
-    await audityService.create(payload);
+    await auditLogsService.create(payload);
   } else {
     console.error('User Id -> ', user_id);
     console.error('Module -> ', module);
