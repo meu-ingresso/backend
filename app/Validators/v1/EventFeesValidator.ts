@@ -2,7 +2,7 @@ import { schema, rules } from '@ioc:Adonis/Core/Validator';
 import { HttpContextContract } from '@ioc:Adonis/Core/HttpContext';
 import ReportHandler from './Reporters/ReportHandler';
 
-export default class CreateEventFeeValidator {
+class CreateEventFeeValidator {
   constructor(protected context: HttpContextContract) {}
 
   public reporter = ReportHandler;
@@ -15,10 +15,19 @@ export default class CreateEventFeeValidator {
     variable_fee: schema.number.optional(),
   });
 
-  public messages = {};
+  public messages = {
+    'event_id.required': 'O campo event_id é obrigatório.',
+    'event_id.exists': 'O evento especificado não existe.',
+    'platform_fee.required': 'A taxa da plataforma (platform_fee) é obrigatória.',
+    'promoter_fee.required': 'A taxa do promotor (promoter_fee) é obrigatória.',
+    'platform_fee.number': 'A taxa da plataforma deve ser um número.',
+    'promoter_fee.number': 'A taxa do promotor deve ser um número.',
+    'fixed_fee.number': 'A taxa fixa (fixed_fee) deve ser um número.',
+    'variable_fee.number': 'A taxa variável (variable_fee) deve ser um número.',
+  };
 }
 
-export class UpdateEventFeeValidator {
+class UpdateEventFeeValidator {
   constructor(protected context: HttpContextContract) {}
 
   public reporter = ReportHandler;
@@ -32,5 +41,14 @@ export class UpdateEventFeeValidator {
     variable_fee: schema.number.optional(),
   });
 
-  public messages = {};
+  public messages = {
+    'id.required': 'O campo id é obrigatório.',
+    'event_id.exists': 'O evento especificado não existe.',
+    'platform_fee.number': 'A taxa da plataforma deve ser um número.',
+    'promoter_fee.number': 'A taxa do promotor deve ser um número.',
+    'fixed_fee.number': 'A taxa fixa (fixed_fee) deve ser um número.',
+    'variable_fee.number': 'A taxa variável (variable_fee) deve ser um número.',
+  };
 }
+
+export { CreateEventFeeValidator, UpdateEventFeeValidator };

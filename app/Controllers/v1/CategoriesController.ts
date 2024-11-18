@@ -1,16 +1,16 @@
 import { HttpContextContract } from '@ioc:Adonis/Core/HttpContext';
-import CategoriesService from 'App/Services/v1/CategoriesService';
-import { CreateCategoryValidator, UpdateCategoryValidator } from 'App/Validators/v1/CategoriesValidator';
 import QueryModelValidator from 'App/Validators/v1/QueryModelValidator';
+import { CreateCategoryValidator, UpdateCategoryValidator } from 'App/Validators/v1/CategoriesValidator';
+import DynamicService from 'App/Services/v1/DynamicService';
 import utils from 'Utils/utils';
 
 export default class CategoriesController {
-  private categoriesService: CategoriesService = new CategoriesService();
+  private dynamicService: DynamicService = new DynamicService();
 
   public async create(context: HttpContextContract) {
     const payload = await context.request.validate(CreateCategoryValidator);
 
-    const result = await this.categoriesService.create(payload);
+    const result = await this.dynamicService.create('Category', payload);
 
     const headers = utils.getHeaders();
 
@@ -22,7 +22,7 @@ export default class CategoriesController {
   public async update(context: HttpContextContract) {
     const payload = await context.request.validate(UpdateCategoryValidator);
 
-    const result = await this.categoriesService.update(payload);
+    const result = await this.dynamicService.update('Category', payload);
 
     const headers = utils.getHeaders();
 
@@ -34,7 +34,7 @@ export default class CategoriesController {
   public async search(context: HttpContextContract) {
     const payload = await context.request.validate(QueryModelValidator);
 
-    const result = await this.categoriesService.search(payload);
+    const result = await this.dynamicService.search('Category', payload);
 
     const headers = utils.getHeaders();
 

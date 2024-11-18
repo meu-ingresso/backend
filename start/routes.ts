@@ -51,6 +51,18 @@ Route.group(() => {
   Route.post('/event', 'v1/EventsController.create');
   Route.patch('/event', 'v1/EventsController.update');
 
+  Route.get('/event-collaborators', 'v1/EventCollaboratorsController.search');
+  Route.post('/event-collaborator', 'v1/EventCollaboratorsController.create');
+  Route.patch('/event-collaborator', 'v1/EventCollaboratorsController.update');
+
+  Route.get('/event-fees', 'v1/EventFeesController.search');
+  Route.post('/event-fee', 'v1/EventFeesController.create');
+  Route.patch('/event-fee', 'v1/EventFeesController.update');
+
+  Route.get('/tickets', 'v1/TicketsController.search');
+  Route.post('/ticket', 'v1/TicketsController.create');
+  Route.patch('/ticket', 'v1/TicketsController.update');
+
   // ROTAS COM AUTENTICAÇÃO
   Route.group(() => {
     Route.get('/logout', 'v1/AuthController.logout');

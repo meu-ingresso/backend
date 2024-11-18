@@ -1,16 +1,16 @@
 import { HttpContextContract } from '@ioc:Adonis/Core/HttpContext';
-import StatusesService from 'App/Services/v1/StatusesService';
-import { CreateStatusValidator, UpdateStatusValidator } from 'App/Validators/v1/StatusesValidator';
 import QueryModelValidator from 'App/Validators/v1/QueryModelValidator';
+import { CreateStatusValidator, UpdateStatusValidator } from 'App/Validators/v1/StatusesValidator';
+import DynamicService from 'App/Services/v1/DynamicService';
 import utils from 'Utils/utils';
 
 export default class StatusesController {
-  private statusesService: StatusesService = new StatusesService();
+  private dynamicService: DynamicService = new DynamicService();
 
   public async create(context: HttpContextContract) {
     const payload = await context.request.validate(CreateStatusValidator);
 
-    const result = await this.statusesService.create(payload);
+    const result = await this.dynamicService.create('Status', payload);
 
     const headers = utils.getHeaders();
 
@@ -22,7 +22,7 @@ export default class StatusesController {
   public async update(context: HttpContextContract) {
     const payload = await context.request.validate(UpdateStatusValidator);
 
-    const result = await this.statusesService.update(payload);
+    const result = await this.dynamicService.update('Status', payload);
 
     const headers = utils.getHeaders();
 
@@ -34,7 +34,7 @@ export default class StatusesController {
   public async search(context: HttpContextContract) {
     const payload = await context.request.validate(QueryModelValidator);
 
-    const result = await this.statusesService.search(payload);
+    const result = await this.dynamicService.search('Status', payload);
 
     const headers = utils.getHeaders();
 

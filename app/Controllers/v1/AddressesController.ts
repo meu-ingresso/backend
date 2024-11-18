@@ -1,15 +1,15 @@
 import { HttpContextContract } from '@ioc:Adonis/Core/HttpContext';
-import AddressService from 'App/Services/v1/AddressesService';
 import { CreateAddressValidator, UpdateAddressValidator } from 'App/Validators/v1/AddressesValidator';
+import DynamicService from 'App/Services/v1/DynamicService';
 import utils from 'Utils/utils';
 
 export default class AddressesController {
-  private addressService: AddressService = new AddressService();
+  private dynamicService: DynamicService = new DynamicService();
 
   public async create(context: HttpContextContract) {
     const payload = await context.request.validate(CreateAddressValidator);
 
-    const result = await this.addressService.create(payload);
+    const result = await this.dynamicService.create('Address', payload);
 
     const headers = utils.getHeaders();
 
@@ -21,9 +21,7 @@ export default class AddressesController {
   public async update(context: HttpContextContract) {
     const payload = await context.request.validate(UpdateAddressValidator);
 
-    const result = await this.addressService.update(payload);
-
-    // utils.createAudity(context.auth.user?.$attributes.id, 'address', 'update', result.id, null, payload);
+    const result = await this.dynamicService.update('Address', payload);
 
     const headers = utils.getHeaders();
 
@@ -35,7 +33,7 @@ export default class AddressesController {
   public async search(context: HttpContextContract) {
     const query = context.request.qs();
 
-    const result = await this.addressService.search(query);
+    const result = await this.dynamicService.search('Address', query);
 
     const headers = utils.getHeaders();
     const body = utils.getBody('SEARCH_SUCCESS', result);

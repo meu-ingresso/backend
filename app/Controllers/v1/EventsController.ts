@@ -1,16 +1,16 @@
 import { HttpContextContract } from '@ioc:Adonis/Core/HttpContext';
-import EventsService from 'App/Services/v1/EventsService';
-import { CreateEventValidator, UpdateEventValidator } from 'App/Validators/v1/EventsValidator';
 import QueryModelValidator from 'App/Validators/v1/QueryModelValidator';
+import { CreateEventValidator, UpdateEventValidator } from 'App/Validators/v1/EventsValidator';
+import DynamicService from 'App/Services/v1/DynamicService';
 import utils from 'Utils/utils';
 
 export default class EventsController {
-  private eventsService: EventsService = new EventsService();
+  private dynamicService: DynamicService = new DynamicService();
 
   public async create(context: HttpContextContract) {
     const payload = await context.request.validate(CreateEventValidator);
 
-    const result = await this.eventsService.create(payload);
+    const result = await this.dynamicService.create('Event', payload);
 
     const headers = utils.getHeaders();
 
@@ -22,7 +22,7 @@ export default class EventsController {
   public async update(context: HttpContextContract) {
     const payload = await context.request.validate(UpdateEventValidator);
 
-    const result = await this.eventsService.update(payload);
+    const result = await this.dynamicService.update('Event', payload);
 
     const headers = utils.getHeaders();
 
@@ -34,7 +34,7 @@ export default class EventsController {
   public async search(context: HttpContextContract) {
     const payload = await context.request.validate(QueryModelValidator);
 
-    const result = await this.eventsService.search(payload);
+    const result = await this.dynamicService.search('Event', payload);
 
     const headers = utils.getHeaders();
 

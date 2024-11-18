@@ -1,19 +1,19 @@
 import { HttpContextContract } from '@ioc:Adonis/Core/HttpContext';
-import RolePermissionService from 'App/Services/v1/RolePermissionsService';
+import QueryModelValidator from 'App/Validators/v1/QueryModelValidator';
 import {
   CreateRolePermissionValidator,
   UpdateRolePermissionValidator,
 } from 'App/Validators/v1/RolePermissionsValidator';
-import QueryModelValidator from 'App/Validators/v1/QueryModelValidator';
+import DynamicService from 'App/Services/v1/DynamicService';
 import utils from 'Utils/utils';
 
 export default class RolePermissionsController {
-  private rolePermissionService: RolePermissionService = new RolePermissionService();
+  private dynamicService: DynamicService = new DynamicService();
 
   public async create(context: HttpContextContract) {
     const payload = await context.request.validate(CreateRolePermissionValidator);
 
-    const result = await this.rolePermissionService.create(payload);
+    const result = await this.dynamicService.create('RolePermission', payload);
 
     const headers = utils.getHeaders();
 
@@ -25,7 +25,7 @@ export default class RolePermissionsController {
   public async update(context: HttpContextContract) {
     const payload = await context.request.validate(UpdateRolePermissionValidator);
 
-    const result = await this.rolePermissionService.update(payload);
+    const result = await this.dynamicService.update('RolePermission', payload);
 
     const headers = utils.getHeaders();
 
@@ -37,7 +37,7 @@ export default class RolePermissionsController {
   public async search(context: HttpContextContract) {
     const payload = await context.request.validate(QueryModelValidator);
 
-    const result = await this.rolePermissionService.search(payload);
+    const result = await this.dynamicService.search('RolePermission', payload);
 
     const headers = utils.getHeaders();
 

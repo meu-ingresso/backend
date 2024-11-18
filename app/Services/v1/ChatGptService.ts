@@ -1,6 +1,5 @@
 import { Configuration, OpenAIApi } from 'openai';
 import Env from '@ioc:Adonis/Core/Env';
-import utils from 'Utils/utils';
 
 export default class ChatGptService {
   private openai: OpenAIApi;
@@ -15,8 +14,6 @@ export default class ChatGptService {
 
   public async create(userId: number, data: any): Promise<any> {
     try {
-      utils.createAudity(userId, 'openai', 'create', JSON.stringify(data));
-
       const chatCompletions = await this.openai.createChatCompletion({
         model: 'gpt-4',
         messages: data.messages,
@@ -31,12 +28,8 @@ export default class ChatGptService {
       ) {
         const responseMessage = chatCompletions.data.choices[0].message;
 
-        utils.createAudity(userId, 'openai', 'result-success', JSON.stringify(responseMessage?.content));
-
         return responseMessage?.content;
       }
-
-      utils.createAudity(userId, 'openai', 'result-error', JSON.stringify(chatCompletions));
 
       return '';
     } catch (err) {

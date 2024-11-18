@@ -1,16 +1,16 @@
 import { HttpContextContract } from '@ioc:Adonis/Core/HttpContext';
-import PeopleService from 'App/Services/v1/PeopleService';
-import { CreatePersonValidator, UpdatePersonValidator } from 'App/Validators/v1/PeopleValidator';
 import QueryModelValidator from 'App/Validators/v1/QueryModelValidator';
+import { CreatePersonValidator, UpdatePersonValidator } from 'App/Validators/v1/PeopleValidator';
+import DynamicService from 'App/Services/v1/DynamicService';
 import utils from 'Utils/utils';
 
 export default class PeopleController {
-  private peopleService: PeopleService = new PeopleService();
+  private dynamicService: DynamicService = new DynamicService();
 
   public async create(context: HttpContextContract) {
     const payload = await context.request.validate(CreatePersonValidator);
 
-    const result = await this.peopleService.create(payload);
+    const result = await this.dynamicService.create('People', payload);
 
     const headers = utils.getHeaders();
 
@@ -25,7 +25,7 @@ export default class PeopleController {
 
     console.log('PeopleController.payload', payload);
 
-    const result = await this.peopleService.update(payload);
+    const result = await this.dynamicService.update('People', payload);
 
     console.log('PeopleController.result', result);
 
@@ -39,7 +39,7 @@ export default class PeopleController {
   public async search(context: HttpContextContract) {
     const payload = await context.request.validate(QueryModelValidator);
 
-    const result = await this.peopleService.search(payload);
+    const result = await this.dynamicService.search('People', payload);
 
     const headers = utils.getHeaders();
 

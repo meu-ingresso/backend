@@ -1,16 +1,16 @@
 import { HttpContextContract } from '@ioc:Adonis/Core/HttpContext';
 import QueryModelValidator from 'App/Validators/v1/QueryModelValidator';
-import { CreateRoleValidator, UpdateRoleValidator } from 'App/Validators/v1/RolesValidator';
+import { CreateTicketValidator, UpdateTicketValidator } from 'App/Validators/v1/TicketsValidator';
 import DynamicService from 'App/Services/v1/DynamicService';
 import utils from 'Utils/utils';
 
-export default class RolesController {
+export default class TicketsController {
   private dynamicService: DynamicService = new DynamicService();
 
   public async create(context: HttpContextContract) {
-    const payload = await context.request.validate(CreateRoleValidator);
+    const payload = await context.request.validate(CreateTicketValidator);
 
-    const result = await this.dynamicService.create('Role', payload);
+    const result = await this.dynamicService.create('Ticket', payload);
 
     const headers = utils.getHeaders();
 
@@ -20,9 +20,9 @@ export default class RolesController {
   }
 
   public async update(context: HttpContextContract) {
-    const payload = await context.request.validate(UpdateRoleValidator);
+    const payload = await context.request.validate(UpdateTicketValidator);
 
-    const result = await this.dynamicService.update('Role', payload);
+    const result = await this.dynamicService.update('Ticket', payload);
 
     const headers = utils.getHeaders();
 
@@ -34,7 +34,7 @@ export default class RolesController {
   public async search(context: HttpContextContract) {
     const payload = await context.request.validate(QueryModelValidator);
 
-    const result = await this.dynamicService.search('Role', payload);
+    const result = await this.dynamicService.search('Ticket', payload);
 
     const headers = utils.getHeaders();
 

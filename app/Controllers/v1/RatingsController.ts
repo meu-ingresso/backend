@@ -1,16 +1,16 @@
 import { HttpContextContract } from '@ioc:Adonis/Core/HttpContext';
-import RatingsService from 'App/Services/v1/RatingsService';
-import { CreateRatingValidator, UpdateRatingValidator } from 'App/Validators/v1/RatingsValidator';
 import QueryModelValidator from 'App/Validators/v1/QueryModelValidator';
+import { CreateRatingValidator, UpdateRatingValidator } from 'App/Validators/v1/RatingsValidator';
+import DynamicService from 'App/Services/v1/DynamicService';
 import utils from 'Utils/utils';
 
 export default class RatingsController {
-  private ratingsService: RatingsService = new RatingsService();
+  private dynamicService: DynamicService = new DynamicService();
 
   public async create(context: HttpContextContract) {
     const payload = await context.request.validate(CreateRatingValidator);
 
-    const result = await this.ratingsService.create(payload);
+    const result = await this.dynamicService.create('Rating', payload);
 
     const headers = utils.getHeaders();
 
@@ -22,7 +22,7 @@ export default class RatingsController {
   public async update(context: HttpContextContract) {
     const payload = await context.request.validate(UpdateRatingValidator);
 
-    const result = await this.ratingsService.update(payload);
+    const result = await this.dynamicService.update('Rating', payload);
 
     const headers = utils.getHeaders();
 
@@ -34,7 +34,7 @@ export default class RatingsController {
   public async search(context: HttpContextContract) {
     const payload = await context.request.validate(QueryModelValidator);
 
-    const result = await this.ratingsService.search(payload);
+    const result = await this.dynamicService.search('Rating', payload);
 
     const headers = utils.getHeaders();
 

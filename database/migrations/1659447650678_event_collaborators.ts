@@ -8,7 +8,7 @@ export default class EventCollaboratorsSchema extends BaseSchema {
       table.uuid('id').primary();
       table.uuid('event_id').notNullable().references('id').inTable('events').onDelete('CASCADE');
       table.uuid('user_id').notNullable().references('id').inTable('users').onDelete('CASCADE');
-      table.string('role', 50).notNullable();
+      table.uuid('role_id').notNullable().references('id').inTable('roles').onDelete('CASCADE');
       table.timestamp('created_at', { useTz: true }).defaultTo(this.now());
       table.timestamp('updated_at', { useTz: true }).defaultTo(this.now());
     });

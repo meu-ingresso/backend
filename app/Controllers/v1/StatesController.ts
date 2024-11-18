@@ -1,15 +1,15 @@
 import { HttpContextContract } from '@ioc:Adonis/Core/HttpContext';
-import StatesService from 'App/Services/v1/StatesService';
+import DynamicService from 'App/Services/v1/DynamicService';
 import { CreateStateValidator, UpdateStateValidator } from 'App/Validators/v1/StatesValidator';
 import utils from 'Utils/utils';
 
 export default class AddressesController {
-  private statesService: StatesService = new StatesService();
+  private dynamicService: DynamicService = new DynamicService();
 
   public async create(context: HttpContextContract) {
     const payload = await context.request.validate(CreateStateValidator);
 
-    const result = await this.statesService.create(payload);
+    const result = await this.dynamicService.create('State', payload);
 
     const headers = utils.getHeaders();
 
@@ -21,7 +21,7 @@ export default class AddressesController {
   public async update(context: HttpContextContract) {
     const payload = await context.request.validate(UpdateStateValidator);
 
-    const result = await this.statesService.update(payload);
+    const result = await this.dynamicService.update('State', payload);
 
     const headers = utils.getHeaders();
 
@@ -33,7 +33,7 @@ export default class AddressesController {
   public async search(context: HttpContextContract) {
     const query = context.request.qs();
 
-    const result = await this.statesService.search(query);
+    const result = await this.dynamicService.search('State', query);
 
     const headers = utils.getHeaders();
     const body = utils.getBody('SEARCH_SUCCESS', result);
