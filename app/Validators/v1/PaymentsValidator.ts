@@ -2,7 +2,7 @@ import { schema, rules } from '@ioc:Adonis/Core/Validator';
 import { HttpContextContract } from '@ioc:Adonis/Core/HttpContext';
 import ReportHandler from './Reporters/ReportHandler';
 
-export default class CreatePaymentValidator {
+class CreatePaymentValidator {
   constructor(protected context: HttpContextContract) {}
 
   public reporter = ReportHandler;
@@ -16,10 +16,20 @@ export default class CreatePaymentValidator {
     paid_at: schema.date.optional(),
   });
 
-  public messages = {};
+  public messages = {
+    'user_id.required': 'O campo user_id é obrigatório.',
+    'user_id.exists': 'O usuário especificado não existe.',
+    'status_id.required': 'O campo status_id é obrigatório.',
+    'status_id.exists': 'O status especificado não existe.',
+    'payment_method.required': 'O campo método de pagamento é obrigatório.',
+    'gross_value.required': 'O campo valor bruto é obrigatório.',
+    'gross_value.number': 'O valor bruto deve ser um número válido.',
+    'net_value.number': 'O valor líquido deve ser um número válido.',
+    'paid_at.date': 'A data de pagamento deve ser uma data válida.',
+  };
 }
 
-export class UpdatePaymentValidator {
+class UpdatePaymentValidator {
   constructor(protected context: HttpContextContract) {}
 
   public reporter = ReportHandler;
@@ -34,5 +44,15 @@ export class UpdatePaymentValidator {
     paid_at: schema.date.optional(),
   });
 
-  public messages = {};
+  public messages = {
+    'id.required': 'O campo id é obrigatório.',
+    'user_id.exists': 'O usuário especificado não existe.',
+    'status_id.exists': 'O status especificado não existe.',
+    'payment_method.string': 'O método de pagamento deve ser um texto válido.',
+    'gross_value.number': 'O valor bruto deve ser um número válido.',
+    'net_value.number': 'O valor líquido deve ser um número válido.',
+    'paid_at.date': 'A data de pagamento deve ser uma data válida.',
+  };
 }
+
+export { CreatePaymentValidator, UpdatePaymentValidator };

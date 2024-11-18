@@ -2,7 +2,7 @@ import { schema } from '@ioc:Adonis/Core/Validator';
 import { HttpContextContract } from '@ioc:Adonis/Core/HttpContext';
 import ReportHandler from './Reporters/ReportHandler';
 
-export default class CreateParameterValidator {
+class CreateParameterValidator {
   constructor(protected context: HttpContextContract) {}
 
   public reporter = ReportHandler;
@@ -13,10 +13,15 @@ export default class CreateParameterValidator {
     description: schema.string.optional(),
   });
 
-  public messages = {};
+  public messages = {
+    'key.required': 'O campo "key" é obrigatório.',
+    'key.string': 'O campo "key" deve ser um texto válido.',
+    'value.string': 'O campo "value" deve ser um texto válido.',
+    'description.string': 'O campo "description" deve ser um texto válido.',
+  };
 }
 
-export class UpdateParameterValidator {
+class UpdateParameterValidator {
   constructor(protected context: HttpContextContract) {}
 
   public reporter = ReportHandler;
@@ -28,5 +33,13 @@ export class UpdateParameterValidator {
     description: schema.string.optional(),
   });
 
-  public messages = {};
+  public messages = {
+    'id.required': 'O campo "id" é obrigatório.',
+    'id.string': 'O campo "id" deve ser um texto válido.',
+    'key.string': 'O campo "key" deve ser um texto válido.',
+    'value.string': 'O campo "value" deve ser um texto válido.',
+    'description.string': 'O campo "description" deve ser um texto válido.',
+  };
 }
+
+export { CreateParameterValidator, UpdateParameterValidator };

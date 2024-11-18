@@ -63,6 +63,22 @@ Route.group(() => {
   Route.post('/ticket', 'v1/TicketsController.create');
   Route.patch('/ticket', 'v1/TicketsController.update');
 
+  Route.get('/coupons', 'v1/CouponsController.search');
+  Route.post('/coupon', 'v1/CouponsController.create');
+  Route.patch('/coupon', 'v1/CouponsController.update');
+
+  Route.get('/customer-tickets', 'v1/CustomerTicketsController.search');
+  Route.post('/customer-ticket', 'v1/CustomerTicketsController.create');
+  Route.patch('/customer-ticket', 'v1/CustomerTicketsController.update');
+
+  Route.get('/payments', 'v1/PaymentsController.search');
+  Route.post('/payment', 'v1/PaymentsController.create');
+  Route.patch('/payment', 'v1/PaymentsController.update');
+
+  Route.get('/parameters', 'v1/ParametersController.search');
+  Route.post('/parameter', 'v1/ParametersController.create');
+  Route.patch('/parameter', 'v1/ParametersController.update');
+
   // ROTAS COM AUTENTICAÇÃO
   Route.group(() => {
     Route.get('/logout', 'v1/AuthController.logout');

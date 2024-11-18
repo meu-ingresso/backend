@@ -11,7 +11,7 @@ class CreateCustomerTicketValidator {
     ticket_id: schema.string({}, [rules.exists({ table: 'tickets', column: 'id' })]),
     current_owner_id: schema.string({}, [rules.exists({ table: 'people', column: 'id' })]),
     previous_owner_id: schema.string.optional({}, [rules.exists({ table: 'people', column: 'id' })]),
-    status: schema.string({}, [rules.exists({ table: 'status', column: 'id' })]),
+    status_id: schema.string({}, [rules.exists({ table: 'status', column: 'id' })]),
     validated_by: schema.string.optional({}, [rules.exists({ table: 'users', column: 'id' })]),
     validated_at: schema.date.optional(),
   });
@@ -22,8 +22,8 @@ class CreateCustomerTicketValidator {
     'current_owner_id.required': 'O ID do proprietário atual é obrigatório.',
     'current_owner_id.exists': 'O proprietário atual fornecido não existe.',
     'previous_owner_id.exists': 'O proprietário anterior fornecido não existe.',
-    'status.required': 'O status é obrigatório.',
-    'status.exists': 'O status fornecido não existe.',
+    'status_id.required': 'O status é obrigatório.',
+    'status_id.exists': 'O status fornecido não existe.',
     'validated_by.exists': 'O validador fornecido não existe.',
   };
 }
@@ -38,7 +38,7 @@ class UpdateCustomerTicketValidator {
     ticket_id: schema.string.optional({}, [rules.exists({ table: 'tickets', column: 'id' })]),
     current_owner_id: schema.string.optional({}, [rules.exists({ table: 'people', column: 'id' })]),
     previous_owner_id: schema.string.optional({}, [rules.exists({ table: 'people', column: 'id' })]),
-    status: schema.string.optional({}, [rules.exists({ table: 'status', column: 'id' })]),
+    status_id: schema.string.optional({}, [rules.exists({ table: 'status', column: 'id' })]),
     validated_by: schema.string.optional({}, [rules.exists({ table: 'users', column: 'id' })]),
     validated_at: schema.date.optional(),
   });
@@ -49,7 +49,7 @@ class UpdateCustomerTicketValidator {
     'ticket_id.exists': 'O ingresso fornecido não existe.',
     'current_owner_id.exists': 'O proprietário atual fornecido não existe.',
     'previous_owner_id.exists': 'O proprietário anterior fornecido não existe.',
-    'status.exists': 'O status fornecido não existe.',
+    'status_id.exists': 'O status fornecido não existe.',
     'validated_by.exists': 'O validador fornecido não existe.',
   };
 }
