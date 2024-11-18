@@ -32,16 +32,6 @@ export default class CustomerTicketService {
     return ticket;
   }
 
-  public async delete(id: string): Promise<void> {
-    const ticket = await CustomerTicket.findOrFail(id);
-
-    await Database.transaction(async (trx) => {
-      ticket.useTransaction(trx);
-
-      await ticket.delete();
-    });
-  }
-
   public async search(query?: any): Promise<{ meta?: any; data: ModelObject[] }> {
     return this.dataAccessService.search(query);
   }

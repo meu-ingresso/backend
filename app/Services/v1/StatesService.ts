@@ -32,16 +32,6 @@ export default class StateService {
     return state;
   }
 
-  public async delete(id: string): Promise<void> {
-    const state = await State.findOrFail(id);
-
-    await Database.transaction(async (trx) => {
-      state.useTransaction(trx);
-
-      await state.delete();
-    });
-  }
-
   public async search(query?: any): Promise<{ meta?: any; data: ModelObject[] }> {
     return this.dataAccessService.search(query);
   }

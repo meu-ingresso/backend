@@ -8,8 +8,9 @@ export default class PeopleSchema extends BaseSchema {
       table.uuid('id').primary();
       table.string('first_name', 100).notNullable();
       table.string('last_name', 100).notNullable();
+      table.string('person_type', 50).notNullable();
       table.string('tax', 20).nullable();
-      table.date('birth_date').notNullable();
+      table.date('birth_date').nullable();
       table.string('phone', 50).nullable();
       table.string('email', 254).notNullable().unique();
       table.timestamp('created_at', { useTz: true }).defaultTo(this.now());

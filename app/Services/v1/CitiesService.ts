@@ -32,16 +32,6 @@ export default class CityService {
     return city;
   }
 
-  public async delete(id: string): Promise<void> {
-    const city = await City.findOrFail(id);
-
-    await Database.transaction(async (trx) => {
-      city.useTransaction(trx);
-
-      await city.delete();
-    });
-  }
-
   public async search(query?: any): Promise<{ meta?: any; data: ModelObject[] }> {
     return this.dataAccessService.search(query);
   }

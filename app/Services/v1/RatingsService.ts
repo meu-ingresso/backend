@@ -32,16 +32,6 @@ export default class RatingService {
     return rating;
   }
 
-  public async delete(id: string): Promise<void> {
-    const rating = await Rating.findOrFail(id);
-
-    await Database.transaction(async (trx) => {
-      rating.useTransaction(trx);
-
-      await rating.delete();
-    });
-  }
-
   public async search(query?: any): Promise<{ meta?: any; data: ModelObject[] }> {
     return this.dataAccessService.search(query);
   }

@@ -32,16 +32,6 @@ export default class CategoryService {
     return category;
   }
 
-  public async delete(id: string): Promise<void> {
-    const category = await Category.findOrFail(id);
-
-    await Database.transaction(async (trx) => {
-      category.useTransaction(trx);
-
-      await category.delete();
-    });
-  }
-
   public async search(query?: any): Promise<{ meta?: any; data: ModelObject[] }> {
     return this.dataAccessService.search(query);
   }

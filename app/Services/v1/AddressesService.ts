@@ -32,16 +32,6 @@ export default class AddressService {
     return address;
   }
 
-  public async delete(id: string): Promise<void> {
-    const address = await Address.findOrFail(id);
-
-    await Database.transaction(async (trx) => {
-      address.useTransaction(trx);
-
-      await address.delete();
-    });
-  }
-
   public async search(query?: any): Promise<{ meta?: any; data: ModelObject[] }> {
     return this.dataAccessService.search(query);
   }

@@ -32,16 +32,6 @@ export default class RoleService {
     return role;
   }
 
-  public async delete(id: string): Promise<void> {
-    const role = await Role.findOrFail(id);
-
-    await Database.transaction(async (trx) => {
-      role.useTransaction(trx);
-
-      await role.delete();
-    });
-  }
-
   public async search(query?: any): Promise<{ meta?: any; data: ModelObject[] }> {
     return this.dataAccessService.search(query);
   }

@@ -32,16 +32,6 @@ export default class StatusService {
     return status;
   }
 
-  public async delete(id: string): Promise<void> {
-    const status = await Status.findOrFail(id);
-
-    await Database.transaction(async (trx) => {
-      status.useTransaction(trx);
-
-      await status.delete();
-    });
-  }
-
   public async search(query?: any): Promise<{ meta?: any; data: ModelObject[] }> {
     return this.dataAccessService.search(query);
   }

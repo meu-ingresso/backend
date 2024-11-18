@@ -18,12 +18,14 @@ export default class RoleService {
     return role_permission;
   }
 
-  public async update(record: Record<string, any>): Promise<RolePermission> {
-    let role_permission: RolePermission = await RolePermission.findOrFail(record.id);
+  public async update(record: Record<string, any>): Promise<RolePermission | any> {
+    const rolePermission = await RolePermission.find(record.id);
 
-    await RolePermission.query().where('id', record.id).delete();
+    if (!rolePermission) {
+      return null;
+    }
 
-    return role_permission;
+    return RolePermission.query().where('id', record.id).delete();
   }
 
   public async search(query?: any): Promise<{ meta?: any; data: ModelObject[] }> {

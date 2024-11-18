@@ -32,16 +32,6 @@ export default class EventCollaboratorService {
     return collaborator;
   }
 
-  public async delete(id: string): Promise<void> {
-    const collaborator = await EventCollaborator.findOrFail(id);
-
-    await Database.transaction(async (trx) => {
-      collaborator.useTransaction(trx);
-
-      await collaborator.delete();
-    });
-  }
-
   public async search(query?: any): Promise<{ meta?: any; data: ModelObject[] }> {
     return this.dataAccessService.search(query);
   }

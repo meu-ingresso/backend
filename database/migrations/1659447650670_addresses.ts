@@ -13,7 +13,6 @@ export default class AddressesSchema extends BaseSchema {
       table.string('neighborhood', 255).notNullable();
       table.decimal('latitude', 10, 8).nullable();
       table.decimal('longitude', 11, 8).nullable();
-      table.uuid('state_id').notNullable().references('id').inTable('states').onDelete('CASCADE');
       table.uuid('city_id').notNullable().references('id').inTable('cities').onDelete('CASCADE');
       table.timestamp('created_at', { useTz: true }).defaultTo(this.now());
     });

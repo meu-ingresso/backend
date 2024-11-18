@@ -2,7 +2,7 @@ import { DateTime } from 'luxon';
 import { v4 as uuidv4 } from 'uuid';
 import { BaseModel, column, beforeCreate, belongsTo, BelongsTo, hasMany, HasMany } from '@ioc:Adonis/Lucid/Orm';
 import Roles from './Roles';
-import ApiTokens from './ApiTokens';
+import Tokens from './Tokens';
 import Events from './Events';
 
 export default class Users extends BaseModel {
@@ -35,10 +35,10 @@ export default class Users extends BaseModel {
   })
   public role: BelongsTo<typeof Roles>;
 
-  @hasMany(() => ApiTokens, {
+  @hasMany(() => Tokens, {
     foreignKey: 'user_id',
   })
-  public apiTokens: HasMany<typeof ApiTokens>;
+  public tokens: HasMany<typeof Tokens>;
 
   @hasMany(() => Events, {
     foreignKey: 'promoter_id',

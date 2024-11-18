@@ -32,16 +32,6 @@ export default class EventFeeService {
     return fee;
   }
 
-  public async delete(id: string): Promise<void> {
-    const fee = await EventFee.findOrFail(id);
-
-    await Database.transaction(async (trx) => {
-      fee.useTransaction(trx);
-
-      await fee.delete();
-    });
-  }
-
   public async search(query?: any): Promise<{ meta?: any; data: ModelObject[] }> {
     return this.dataAccessService.search(query);
   }

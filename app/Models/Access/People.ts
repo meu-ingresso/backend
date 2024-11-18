@@ -15,6 +15,9 @@ export default class People extends BaseModel {
   @column()
   public tax: string | null;
 
+  @column()
+  public person_type: string | null;
+
   @column.date()
   public birth_date: DateTime;
 

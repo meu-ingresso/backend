@@ -32,16 +32,6 @@ export default class PaymentService {
     return payment;
   }
 
-  public async delete(id: string): Promise<void> {
-    const payment = await Payment.findOrFail(id);
-
-    await Database.transaction(async (trx) => {
-      payment.useTransaction(trx);
-
-      await payment.delete();
-    });
-  }
-
   public async search(query?: any): Promise<{ meta?: any; data: ModelObject[] }> {
     return this.dataAccessService.search(query);
   }

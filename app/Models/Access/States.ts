@@ -2,7 +2,6 @@ import { DateTime } from 'luxon';
 import { v4 as uuidv4 } from 'uuid';
 import { BaseModel, column, beforeCreate, hasMany, HasMany } from '@ioc:Adonis/Lucid/Orm';
 import Cities from './Cities';
-import Addresses from './Addresses';
 
 export default class States extends BaseModel {
   @column({ isPrimary: true })
@@ -21,11 +20,6 @@ export default class States extends BaseModel {
     foreignKey: 'state_id',
   })
   public cities: HasMany<typeof Cities>;
-
-  @hasMany(() => Addresses, {
-    foreignKey: 'state_id',
-  })
-  public addresses: HasMany<typeof Addresses>;
 
   @beforeCreate()
   public static assignUuid(state: States) {

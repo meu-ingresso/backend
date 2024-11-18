@@ -1,82 +1,56 @@
 import { HttpContextContract } from '@ioc:Adonis/Core/HttpContext';
 import LoginService from 'App/Services/v1/AuthService';
-import RolePermissionService from 'App/Services/v1/RolePermissionService';
 import AuthValidator from 'App/Validators/v1/AuthValidator';
 import utils from 'Utils/utils';
 
-export default class LoginController {
-  public loginService = new LoginService();
-  public rolePermissionService = new RolePermissionService();
+export default class AuthController {
+  private loginService: LoginService = new LoginService();
 
   public async login(context: HttpContextContract) {
     const payload = await context.request.validate(AuthValidator);
 
     const auth = await this.loginService.login(payload);
 
-    const sellers = [];
-
-    auth.groupMainUser.forEach((element) => {
-      // @ts-ignore
-      sellers.push({ id: element.user.id, id_erp: element.user.id_erp });
-    });
-
     if (!auth) {
-      const failedBody = utils.getBody('LOGOUT_FAILED', { message: 'Invalid credentials' });
+      const headers = utils.getHeaders();
 
-      return context.response.status(400).send(failedBody);
+      const body = utils.getBody('LOGIN_FAILURE', null);
+
+      return utils.getResponse(context, 401, headers, body);
     }
 
-    const getPermissions = await this.rolePermissionService.getByRoleId(auth.role_id);
-
-    const cleanedPermissions = getPermissions.map((item) => {
-      const newItem = {
-        module_name: item.permission.module_name,
-        module_prefix: item.permission.module_prefix,
-      };
-      return newItem;
-    });
-
-    const data = {
-      name: auth.first_name + ' ' + auth.last_name,
-      cellphone: auth.cellphone,
-      email: auth.email,
-      is_active: auth.is_active,
-      role_id: auth.role_id,
-      role: auth.role.name,
-      id_erp: auth.id_erp,
-      sellers: sellers,
-      permissions: cleanedPermissions,
-    };
-
-    await this.loginService.removeApiTokens(auth.id);
-
-    const expiresIn = 604800000;
+    const expiresIn = 302400000;
 
     const token = await context.auth.use('api').generate(auth, { expiresIn });
 
-    utils.createAudity(auth.id, 'auth', 'login', 'User logged in');
+    utils.createAudity(auth.id, 'auth', 'login', auth.id);
 
-    const body = utils.getBody('LOGIN_SUCCESS', { ...token.toJSON(), payload: { id: auth.id, ...data } });
+    const headers = utils.getHeaders();
 
-    context.response.status(200).send(body);
+    const body = utils.getBody('LOGIN_SUCCESS', { auth, token });
+
+    utils.getResponse(context, 200, headers, body);
   }
 
   public async logout(context: HttpContextContract) {
-    const headers = utils.getHeaders();
+    const userId = context.auth.user?.$attributes.id;
 
-    if (!context.request.header('Authorization')) {
-      const failedBody = utils.getBody('LOGOUT_FAILED', { message: 'Invalid credentials', revoked: false });
+    if (!userId) {
+      const headers = utils.getHeaders();
 
-      return utils.getResponse(context, 400, headers, failedBody);
+      const body = utils.getBody('LOGOUT_FAILURE', { message: 'Invalid credentials', revoked: false });
+
+      return utils.getResponse(context, 401, headers, body);
     }
 
-    utils.createAudity(context.auth.user?.$attributes.id, 'auth', 'logout', 'User logged out');
+    utils.createAudity(userId, 'auth', 'logout', userId, { revoked: true }, { revoked: false });
 
-    await this.loginService.removeApiTokens(context.auth.user?.$attributes.id);
+    await this.loginService.removeExpiredTokens(userId);
 
     await context.auth.use('api').revoke();
 
-    const body = utils.getBody('LOGOUT_SUCCESS', { revoked: true });
+    const headers = utils.getHeaders();
+    const body = utils.getBody('LOGOUT_SUCCESS', null);
 
     utils.getResponse(context, 200, headers, body);
   }

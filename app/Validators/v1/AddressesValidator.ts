@@ -2,7 +2,7 @@ import { schema, rules } from '@ioc:Adonis/Core/Validator';
 import { HttpContextContract } from '@ioc:Adonis/Core/HttpContext';
 import ReportHandler from './Reporters/ReportHandler';
 
-export default class CreateAddressValidator {
+class CreateAddressValidator {
   constructor(protected context: HttpContextContract) {}
 
   public reporter = ReportHandler;
@@ -15,14 +15,21 @@ export default class CreateAddressValidator {
     neighborhood: schema.string(),
     latitude: schema.number.optional(),
     longitude: schema.number.optional(),
-    state_id: schema.string({}, [rules.exists({ table: 'states', column: 'id' })]),
     city_id: schema.string({}, [rules.exists({ table: 'cities', column: 'id' })]),
   });
 
-  public messages = {};
+  public messages = {
+    'street.required': 'O campo "street" é obrigatório.',
+    'zipcode.required': 'O campo "zipcode" é obrigatório.',
+    'neighborhood.required': 'O campo "neighborhood" é obrigatório.',
+    'city_id.required': 'O campo "city_id" é obrigatório.',
+    'city_id.exists': 'O "city_id" informado não existe na tabela de cidades.',
+    'latitude.number': 'O campo "latitude" deve ser um número válido.',
+    'longitude.number': 'O campo "longitude" deve ser um número válido.',
+  };
 }
 
-export class UpdateAddressValidator {
+class UpdateAddressValidator {
   constructor(protected context: HttpContextContract) {}
 
   public reporter = ReportHandler;
@@ -36,9 +43,15 @@ export class UpdateAddressValidator {
     neighborhood: schema.string.optional(),
     latitude: schema.number.optional(),
     longitude: schema.number.optional(),
-    state_id: schema.string.optional({}, [rules.exists({ table: 'states', column: 'id' })]),
     city_id: schema.string.optional({}, [rules.exists({ table: 'cities', column: 'id' })]),
   });
 
-  public messages = {};
+  public messages = {
+    'id.required': 'O campo "id" é obrigatório.',
+    'city_id.exists': 'O "city_id" informado não existe na tabela de cidades.',
+    'latitude.number': 'O campo "latitude" deve ser um número válido.',
+    'longitude.number': 'O campo "longitude" deve ser um número válido.',
+  };
 }
+
+export { CreateAddressValidator, UpdateAddressValidator };

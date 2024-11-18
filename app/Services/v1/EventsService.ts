@@ -32,16 +32,6 @@ export default class EventService {
     return event;
   }
 
-  public async delete(id: string): Promise<void> {
-    const event = await Event.findOrFail(id);
-
-    await Database.transaction(async (trx) => {
-      event.useTransaction(trx);
-
-      await event.delete();
-    });
-  }
-
   public async search(query?: any): Promise<{ meta?: any; data: ModelObject[] }> {
     return this.dataAccessService.search(query);
   }

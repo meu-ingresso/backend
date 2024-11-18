@@ -1,6 +1,6 @@
 import LoginRequest from 'App/Models/Transfer/LoginRequest';
 import User from 'App/Models/Access/Users';
-import ApiTokens from 'App/Models/Access/ApiTokens';
+import ApiTokens from 'App/Models/Access/Tokens';
 import Hash from '@ioc:Adonis/Core/Hash';
 import { DateTime } from 'luxon';
 

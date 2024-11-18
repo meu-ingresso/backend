@@ -32,16 +32,6 @@ export default class PermissionService {
     return permission;
   }
 
-  public async delete(id: string): Promise<void> {
-    const permission = await Permission.findOrFail(id);
-
-    await Database.transaction(async (trx) => {
-      permission.useTransaction(trx);
-
-      await permission.delete();
-    });
-  }
-
   public async search(query?: any): Promise<{ meta?: any; data: ModelObject[] }> {
     return this.dataAccessService.search(query);
   }

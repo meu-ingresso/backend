@@ -32,16 +32,6 @@ export default class ParameterService {
     return parameter;
   }
 
-  public async delete(id: string): Promise<void> {
-    const parameter = await Parameter.findOrFail(id);
-
-    await Database.transaction(async (trx) => {
-      parameter.useTransaction(trx);
-
-      await parameter.delete();
-    });
-  }
-
   public async search(query?: any): Promise<{ meta?: any; data: ModelObject[] }> {
     return this.dataAccessService.search(query);
   }

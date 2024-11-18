@@ -41,16 +41,6 @@ export default class UserService {
     return user;
   }
 
-  public async delete(id: string): Promise<void> {
-    const user = await User.findOrFail(id);
-
-    await Database.transaction(async (trx) => {
-      user.useTransaction(trx);
-
-      await user.delete();
-    });
-  }
-
   public async search(query?: any): Promise<{ meta?: any; data: ModelObject[] }> {
     return this.dataAccessService.search(query);
   }

@@ -18,30 +18,6 @@ export default class AuditLogService {
     return auditLog;
   }
 
-  public async update(record: Record<string, any>): Promise<AuditLog> {
-    const auditLog = await AuditLog.findOrFail(record.id);
-
-    await Database.transaction(async (trx) => {
-      auditLog.useTransaction(trx);
-
-      auditLog.merge({ ...record });
-
-      await auditLog.save();
-    });
-
-    return auditLog;
-  }
-
-  public async delete(id: string): Promise<void> {
-    const auditLog = await AuditLog.findOrFail(id);
-
-    await Database.transaction(async (trx) => {
-      auditLog.useTransaction(trx);
-
-      await auditLog.delete();
-    });
-  }
-
   public async search(query?: any): Promise<{ meta?: any; data: ModelObject[] }> {
     return this.dataAccessService.search(query);
   }
