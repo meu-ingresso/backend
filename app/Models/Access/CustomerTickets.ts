@@ -4,6 +4,7 @@ import { BaseModel, column, beforeCreate, afterCreate, belongsTo, BelongsTo } fr
 import Tickets from './Tickets';
 import People from './People';
 import Users from './Users';
+import Status from './Statuses';
 
 export default class CustomerTickets extends BaseModel {
   @column({ isPrimary: true })
@@ -19,7 +20,7 @@ export default class CustomerTickets extends BaseModel {
   public previous_owner_id: string | null;
 
   @column()
-  public status: string;
+  public status_id: string;
 
   @column()
   public ticket_identifier: string | null;
@@ -58,6 +59,11 @@ export default class CustomerTickets extends BaseModel {
     foreignKey: 'validated_by',
   })
   public validatedBy: BelongsTo<typeof Users>;
+
+  @belongsTo(() => Status, {
+    foreignKey: 'status_id',
+  })
+  public status: BelongsTo<typeof Status>;
 
   @beforeCreate()
   public static assignUuid(customerTicket: CustomerTickets) {
