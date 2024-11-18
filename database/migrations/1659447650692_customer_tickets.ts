@@ -7,13 +7,15 @@ export default class CustomerTicketsSchema extends BaseSchema {
     this.schema.createTable(this.tableName, (table) => {
       table.uuid('id').primary();
       table.uuid('ticket_id').notNullable().references('id').inTable('tickets').onDelete('CASCADE');
-      table.string('owner_name', 255).notNullable();
-      table.string('owner_email', 255).notNullable();
-      table.string('owner_tax', 20).nullable();
-      table.string('status', 50).defaultTo('NOT_USED');
+      table.uuid('current_owner_id').notNullable().references('id').inTable('people').onDelete('CASCADE');
+      table.uuid('previous_owner_id').nullable().references('id').inTable('people').onDelete('CASCADE');
+      table.uuid('status').notNullable().references('id').inTable('status').onDelete('CASCADE');
       table.string('ticket_identifier', 255).nullable().unique();
-      table.boolean('validated').defaultTo(false);
+      table.boolean('validated').notNullable().defaultTo(false);
+      table.uuid('validated_by').nullable().references('id').inTable('users').onDelete('SET NULL');
       table.timestamp('validated_at', { useTz: true }).nullable();
+      table.timestamp('created_at', { useTz: true }).defaultTo(this.now());
+      table.timestamp('updated_at', { useTz: true }).defaultTo(this.now());
     });
   }
 

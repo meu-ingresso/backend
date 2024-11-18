@@ -10,7 +10,7 @@ class CreateUserValidator {
   public schema = schema.create({
     email: schema.string({}, [rules.email(), rules.unique({ table: 'users', column: 'email' })]),
     password: schema.string(),
-    role_id: schema.string(),
+    role_id: schema.string({}, [rules.exists({ table: 'roles', column: 'id' })]),
     is_active: schema.boolean(),
   });
 
