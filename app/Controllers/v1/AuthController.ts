@@ -21,7 +21,7 @@ export default class AuthController {
 
     const expiresIn = 302400000;
 
-    const token = await context.auth.use('api').generate(auth, { expiresIn });
+    const token = await context.auth.use('api').generate(auth as any, { expiresIn });
 
     utils.createAudity(auth.id, 'auth', 'login', auth.id);
 

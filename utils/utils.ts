@@ -1,9 +1,9 @@
 import HttpHeader from 'App/Models/Transfer/HttpHeader';
 import HttpBody from 'App/Models/Transfer/HttpBody';
 import { HttpContextContract } from '@ioc:Adonis/Core/HttpContext';
-import AuditLogsService from 'App/Services/v1/AuditLogsService';
+import DynamicService from 'App/Services/v1/DynamicService';
 
-const auditLogsService = new AuditLogsService();
+const dynamicService = new DynamicService();
 
 function getHeaders() {
   const headers: HttpHeader[] = [{ key: 'Content-type', value: 'application/json' }];
@@ -42,7 +42,7 @@ async function createAudity(
         new_data: new_data ? JSON.stringify(new_data) : null,
       };
 
-      await auditLogsService.create(payload);
+      await dynamicService.create('AuditLog', payload);
     } else {
       console.error('Missing User ID for Audit Log');
       console.error('Module ->', module);

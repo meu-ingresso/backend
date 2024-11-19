@@ -14,6 +14,8 @@ export default class ChatGptService {
 
   public async create(userId: number, data: any): Promise<any> {
     try {
+      console.log('UserId:', userId);
+
       const chatCompletions = await this.openai.createChatCompletion({
         model: 'gpt-4',
         messages: data.messages,
