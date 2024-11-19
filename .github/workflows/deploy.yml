@@ -29,14 +29,15 @@ jobs:
             ENVIRONMENT="staging"
             GIT_BRANCH="staging"
           else
-            echo "Branch $BRANCH not configured for deploy."
+            echo "Branch $BRANCH não configurada para deploy."
             exit 1
           fi
 
-          ssh -t -o StrictHostKeyChecking=no ubuntu@18.207.6.216 << EOF
+          ssh -o StrictHostKeyChecking=no ubuntu@18.207.6.216 << EOF
             export NVM_DIR="/home/ubuntu/.nvm"
             [ -s "\$NVM_DIR/nvm.sh" ] && \. "\$NVM_DIR/nvm.sh"
             export PATH="\$PATH:$(yarn global bin)"
+            export ENVIRONMENT=$ENVIRONMENT
             cd /home/ubuntu/Projetos/backend-\$ENVIRONMENT
             git fetch --all
             git reset --hard origin/\$GIT_BRANCH
