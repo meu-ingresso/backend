@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+      - staging
 
 jobs:
   deploy:
@@ -20,12 +21,24 @@ jobs:
 
       - name: Run Deploy Script
         run: |
-          ssh -t -o StrictHostKeyChecking=no ubuntu@18.207.6.216 << 'EOF'
+          BRANCH=${{ github.ref_name }}
+          if [ "$BRANCH" == "main" ]; then
+            ENVIRONMENT="production"
+            GIT_BRANCH="main"
+          elif [ "$BRANCH" == "staging" ]; then
+            ENVIRONMENT="staging"
+            GIT_BRANCH="staging"
+          else
+            echo "Branch $BRANCH not configured for deploy."
+            exit 1
+          fi
+
+          ssh -t -o StrictHostKeyChecking=no ubuntu@18.207.6.216 << EOF
             export NVM_DIR="/home/ubuntu/.nvm"
-            [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
-            export PATH="$PATH:$(yarn global bin)"
-            cd /home/ubuntu/Projetos/backend
+            [ -s "\$NVM_DIR/nvm.sh" ] && \. "\$NVM_DIR/nvm.sh"
+            export PATH="\$PATH:$(yarn global bin)"
+            cd /home/ubuntu/Projetos/backend-\$ENVIRONMENT
             git fetch --all
-            git reset --hard origin/main
-            ./start.sh
+            git reset --hard origin/\$GIT_BRANCH
+            ENVIRONMENT=\$ENVIRONMENT ./start.sh
           EOF
