@@ -13,10 +13,10 @@ echo "🆚 SETA A VERSÃO DO NODE.JS 🆚"
 nvm use v22.0.0 || exit 11
 echo "Node.js versão: $(node -v)"
 
-echo "⌛⏳ Instalando dependências... ⌛⏳"
+echo "⌛⏳ INSTALANDO DEPENDÊNCIAS... ⌛⏳"
 yarn install
 
-echo "⌛⏳ Compilando aplicação... ⌛⏳"
+echo "⌛⏳ COMPILANDO APLICAÇÃO... ⌛⏳"
 yarn build
 
 echo "✍🏻 COPIANDO ARQUIVO ENV ✍🏻"

@@ -25,5 +25,6 @@ jobs:
             [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
             export PATH="$PATH:$(yarn global bin)"
             cd /home/ubuntu/Projetos/backend
+            git pull
             ./start.sh
           EOF
