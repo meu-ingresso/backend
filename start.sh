@@ -1,15 +1,15 @@
 set -e
 
 echo "Configura o NVM"
-[[ -s /home/ubuntu/.nvm/nvm.sh ]] && . /home/ubuntu/.nvm/nvm.sh
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
 
 echo "Seta a configuração da versão do Node.js"
-
-nvm use 22.0.0 || exit 11
+nvm use v22.0.0 || exit 11
 echo "Node.js versão: $(node -v)"
 
 echo "Instalando dependências..."
-yarn
+yarn install
 
 echo "Compilando aplicação..."
 yarn build
