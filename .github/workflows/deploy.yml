@@ -21,10 +21,11 @@ jobs:
       - name: Deploy to Server
         run: |
           ssh -o StrictHostKeyChecking=no ubuntu@18.207.6.216 << 'EOF'
-            yarn -v && pm2 -v
-            cd /home/ubuntu/Projetos/backend
-            git pull
-            yarn
+            source ~/.bashrc
+            export PATH="$PATH:$(yarn global bin)"
+            cd /Projetos/backend
+            git pull origin main
+            yarn install --production
             yarn build
             cp .env build/
             pm2 restart meu-ingresso-api
