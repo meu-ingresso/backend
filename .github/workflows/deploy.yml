@@ -27,6 +27,6 @@ jobs:
             git pull origin main
             yarn install --production
             yarn build
-            cp .env build/
+            cp /Projetos/shared/conf/.env /Projetos/backend/build/
             pm2 restart meu-ingresso-api
           EOF
