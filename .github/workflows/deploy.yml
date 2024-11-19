@@ -21,6 +21,7 @@ jobs:
       - name: Deploy to Server
         run: |
           ssh -o StrictHostKeyChecking=no ubuntu@18.207.6.216 << 'EOF'
+            yarn -v && pm2 -v
             cd /home/ubuntu/Projetos/backend
             git pull
             yarn
