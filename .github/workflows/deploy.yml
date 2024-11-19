@@ -23,7 +23,7 @@ jobs:
         run: |
           BRANCH=${{ github.ref_name }}
           if [ "$BRANCH" == "main" ]; then
-            ENVIRONMENT="production"
+            ENVIRONMENT="prod"
             GIT_BRANCH="main"
           elif [ "$BRANCH" == "staging" ]; then
             ENVIRONMENT="staging"

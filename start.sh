@@ -12,7 +12,7 @@ fi
 echo "🔍 Ambiente detectado: $ENVIRONMENT"
 
 # Define caminhos com base no ambiente
-if [ "$ENVIRONMENT" == "production" ]; then
+if [ "$ENVIRONMENT" == "prod" ]; then
   DEPLOY_DIR="/home/ubuntu/Projetos/backend-prod"
   ENV_FILE="/home/ubuntu/Projetos/shared/conf/prod/.env"
   PM2_NAME="meu-ingresso-api-prod"
