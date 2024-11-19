@@ -20,7 +20,7 @@ jobs:
 
       - name: Deploy to Server
         run: |
-          ssh -o StrictHostKeyChecking=no ubuntu@18-207-6-216 << 'EOF'
+          ssh -o StrictHostKeyChecking=no ubuntu@18.207.6.216 << 'EOF'
             cd /home/ubuntu/Projetos/backend
             git pull
             yarn
