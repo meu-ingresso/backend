@@ -5,6 +5,7 @@
   "scripts": {
     "dev": "node ace serve --watch",
     "build": "node ace build --production",
+    "pm2": "pm2 start yarn --name meu-ingresso-api -- start",
     "start": "node server.js"
   },
   "devDependencies": {
