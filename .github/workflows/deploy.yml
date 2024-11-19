@@ -40,7 +40,7 @@ jobs:
             export PATH="\$PATH:$(yarn global bin)"
             export ENVIRONMENT=$ENVIRONMENT
             cd /home/ubuntu/Projetos/backend-\$ENVIRONMENT
-            git fetch --all
-            git reset --hard origin/main
+            git fetch
+            git pull origin $GIT_BRANCH
             ENVIRONMENT=\$ENVIRONMENT ./start.sh
           EOF
