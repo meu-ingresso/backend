@@ -22,11 +22,10 @@ jobs:
         run: |
           ssh -o StrictHostKeyChecking=no ubuntu@18.207.6.216 << 'EOF'
             source ~/.bashrc
-            export PATH="$PATH:$(yarn global bin)"
-            cd /Projetos/backend
+            cd /home/ubuntu/Projetos/backend
             git pull origin main
-            yarn install --production
-            yarn build
-            cp /Projetos/shared/conf/.env /Projetos/backend/build/
+            npm install --production
+            npm run build
+            cp /home/ubuntu/Projetos/shared/conf/.env /home/ubuntu/Projetos/backend/build/
             pm2 restart meu-ingresso-api
           EOF
