@@ -4,7 +4,8 @@ import { BaseModel, column, beforeCreate, afterCreate, belongsTo, BelongsTo } fr
 import Tickets from './Tickets';
 import People from './People';
 import Users from './Users';
-import Status from './Statuses';
+import Statuses from './Statuses';
+import Payments from './Payments';
 
 export default class CustomerTickets extends BaseModel {
   @column({ isPrimary: true })
@@ -21,6 +22,9 @@ export default class CustomerTickets extends BaseModel {
 
   @column()
   public status_id: string;
+
+  @column()
+  public payment_id: string;
 
   @column()
   public ticket_identifier: string | null;
@@ -60,10 +64,15 @@ export default class CustomerTickets extends BaseModel {
   })
   public validatedBy: BelongsTo<typeof Users>;
 
-  @belongsTo(() => Status, {
+  @belongsTo(() => Statuses, {
     foreignKey: 'status_id',
   })
-  public status: BelongsTo<typeof Status>;
+  public status: BelongsTo<typeof Statuses>;
+
+  @belongsTo(() => Payments, {
+    foreignKey: 'payment_id',
+  })
+  public payment: BelongsTo<typeof Payments>;
 
   @beforeCreate()
   public static assignUuid(customerTicket: CustomerTickets) {

@@ -10,6 +10,7 @@ export default class CustomerTicketsSchema extends BaseSchema {
       table.uuid('current_owner_id').notNullable().references('id').inTable('people').onDelete('CASCADE');
       table.uuid('previous_owner_id').nullable().references('id').inTable('people').onDelete('CASCADE');
       table.uuid('status_id').notNullable().references('id').inTable('statuses').onDelete('CASCADE');
+      table.uuid('payment_id').notNullable().references('id').inTable('payments').onDelete('CASCADE');
       table.string('ticket_identifier', 255).nullable().unique();
       table.boolean('validated').notNullable().defaultTo(false);
       table.uuid('validated_by').nullable().references('id').inTable('users').onDelete('SET NULL');
