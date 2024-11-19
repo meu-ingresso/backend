@@ -1,7 +1,7 @@
 set -e
 
 echo "Configura o NVM"
-export NVM_DIR="$HOME/.nvm"
+export NVM_DIR="/home/ubuntu/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
 
 echo "Seta a configuração da versão do Node.js"
