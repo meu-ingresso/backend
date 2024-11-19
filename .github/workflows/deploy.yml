@@ -20,7 +20,6 @@ jobs:
 
       - name: Run Deploy Script
         run: |
-          ssh -o StrictHostKeyChecking=no ubuntu@18.207.6.216 << 'EOF'
-            cd /home/ubuntu/Projetos/backend
-            ./start.sh
+          ssh -t -o StrictHostKeyChecking=no ubuntu@18.207.6.216 << 'EOF'
+            bash -l -c "cd /home/ubuntu/Projetos/backend && ./start.sh"
           EOF
