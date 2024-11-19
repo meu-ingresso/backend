@@ -46,6 +46,9 @@ echo "⌛⏳ COMPILANDO APLICAÇÃO... ⌛⏳"
 yarn build
 
 echo "✍🏻 COPIANDO ARQUIVO ENV ✍🏻"
+echo "CAMINHO DO ENV -> $ENV_FILE"
+echo "CAMINHO DA COPIA -> $DEPLOY_DIR/build/"
+
 cp $ENV_FILE $DEPLOY_DIR/build/ || { echo "Erro ao copiar arquivo .env"; exit 1; }
 
 echo "🚀 REINICIANDO APLICAÇÃO COM PM2 🚀"
