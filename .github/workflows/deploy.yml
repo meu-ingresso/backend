@@ -18,14 +18,9 @@ jobs:
         with:
           ssh-private-key: ${{ secrets.DEPLOY_SSH_KEY }}
 
-      - name: Deploy to Server
+      - name: Run Deploy Script
         run: |
           ssh -o StrictHostKeyChecking=no ubuntu@18.207.6.216 << 'EOF'
-            source ~/.bashrc
             cd /home/ubuntu/Projetos/backend
-            git pull origin main
-            npm install --production
-            npm run build
-            cp /home/ubuntu/Projetos/shared/conf/.env /home/ubuntu/Projetos/backend/build/
-            pm2 restart meu-ingresso-api
+            ./start.sh
           EOF
