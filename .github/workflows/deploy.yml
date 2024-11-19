@@ -23,6 +23,7 @@ jobs:
           ssh -t -o StrictHostKeyChecking=no ubuntu@18.207.6.216 << 'EOF'
             export NVM_DIR="/home/ubuntu/.nvm"
             [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+            export PATH="$PATH:$(yarn global bin)"
             cd /home/ubuntu/Projetos/backend
             ./start.sh
           EOF
