@@ -2,6 +2,8 @@ import { DateTime } from 'luxon';
 import { v4 as uuidv4 } from 'uuid';
 import { BaseModel, column, beforeCreate, belongsTo, BelongsTo, hasMany, HasMany } from '@ioc:Adonis/Lucid/Orm';
 import Events from './Events';
+import TicketEventCategories from './TicketEventCategories';
+import Statuses from './Statuses';
 import CustomerTickets from './CustomerTickets';
 
 export default class Tickets extends BaseModel {
@@ -12,10 +14,13 @@ export default class Tickets extends BaseModel {
   public event_id: string;
 
   @column()
+  public ticket_event_category_id: string | null;
+
+  @column()
   public name: string;
 
   @column()
-  public tier: number;
+  public description: string;
 
   @column()
   public total_quantity: number;
@@ -25,6 +30,24 @@ export default class Tickets extends BaseModel {
 
   @column()
   public price: number;
+
+  @column()
+  public status_id: string;
+
+  @column.dateTime()
+  public start_date: DateTime;
+
+  @column.dateTime()
+  public end_date: DateTime;
+
+  @column()
+  public availability: 'Privado' | 'Publico' | 'PDV';
+
+  @column()
+  public min_quantity_per_user: number;
+
+  @column()
+  public max_quantity_per_user: number;
 
   @column()
   public is_active: boolean;
@@ -39,6 +62,16 @@ export default class Tickets extends BaseModel {
     foreignKey: 'event_id',
   })
   public event: BelongsTo<typeof Events>;
+
+  @belongsTo(() => TicketEventCategories, {
+    foreignKey: 'ticket_event_category_id',
+  })
+  public category: BelongsTo<typeof TicketEventCategories>;
+
+  @belongsTo(() => Statuses, {
+    foreignKey: 'status_id',
+  })
+  public status: BelongsTo<typeof Statuses>;
 
   @hasMany(() => CustomerTickets, {
     foreignKey: 'ticket_id',
