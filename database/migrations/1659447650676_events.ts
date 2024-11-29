@@ -18,9 +18,17 @@ export default class EventsSchema extends BaseSchema {
       table.string('contact', 100).nullable();
       table.string('location_name', 150).nullable();
       table.text('general_information').nullable();
-      table.string('house_map', 255).nullable();
       table.integer('max_capacity').nullable();
+      table.enum('availability', ['Publico', 'Oculto']).notNullable().defaultTo('Publico');
+      table.enum('type', ['Ingresso', 'Inscrição']).notNullable().defaultTo('Ingresso');
       table.uuid('promoter_id').notNullable().references('id').inTable('users').onDelete('CASCADE');
+      table.text('id_pixel').nullable();
+      table.text('id_tag_manager').nullable();
+      table.text('id_analytics').nullable();
+      table.text('id_google_ads').nullable();
+      table.text('ads_conversion_label').nullable();
+      table.boolean('is_featured').notNullable().defaultTo(false);
+      table.boolean('is_active').notNullable().defaultTo(true);
       table.timestamp('created_at', { useTz: true }).defaultTo(this.now());
       table.timestamp('updated_at', { useTz: true }).defaultTo(this.now());
     });

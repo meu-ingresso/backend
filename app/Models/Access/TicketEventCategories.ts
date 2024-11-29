@@ -1,9 +1,9 @@
 import { DateTime } from 'luxon';
 import { v4 as uuidv4 } from 'uuid';
 import { BaseModel, column, belongsTo, BelongsTo, beforeCreate } from '@ioc:Adonis/Lucid/Orm';
-import Event from './Events';
+import Events from './Events';
 
-export default class EventFees extends BaseModel {
+export default class TicketEventCategory extends BaseModel {
   @column({ isPrimary: true })
   public id: string;
 
@@ -11,16 +11,10 @@ export default class EventFees extends BaseModel {
   public event_id: string;
 
   @column()
-  public platform_fee: number;
+  public name: string;
 
   @column()
-  public promoter_fee: number;
-
-  @column()
-  public fixed_fee: number | null;
-
-  @column()
-  public variable_fee: number | null;
+  public is_active: boolean;
 
   @column.dateTime({ autoCreate: true })
   public created_at: DateTime;
@@ -28,13 +22,13 @@ export default class EventFees extends BaseModel {
   @column.dateTime({ autoCreate: true, autoUpdate: true })
   public updated_at: DateTime;
 
-  @belongsTo(() => Event, {
+  @belongsTo(() => Events, {
     foreignKey: 'event_id',
   })
-  public event: BelongsTo<typeof Event>;
+  public event: BelongsTo<typeof Events>;
 
   @beforeCreate()
-  public static assignUuid(eventFee: EventFees) {
-    eventFee.id = uuidv4();
+  public static assignUuid(ticketEventCategory: TicketEventCategory) {
+    ticketEventCategory.id = uuidv4();
   }
 }

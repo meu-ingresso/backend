@@ -2,24 +2,24 @@ import { schema, rules } from '@ioc:Adonis/Core/Validator';
 import { HttpContextContract } from '@ioc:Adonis/Core/HttpContext';
 import ReportHandler from './Reporters/ReportHandler';
 
-class CreatePersonValidator {
+class CreatePeopleValidator {
   constructor(protected context: HttpContextContract) {}
 
   public reporter = ReportHandler;
 
   public schema = schema.create({
     person_type: schema.enum(['PF', 'PJ', 'ESTRANGEIRO']),
-    first_name: schema.string(),
-    last_name: schema.string(),
-    tax: schema.string.optional(),
+    first_name: schema.string({ trim: true }),
+    last_name: schema.string({ trim: true }),
+    tax: schema.string.optional({ trim: true }),
     birth_date: schema.date.optional({}, [rules.requiredWhen('person_type', '=', 'PF')]),
-    phone: schema.string.optional(),
-    email: schema.string({}, [rules.email(), rules.unique({ table: 'people', column: 'email' })]),
+    phone: schema.string.optional({ trim: true }),
+    email: schema.string({ trim: true }, [rules.email(), rules.unique({ table: 'people', column: 'email' })]),
   });
 
   public messages = {
     'person_type.required': 'O campo "person_type" é obrigatório.',
-    'person_type.enum': 'O campo "person_type" deve ser FISICA, JURIDICA ou ESTRANGEIRO.',
+    'person_type.enum': 'O campo "person_type" deve ser PF, PJ ou ESTRANGEIRO.',
     'first_name.required': 'O campo "first_name" é obrigatório.',
     'last_name.required': 'O campo "last_name" é obrigatório.',
     'birth_date.requiredWhen': 'O campo "birth_date" é obrigatório para pessoa física.',
@@ -28,20 +28,21 @@ class CreatePersonValidator {
     'email.unique': 'O e-mail fornecido já está registrado.',
   };
 }
-class UpdatePersonValidator {
+
+class UpdatePeopleValidator {
   constructor(protected context: HttpContextContract) {}
 
   public reporter = ReportHandler;
 
   public schema = schema.create({
-    id: schema.string(),
+    id: schema.string({ trim: true }),
     person_type: schema.enum.optional(['PF', 'PJ', 'ESTRANGEIRO']),
-    first_name: schema.string.optional(),
-    last_name: schema.string.optional(),
-    tax: schema.string.optional(),
+    first_name: schema.string.optional({ trim: true }),
+    last_name: schema.string.optional({ trim: true }),
+    tax: schema.string.optional({ trim: true }),
     birth_date: schema.date.optional(),
-    phone: schema.string.optional(),
-    email: schema.string.optional({}, [rules.email()]),
+    phone: schema.string.optional({ trim: true }),
+    email: schema.string.optional({ trim: true }, [rules.email()]),
   });
 
   public messages = {
@@ -52,4 +53,4 @@ class UpdatePersonValidator {
   };
 }
 
-export { CreatePersonValidator, UpdatePersonValidator };
+export { CreatePeopleValidator, UpdatePeopleValidator };

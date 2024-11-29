@@ -10,7 +10,8 @@ export default class PaymentsSchema extends BaseSchema {
       table.uuid('status_id').notNullable().references('id').inTable('statuses').onDelete('SET NULL');
       table.string('payment_method', 50).notNullable();
       table.decimal('gross_value', 10, 2).notNullable();
-      table.decimal('net_value', 10, 2).nullable();
+      table.decimal('net_value', 10, 2).notNullable();
+      table.uuid('coupon_id').nullable().references('id').inTable('coupons').onDelete('SET NULL');
       table.timestamp('paid_at', { useTz: true }).nullable();
       table.timestamp('created_at', { useTz: true }).defaultTo(this.now());
     });

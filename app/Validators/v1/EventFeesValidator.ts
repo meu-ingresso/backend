@@ -8,7 +8,7 @@ class CreateEventFeeValidator {
   public reporter = ReportHandler;
 
   public schema = schema.create({
-    event_id: schema.string({}, [rules.exists({ table: 'events', column: 'id' })]),
+    event_id: schema.string({ trim: true }, [rules.exists({ table: 'events', column: 'id' })]),
     platform_fee: schema.number(),
     promoter_fee: schema.number(),
     fixed_fee: schema.number.optional(),
@@ -16,14 +16,14 @@ class CreateEventFeeValidator {
   });
 
   public messages = {
-    'event_id.required': 'O campo event_id é obrigatório.',
-    'event_id.exists': 'O evento especificado não existe.',
-    'platform_fee.required': 'A taxa da plataforma (platform_fee) é obrigatória.',
-    'promoter_fee.required': 'A taxa do promotor (promoter_fee) é obrigatória.',
-    'platform_fee.number': 'A taxa da plataforma deve ser um número.',
-    'promoter_fee.number': 'A taxa do promotor deve ser um número.',
-    'fixed_fee.number': 'A taxa fixa (fixed_fee) deve ser um número.',
-    'variable_fee.number': 'A taxa variável (variable_fee) deve ser um número.',
+    'event_id.required': 'O campo "event_id" é obrigatório.',
+    'event_id.exists': 'O evento especificado não foi encontrado.',
+    'platform_fee.required': 'O campo "platform_fee" é obrigatório.',
+    'platform_fee.number': 'O campo "platform_fee" deve ser um número.',
+    'promoter_fee.required': 'O campo "promoter_fee" é obrigatório.',
+    'promoter_fee.number': 'O campo "promoter_fee" deve ser um número.',
+    'fixed_fee.number': 'O campo "fixed_fee" deve ser um número.',
+    'variable_fee.number': 'O campo "variable_fee" deve ser um número.',
   };
 }
 
@@ -33,8 +33,8 @@ class UpdateEventFeeValidator {
   public reporter = ReportHandler;
 
   public schema = schema.create({
-    id: schema.string(),
-    event_id: schema.string.optional({}, [rules.exists({ table: 'events', column: 'id' })]),
+    id: schema.string({ trim: true }),
+    event_id: schema.string.optional({ trim: true }, [rules.exists({ table: 'events', column: 'id' })]),
     platform_fee: schema.number.optional(),
     promoter_fee: schema.number.optional(),
     fixed_fee: schema.number.optional(),
@@ -42,12 +42,13 @@ class UpdateEventFeeValidator {
   });
 
   public messages = {
-    'id.required': 'O campo id é obrigatório.',
-    'event_id.exists': 'O evento especificado não existe.',
-    'platform_fee.number': 'A taxa da plataforma deve ser um número.',
-    'promoter_fee.number': 'A taxa do promotor deve ser um número.',
-    'fixed_fee.number': 'A taxa fixa (fixed_fee) deve ser um número.',
-    'variable_fee.number': 'A taxa variável (variable_fee) deve ser um número.',
+    'id.required': 'O campo "id" é obrigatório.',
+    'id.string': 'O campo "id" deve ser uma string válida.',
+    'event_id.exists': 'O evento especificado não foi encontrado.',
+    'platform_fee.number': 'O campo "platform_fee" deve ser um número.',
+    'promoter_fee.number': 'O campo "promoter_fee" deve ser um número.',
+    'fixed_fee.number': 'O campo "fixed_fee" deve ser um número.',
+    'variable_fee.number': 'O campo "variable_fee" deve ser um número.',
   };
 }
 
