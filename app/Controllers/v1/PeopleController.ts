@@ -1,6 +1,6 @@
 import { HttpContextContract } from '@ioc:Adonis/Core/HttpContext';
 import QueryModelValidator from 'App/Validators/v1/QueryModelValidator';
-import { CreatePersonValidator, UpdatePersonValidator } from 'App/Validators/v1/PeopleValidator';
+import { CreatePeopleValidator, UpdatePeopleValidator } from 'App/Validators/v1/PeopleValidator';
 import DynamicService from 'App/Services/v1/DynamicService';
 import utils from 'Utils/utils';
 
@@ -8,7 +8,7 @@ export default class PeopleController {
   private dynamicService: DynamicService = new DynamicService();
 
   public async create(context: HttpContextContract) {
-    const payload = await context.request.validate(CreatePersonValidator);
+    const payload = await context.request.validate(CreatePeopleValidator);
 
     const result = await this.dynamicService.create('People', payload);
 
@@ -21,7 +21,7 @@ export default class PeopleController {
 
   public async update(context: HttpContextContract) {
     console.log('PeopleController.update');
-    const payload = await context.request.validate(UpdatePersonValidator);
+    const payload = await context.request.validate(UpdatePeopleValidator);
 
     console.log('PeopleController.payload', payload);
 

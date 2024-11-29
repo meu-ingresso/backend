@@ -1,6 +1,6 @@
 import { DateTime } from 'luxon';
+import { BaseModel, column, belongsTo, BelongsTo, beforeCreate } from '@ioc:Adonis/Lucid/Orm';
 import { v4 as uuidv4 } from 'uuid';
-import { BaseModel, column, beforeCreate, belongsTo, BelongsTo } from '@ioc:Adonis/Lucid/Orm';
 import Events from './Events';
 import Users from './Users';
 
@@ -15,7 +15,7 @@ export default class EventCollaborators extends BaseModel {
   public user_id: string;
 
   @column()
-  public role: string;
+  public role_id: string;
 
   @column.dateTime({ autoCreate: true })
   public created_at: DateTime;
@@ -23,18 +23,14 @@ export default class EventCollaborators extends BaseModel {
   @column.dateTime({ autoCreate: true, autoUpdate: true })
   public updated_at: DateTime;
 
-  @belongsTo(() => Events, {
-    foreignKey: 'event_id',
-  })
+  @belongsTo(() => Events, { foreignKey: 'event_id' })
   public event: BelongsTo<typeof Events>;
 
-  @belongsTo(() => Users, {
-    foreignKey: 'user_id',
-  })
+  @belongsTo(() => Users, { foreignKey: 'user_id' })
   public user: BelongsTo<typeof Users>;
 
   @beforeCreate()
-  public static assignUuid(collaborator: EventCollaborators) {
-    collaborator.id = uuidv4();
+  public static assignUuid(eventCollaborator: EventCollaborators) {
+    eventCollaborator.id = uuidv4();
   }
 }

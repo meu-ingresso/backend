@@ -3,13 +3,14 @@ import { v4 as uuidv4 } from 'uuid';
 import { BaseModel, column, beforeCreate, belongsTo, BelongsTo } from '@ioc:Adonis/Lucid/Orm';
 import Users from './Users';
 import Statuses from './Statuses';
+import Coupons from './Coupons';
 
 export default class Payments extends BaseModel {
   @column({ isPrimary: true })
   public id: string;
 
   @column()
-  public user_id: string;
+  public user_id: string | null;
 
   @column()
   public status_id: string;
@@ -21,7 +22,10 @@ export default class Payments extends BaseModel {
   public gross_value: number;
 
   @column()
-  public net_value: number | null;
+  public net_value: number;
+
+  @column()
+  public coupon_id: string | null;
 
   @column.dateTime()
   public paid_at: DateTime | null;
@@ -38,6 +42,11 @@ export default class Payments extends BaseModel {
     foreignKey: 'status_id',
   })
   public status: BelongsTo<typeof Statuses>;
+
+  @belongsTo(() => Coupons, {
+    foreignKey: 'coupon_id',
+  })
+  public coupon: BelongsTo<typeof Coupons>;
 
   @beforeCreate()
   public static assignUuid(payment: Payments) {

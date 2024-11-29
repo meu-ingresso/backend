@@ -1,9 +1,9 @@
-import { DateTime } from 'luxon';
 import { BaseModel, column, belongsTo, BelongsTo, beforeCreate } from '@ioc:Adonis/Lucid/Orm';
+import { DateTime } from 'luxon';
 import Events from './Events';
 import { v4 as uuidv4 } from 'uuid';
 
-export default class EventAttachments extends BaseModel {
+export default class EventCheckoutFields extends BaseModel {
   @column({ isPrimary: true })
   public id: string;
 
@@ -14,13 +14,25 @@ export default class EventAttachments extends BaseModel {
   public name: string;
 
   @column()
-  public type: string | null;
+  public type: string;
 
   @column()
-  public image_url: string | null;
+  public required: boolean;
+
+  @column()
+  public is_unique: boolean;
+
+  @column()
+  public visible_on_ticket: boolean;
+
+  @column()
+  public help_text: string | null;
 
   @column.dateTime({ autoCreate: true })
   public created_at: DateTime;
+
+  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  public updated_at: DateTime;
 
   @belongsTo(() => Events, {
     foreignKey: 'event_id',
@@ -28,7 +40,7 @@ export default class EventAttachments extends BaseModel {
   public event: BelongsTo<typeof Events>;
 
   @beforeCreate()
-  public static assignUuid(eventAttachment: EventAttachments) {
-    eventAttachment.id = uuidv4();
+  public static assignUuid(eventCheckoutField: EventCheckoutFields) {
+    eventCheckoutField.id = uuidv4();
   }
 }
