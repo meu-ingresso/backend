@@ -11,6 +11,8 @@ import Addresses from './Addresses';
 import EventAttachments from './EventAttachments';
 import EventCollaborators from './EventCollaborators';
 import Promoters from './Users';
+import EventCollaborators from './EventCollaborators';
+import Coupons from './Coupons';
 
 export default class Events extends BaseModel {
   @column({ isPrimary: true })
@@ -114,6 +116,9 @@ export default class Events extends BaseModel {
 
   @hasMany(() => EventCollaborators, { foreignKey: 'event_id' })
   public collaborators: HasMany<typeof EventCollaborators>;
+
+  @hasMany(() => Coupons, { foreignKey: 'event_id' })
+  public coupons: HasMany<typeof Coupons>;
 
   @hasMany(() => EventCheckoutFields, { foreignKey: 'event_id' })
   public checkoutFields: HasMany<typeof EventCheckoutFields>;
