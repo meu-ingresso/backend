@@ -38,17 +38,12 @@ export default class EventsController {
 
     const result = await this.dynamicService.search('Event', payload);
 
-    const headers = utils.getHeaders();
-
-    const body = utils.getBody('SEARCH_SUCCESS', result);
-
-    utils.getResponse(context, 200, headers, body);
-  }
-
-  public async getTotalizers(context: HttpContextContract) {
-    const event = context.params.event;
-
-    const result = await this.eventService.getTotalizers(event);
+    if (result && result.data && !!result.data.length) {
+      for (let i = 0; i < result.data.length; i++) {
+        const totalizer = await this.eventService.getTotalizers(result.data[i].id);
+        result.data[i].totalizers = totalizer;
+      }
+    }
 
     const headers = utils.getHeaders();
 
