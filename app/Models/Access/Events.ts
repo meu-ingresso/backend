@@ -8,6 +8,7 @@ import Categories from './Categories';
 import Ratings from './Ratings';
 import Statuses from './Statuses';
 import Addresses from './Addresses';
+import EventAttachments from './EventAttachments';
 
 export default class Events extends BaseModel {
   @column({ isPrimary: true })
@@ -93,6 +94,9 @@ export default class Events extends BaseModel {
 
   @belongsTo(() => Categories, { foreignKey: 'category_id' })
   public category: BelongsTo<typeof Categories>;
+
+  @belongsTo(() => EventAttachments, { foreignKey: 'event_id' })
+  public attachments: BelongsTo<typeof EventAttachments>;
 
   @belongsTo(() => Ratings, { foreignKey: 'rating_id' })
   public rating: BelongsTo<typeof Ratings>;
