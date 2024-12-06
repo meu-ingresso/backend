@@ -7,7 +7,7 @@ export default class EventService {
       .join('tickets', 'customer_tickets.ticket_id', 'tickets.id')
       .join('payments', 'customer_tickets.payment_id', 'payments.id')
       .where('tickets.event_id', event_id)
-      .select('payments.gross_value as gross_value', 'customer_tickets.created_at as created_at');
+      .select('payments.net_value as net_value', 'customer_tickets.created_at as created_at');
 
     let total = {
       totalSales: 0,
@@ -20,7 +20,7 @@ export default class EventService {
 
     for (const totalizer of totalizers) {
       total.totalSales += 1;
-      total.totalSalesAmout += Number(totalizer.gross_value);
+      total.totalSalesAmout += Number(totalizer.net_value);
 
       const createdAt = DateTime.fromJSDate(totalizer.created_at);
 
@@ -29,7 +29,7 @@ export default class EventService {
 
       if (created === todayDate) {
         total.totalSalesToday += 1;
-        total.totalSalesAmountToday += Number(totalizer.gross_value);
+        total.totalSalesAmountToday += Number(totalizer.net_value);
       }
     }
 
