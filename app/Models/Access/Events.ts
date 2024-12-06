@@ -11,7 +11,6 @@ import Addresses from './Addresses';
 import EventAttachments from './EventAttachments';
 import EventCollaborators from './EventCollaborators';
 import Promoters from './Users';
-import EventCollaborators from './EventCollaborators';
 import Coupons from './Coupons';
 
 export default class Events extends BaseModel {
