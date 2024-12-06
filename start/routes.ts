@@ -56,6 +56,7 @@ Route.group(() => {
   Route.patch('/rating', 'v1/RatingsController.update');
 
   Route.get('/events', 'v1/EventsController.search');
+  Route.get('/event/totalizers/:event', 'v1/EventsController.getTotalizers');
   Route.post('/event', 'v1/EventsController.create');
   Route.patch('/event', 'v1/EventsController.update');
 
