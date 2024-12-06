@@ -14,7 +14,7 @@ export default class TicketsSchema extends BaseSchema {
         .inTable('ticket_event_categories')
         .onDelete('RESTRICT');
       table.string('name', 50).notNullable();
-      table.string('description', 100).notNullable();
+      table.string('description', 100).nullable();
       table.integer('total_quantity', 255).notNullable();
       table.integer('remaining_quantity', 255).notNullable();
       table.decimal('price', 10, 2).notNullable();

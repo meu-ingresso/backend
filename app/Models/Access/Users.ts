@@ -4,6 +4,7 @@ import { BaseModel, column, beforeCreate, belongsTo, BelongsTo, hasMany, HasMany
 import Roles from './Roles';
 import Tokens from './Tokens';
 import Events from './Events';
+import People from './People';
 
 export default class Users extends BaseModel {
   @column({ isPrimary: true })
@@ -21,6 +22,9 @@ export default class Users extends BaseModel {
   @column()
   public role_id: string | null;
 
+  @column()
+  public people_id: string;
+
   @column.dateTime({ autoCreate: true })
   public created_at: DateTime | null;
 
@@ -29,6 +33,11 @@ export default class Users extends BaseModel {
 
   @column.dateTime()
   public deleted_at: DateTime | null;
+
+  @belongsTo(() => People, {
+    foreignKey: 'person_id',
+  })
+  public person: BelongsTo<typeof People>;
 
   @belongsTo(() => Roles, {
     foreignKey: 'role_id',

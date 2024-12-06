@@ -6,6 +6,7 @@ export default class UsersSchema extends BaseSchema {
   public async up() {
     this.schema.createTable(this.tableName, (table) => {
       table.uuid('id').primary();
+      table.uuid('people_id').notNullable().references('id').inTable('people').onDelete('CASCADE');
       table.string('email', 200).unique().nullable();
       table.string('password', 100).nullable();
       table.uuid('role_id').nullable().references('id').inTable('roles').onDelete('SET NULL');
