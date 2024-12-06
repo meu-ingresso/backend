@@ -95,9 +95,6 @@ export default class Events extends BaseModel {
   @belongsTo(() => Categories, { foreignKey: 'category_id' })
   public category: BelongsTo<typeof Categories>;
 
-  @belongsTo(() => EventAttachments, { foreignKey: 'event_id' })
-  public attachments: BelongsTo<typeof EventAttachments>;
-
   @belongsTo(() => Ratings, { foreignKey: 'rating_id' })
   public rating: BelongsTo<typeof Ratings>;
 
@@ -106,6 +103,9 @@ export default class Events extends BaseModel {
 
   @hasMany(() => Tickets, { foreignKey: 'event_id' })
   public tickets: HasMany<typeof Tickets>;
+
+  @hasMany(() => EventAttachments, { foreignKey: 'event_id' })
+  public attachments: HasMany<typeof EventAttachments>;
 
   @hasMany(() => EventCheckoutFields, { foreignKey: 'event_id' })
   public checkoutFields: HasMany<typeof EventCheckoutFields>;
