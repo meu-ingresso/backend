@@ -9,6 +9,7 @@ import Ratings from './Ratings';
 import Statuses from './Statuses';
 import Addresses from './Addresses';
 import EventAttachments from './EventAttachments';
+import Promoters from './Users';
 
 export default class Events extends BaseModel {
   @column({ isPrimary: true })
@@ -100,6 +101,9 @@ export default class Events extends BaseModel {
 
   @belongsTo(() => Addresses, { foreignKey: 'address_id' })
   public address: BelongsTo<typeof Addresses>;
+
+  @belongsTo(() => Promoters, { foreignKey: 'promoter_id' })
+  public promoter: BelongsTo<typeof Promoters>;
 
   @hasMany(() => Tickets, { foreignKey: 'event_id' })
   public tickets: HasMany<typeof Tickets>;
