@@ -35,9 +35,9 @@ export default class Users extends BaseModel {
   public deleted_at: DateTime | null;
 
   @belongsTo(() => People, {
-    foreignKey: 'person_id',
+    foreignKey: 'people_id',
   })
-  public person: BelongsTo<typeof People>;
+  public people: BelongsTo<typeof People>;
 
   @belongsTo(() => Roles, {
     foreignKey: 'role_id',
