@@ -1,6 +1,7 @@
 import BaseSeeder from '@ioc:Adonis/Lucid/Seeder';
 import { DateTime } from 'luxon';
 import { v4 as uuidv4 } from 'uuid';
+import Hash from '@ioc:Adonis/Core/Hash';
 import Role from 'App/Models/Access/Roles';
 import Permission from 'App/Models/Access/Permissions';
 import RolePermission from 'App/Models/Access/RolePermissions';
@@ -68,7 +69,7 @@ export default class DatabaseSeeder extends BaseSeeder {
         id: uuidv4(),
         people_id: people[0].id,
         email: 'admin@example.com',
-        password: 'password',
+        password: await Hash.make('password123'), // Criptografando a senha
         role_id: roles[0].id,
         is_active: true,
       },
@@ -76,7 +77,7 @@ export default class DatabaseSeeder extends BaseSeeder {
         id: uuidv4(),
         people_id: people[1].id,
         email: 'promoter@example.com',
-        password: 'password',
+        password: await Hash.make('password123'), // Criptografando a senha
         role_id: roles[1].id,
         is_active: true,
       },
