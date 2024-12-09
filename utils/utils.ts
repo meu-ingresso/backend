@@ -24,20 +24,20 @@ function getResponse(context: HttpContextContract, code: number, headers: any, b
 }
 
 async function createAudity(
-  user_id: string | null,
-  module: string,
   action: string,
+  entity: string,
   entity_id: string | null = null,
+  user_id: string | null,
   old_data: Record<string, any> | null = null,
   new_data: Record<string, any> | null = null
 ): Promise<void> {
   try {
     if (user_id) {
       const payload = {
-        user_id,
-        module,
         action,
+        entity,
         entity_id,
+        user_id,
         old_data: old_data ? JSON.stringify(old_data) : null,
         new_data: new_data ? JSON.stringify(new_data) : null,
       };
@@ -46,7 +46,7 @@ async function createAudity(
     } else {
       console.error('Missing User ID for Audit Log');
       console.error('Module ->', module);
-      console.error('Action ->', action);
+      console.error('Action ->', entity);
       console.error('Entity ID ->', entity_id);
       console.error('Old Data ->', old_data);
       console.error('New Data ->', new_data);
