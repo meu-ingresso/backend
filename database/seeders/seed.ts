@@ -207,6 +207,7 @@ export default class DatabaseSeeder extends BaseSeeder {
     const events = await Event.createMany([
       {
         id: uuidv4(),
+        alias: 'festival-de-musica',
         name: 'Festival de Música',
         status_id: statuses[2].id,
         address_id: address[0].id,
@@ -217,6 +218,7 @@ export default class DatabaseSeeder extends BaseSeeder {
       },
       {
         id: uuidv4(),
+        alias: 'partida-de-futebol',
         name: 'Partida de Futebol',
         status_id: statuses[2].id,
         address_id: address[1].id,
