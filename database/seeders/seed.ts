@@ -154,7 +154,7 @@ export default class DatabaseSeeder extends BaseSeeder {
     console.log('Addresses created');
 
     // Categories
-    await Category.createMany([
+    const category = await Category.createMany([
       { id: uuidv4(), name: 'Música', is_active: true },
       { id: uuidv4(), name: 'Esportes', is_active: true },
     ]);
@@ -196,7 +196,7 @@ export default class DatabaseSeeder extends BaseSeeder {
     console.log('Statuses created');
 
     // Ratings
-    await Rating.createMany([
+    const rating = await Rating.createMany([
       { id: uuidv4(), name: 'Livre', description: 'Livre para todas as idades' },
       { id: uuidv4(), name: '18+', description: 'Proibido para menores de 18 anos' },
     ]);
@@ -209,10 +209,21 @@ export default class DatabaseSeeder extends BaseSeeder {
         id: uuidv4(),
         alias: 'festival-de-musica',
         name: 'Festival de Música',
+        description: 'Festival de música eletrônica com DJ ALOK',
+        category_id: category[0].id,
+        rating_id: rating[1].id,
         status_id: statuses[2].id,
         address_id: address[0].id,
         promoter_id: users[0].id,
         start_date: DateTime.now(),
+        end_date: DateTime.now().plus({ days: 10 }),
+        opening_hour: '20:00',
+        ending_hour: '04:00',
+        contact: '47 99999-9999',
+        location_name: 'Green Valley',
+        general_information: 'O evento é uma produção de GDO',
+        max_capacity: 1000,
+        is_featured: true,
         sale_type: 'Ingresso',
         event_type: 'Presencial',
       },
@@ -220,10 +231,21 @@ export default class DatabaseSeeder extends BaseSeeder {
         id: uuidv4(),
         alias: 'partida-de-futebol',
         name: 'Partida de Futebol',
+        description: 'Partida de futebol entre São Paulo e Flamengo',
+        category_id: category[1].id,
+        rating_id: rating[0].id,
         status_id: statuses[2].id,
         address_id: address[1].id,
         promoter_id: users[1].id,
         start_date: DateTime.now(),
+        end_date: DateTime.now().plus({ days: 10 }),
+        opening_hour: '16:00',
+        ending_hour: '22:00',
+        contact: '47 99999-9999',
+        location_name: 'Estádio do Morumbi',
+        general_information: 'Ultimo jogo do campeonato Brasileiro',
+        max_capacity: 5000,
+        is_featured: false,
         sale_type: 'Ingresso',
         event_type: 'Online',
       },
