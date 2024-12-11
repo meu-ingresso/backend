@@ -92,7 +92,7 @@ export default class DatabaseSeeder extends BaseSeeder {
         people_id: people[0].id,
         email: 'jean@gmail.com',
         password: await Hash.make('123456'),
-        role_id: roles[0].id,
+        role_id: roles[1].id,
         is_active: true,
       },
       {
@@ -100,7 +100,7 @@ export default class DatabaseSeeder extends BaseSeeder {
         people_id: people[1].id,
         email: 'admin@gmail.com',
         password: await Hash.make('123456'),
-        role_id: roles[1].id,
+        role_id: roles[0].id,
         is_active: true,
       },
       {
