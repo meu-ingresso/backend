@@ -33,11 +33,15 @@ export default class DatabaseSeeder extends BaseSeeder {
       { id: uuidv4(), name: 'Cliente', created_at: DateTime.now(), updated_at: DateTime.now() },
     ]);
 
+    console.log('Roles created');
+
     // Permissions
     const permissions = await Permission.createMany([
       { id: uuidv4(), name: 'manage-events', description: 'Permission to manage events' },
       { id: uuidv4(), name: 'watch-events', description: 'Permission to watch events' },
     ]);
+
+    console.log('Permissions created');
 
     // Role Permissions
     await RolePermission.createMany([
@@ -45,6 +49,8 @@ export default class DatabaseSeeder extends BaseSeeder {
       { id: uuidv4(), role_id: roles[1].id, permission_id: permissions[0].id },
       { id: uuidv4(), role_id: roles[2].id, permission_id: permissions[1].id },
     ]);
+
+    console.log('Role Permissions created');
 
     // People
     const people = await People.createMany([
@@ -77,6 +83,8 @@ export default class DatabaseSeeder extends BaseSeeder {
       },
     ]);
 
+    console.log('People created');
+
     // Users
     const users = await User.createMany([
       {
@@ -105,17 +113,23 @@ export default class DatabaseSeeder extends BaseSeeder {
       },
     ]);
 
+    console.log('Users created');
+
     // States
     const states = await State.createMany([
       { id: uuidv4(), name: 'Santa Catarina', acronym: 'SC' },
       { id: uuidv4(), name: 'São Paulo', acronym: 'SP' },
     ]);
 
+    console.log('States created');
+
     // Cities
     const city = await City.createMany([
       { id: uuidv4(), name: 'Itajaí', state_id: states[0].id },
       { id: uuidv4(), name: 'São Paulo', state_id: states[1].id },
     ]);
+
+    console.log('Cities created');
 
     // Addresses
     const address = await Addresses.createMany([
@@ -137,11 +151,15 @@ export default class DatabaseSeeder extends BaseSeeder {
       },
     ]);
 
+    console.log('Addresses created');
+
     // Categories
     await Category.createMany([
       { id: uuidv4(), name: 'Música', is_active: true },
       { id: uuidv4(), name: 'Esportes', is_active: true },
     ]);
+
+    console.log('Categories created');
 
     // Statuses
     const statuses = await Status.createMany([
@@ -175,11 +193,15 @@ export default class DatabaseSeeder extends BaseSeeder {
       },
     ]);
 
+    console.log('Statuses created');
+
     // Ratings
     await Rating.createMany([
       { id: uuidv4(), name: 'Livre', description: 'Livre para todas as idades' },
       { id: uuidv4(), name: '18+', description: 'Proibido para menores de 18 anos' },
     ]);
+
+    console.log('Ratings created');
 
     // Events
     const events = await Event.createMany([
@@ -205,11 +227,15 @@ export default class DatabaseSeeder extends BaseSeeder {
       },
     ]);
 
+    console.log('Events created');
+
     const assistant = await Role.findBy('name', 'Assistant');
 
     await EventCollaborator.createMany([
       { id: uuidv4(), event_id: events[1].id, user_id: users[0].id, role_id: assistant?.$attributes.id },
     ]);
+
+    console.log('Event Collaborators created');
 
     // Event Fees
     await EventFee.createMany([
@@ -228,6 +254,8 @@ export default class DatabaseSeeder extends BaseSeeder {
         fixed_fee: 1.5,
       },
     ]);
+
+    console.log('Event Fees created');
 
     // Event Attachments
     await EventAttachment.createMany([
@@ -249,12 +277,16 @@ export default class DatabaseSeeder extends BaseSeeder {
       },
     ]);
 
+    console.log('Event Attachments created');
+
     const ticketEventCategories = await TicketEventCategory.createMany([
       { id: uuidv4(), name: 'VIP', event_id: events[0].id },
       { id: uuidv4(), name: 'Pista', event_id: events[0].id },
       { id: uuidv4(), name: 'VIP', event_id: events[1].id },
       { id: uuidv4(), name: 'Camarote', event_id: events[1].id },
     ]);
+
+    console.log('Ticket Event Categories created');
 
     // Tickets
     const ticket = await Ticket.createMany([
@@ -296,6 +328,9 @@ export default class DatabaseSeeder extends BaseSeeder {
       },
     ]);
 
+    console.log('Tickets created');
+
+    // Payments
     const payment = await Payments.createMany([
       {
         id: uuidv4(),
@@ -317,12 +352,15 @@ export default class DatabaseSeeder extends BaseSeeder {
       },
     ]);
 
+    console.log('Payments created');
+
+    // Customer Tickets
     await CustomerTickets.createMany([
       {
         id: uuidv4(),
         ticket_id: ticket[0].id,
-        current_owner_id: users[2].id,
-        status_id: statuses[7].id,
+        current_owner_id: people[2].id,
+        status_id: statuses[6].id,
         payment_id: payment[0].id,
         ticket_identifier: 'ARG5AD',
         created_at: DateTime.now(),
@@ -330,18 +368,22 @@ export default class DatabaseSeeder extends BaseSeeder {
       {
         id: uuidv4(),
         ticket_id: ticket[1].id,
-        current_owner_id: users[2].id,
-        status_id: statuses[8].id,
+        current_owner_id: people[2].id,
+        status_id: statuses[7].id,
         payment_id: payment[1].id,
         ticket_identifier: '1AGTAD',
         created_at: DateTime.now(),
       },
     ]);
 
+    console.log('Customer Tickets created');
+
     // Parameters
     await Parameter.createMany([
       { id: uuidv4(), key: 'site_name', value: 'Event Platform', description: 'Name of the platform' },
       { id: uuidv4(), key: 'support_email', value: 'support@example.com', description: 'Support contact email' },
     ]);
+
+    console.log('Parameters created');
   }
 }
