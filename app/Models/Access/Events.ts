@@ -18,6 +18,9 @@ export default class Events extends BaseModel {
   public id: string;
 
   @column()
+  public alias: string;
+
+  @column()
   public name: string;
 
   @column()

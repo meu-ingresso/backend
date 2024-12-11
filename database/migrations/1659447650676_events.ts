@@ -6,6 +6,7 @@ export default class EventsSchema extends BaseSchema {
   public async up() {
     this.schema.createTable(this.tableName, (table) => {
       table.uuid('id').primary();
+      table.string('alias', 255).unique().notNullable();
       table.string('name', 100).notNullable();
       table.text('description').nullable();
       table.uuid('status_id').notNullable().references('id').inTable('statuses').onDelete('RESTRICT');
@@ -33,6 +34,12 @@ export default class EventsSchema extends BaseSchema {
       table.boolean('is_active').notNullable().defaultTo(true);
       table.timestamp('created_at', { useTz: true }).defaultTo(this.now());
       table.timestamp('updated_at', { useTz: true }).defaultTo(this.now());
+
+      // Índices para consultas frequentes
+      table.index(['alias'], 'events_alias_index');
+      table.index(['promoter_id'], 'events_promoter_id_index');
+      table.index(['status_id'], 'events_status_id_index');
+      table.index(['category_id'], 'events_category_id_index');
     });
   }
 
