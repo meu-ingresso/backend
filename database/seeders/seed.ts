@@ -19,6 +19,9 @@ import EventAttachment from 'App/Models/Access/EventAttachments';
 import Ticket from 'App/Models/Access/Tickets';
 import TicketEventCategory from 'App/Models/Access/TicketEventCategories';
 import Parameter from 'App/Models/Access/Parameters';
+import Addresses from 'App/Models/Access/Addresses';
+import Payments from 'App/Models/Access/Payments';
+import CustomerTickets from 'App/Models/Access/CustomerTickets';
 
 export default class DatabaseSeeder extends BaseSeeder {
   public async run() {
@@ -27,36 +30,47 @@ export default class DatabaseSeeder extends BaseSeeder {
       { id: uuidv4(), name: 'Admin', created_at: DateTime.now(), updated_at: DateTime.now() },
       { id: uuidv4(), name: 'Promoter', created_at: DateTime.now(), updated_at: DateTime.now() },
       { id: uuidv4(), name: 'Assistant', created_at: DateTime.now(), updated_at: DateTime.now() },
+      { id: uuidv4(), name: 'Cliente', created_at: DateTime.now(), updated_at: DateTime.now() },
     ]);
 
     // Permissions
     const permissions = await Permission.createMany([
-      { id: uuidv4(), name: 'create-event', description: 'Permission to create events' },
-      { id: uuidv4(), name: 'manage-users', description: 'Permission to manage users' },
+      { id: uuidv4(), name: 'manage-events', description: 'Permission to manage events' },
+      { id: uuidv4(), name: 'watch-events', description: 'Permission to watch events' },
     ]);
 
     // Role Permissions
     await RolePermission.createMany([
       { id: uuidv4(), role_id: roles[0].id, permission_id: permissions[0].id },
-      { id: uuidv4(), role_id: roles[1].id, permission_id: permissions[1].id },
+      { id: uuidv4(), role_id: roles[1].id, permission_id: permissions[0].id },
+      { id: uuidv4(), role_id: roles[2].id, permission_id: permissions[1].id },
     ]);
 
     // People
     const people = await People.createMany([
       {
         id: uuidv4(),
-        first_name: 'John',
-        last_name: 'Doe',
-        email: 'john.doe@example.com',
+        first_name: 'Jean',
+        last_name: 'Promotor',
+        email: 'jean@gmail.com',
         person_type: 'PF',
         created_at: DateTime.now(),
         updated_at: DateTime.now(),
       },
       {
         id: uuidv4(),
-        first_name: 'Jane',
-        last_name: 'Smith',
-        email: 'jane.smith@example.com',
+        first_name: 'System',
+        last_name: 'Administrator',
+        email: 'admin@gmail.com',
+        person_type: 'PJ',
+        created_at: DateTime.now(),
+        updated_at: DateTime.now(),
+      },
+      {
+        id: uuidv4(),
+        first_name: 'Cliente',
+        last_name: 'Final',
+        email: 'cliente@gmail.com',
         person_type: 'PJ',
         created_at: DateTime.now(),
         updated_at: DateTime.now(),
@@ -68,17 +82,25 @@ export default class DatabaseSeeder extends BaseSeeder {
       {
         id: uuidv4(),
         people_id: people[0].id,
-        email: 'admin@example.com',
-        password: await Hash.make('password123'), // Criptografando a senha
+        email: 'jean@gmail.com',
+        password: await Hash.make('123456'),
         role_id: roles[0].id,
         is_active: true,
       },
       {
         id: uuidv4(),
         people_id: people[1].id,
-        email: 'promoter@example.com',
-        password: await Hash.make('password123'), // Criptografando a senha
+        email: 'admin@gmail.com',
+        password: await Hash.make('123456'),
         role_id: roles[1].id,
+        is_active: true,
+      },
+      {
+        id: uuidv4(),
+        people_id: people[2].id,
+        email: 'cliente@gmail.com',
+        password: await Hash.make('123456'),
+        role_id: roles[2].id,
         is_active: true,
       },
     ]);
@@ -90,54 +112,103 @@ export default class DatabaseSeeder extends BaseSeeder {
     ]);
 
     // Cities
-    await City.createMany([
-      { id: uuidv4(), name: 'Florianópolis', state_id: states[0].id },
+    const city = await City.createMany([
+      { id: uuidv4(), name: 'Itajaí', state_id: states[0].id },
       { id: uuidv4(), name: 'São Paulo', state_id: states[1].id },
+    ]);
+
+    // Addresses
+    const address = await Addresses.createMany([
+      {
+        id: uuidv4(),
+        street: 'Rua Gelásio Pedro de Miranda',
+        zipcode: '88309305',
+        number: '102',
+        neighborhood: 'São Vicente',
+        city_id: city[0].id,
+      },
+      {
+        id: uuidv4(),
+        street: 'Rua 123',
+        zipcode: '88309305',
+        number: '456',
+        neighborhood: 'Centro',
+        city_id: city[0].id,
+      },
     ]);
 
     // Categories
     await Category.createMany([
-      { id: uuidv4(), name: 'Music', is_active: true },
-      { id: uuidv4(), name: 'Sports', is_active: true },
+      { id: uuidv4(), name: 'Música', is_active: true },
+      { id: uuidv4(), name: 'Esportes', is_active: true },
     ]);
 
     // Statuses
     const statuses = await Status.createMany([
-      { id: uuidv4(), name: 'Active', module: 'event' },
-      { id: uuidv4(), name: 'Inactive', module: 'event' },
+      { id: uuidv4(), name: 'À Venda', description: 'Ingresso a venda', module: 'ticket' },
+      { id: uuidv4(), name: 'Esgotado', description: 'Ingressos esgotados', module: 'ticket' },
+      {
+        id: uuidv4(),
+        name: 'Publicado',
+        description: 'Evento publicado (pós aprovação pela equipe Meu Ingresso)',
+        module: 'event',
+      },
+      {
+        id: uuidv4(),
+        name: 'Rascunho',
+        description: 'Evento em rascunho (Antes de envio para publicação)',
+        module: 'event',
+      },
+      {
+        id: uuidv4(),
+        name: 'Aguardando Aprovação',
+        description: 'Evento publicado pelo promoter, mas aguardando aprovaçnao da Equipe Meu Ingresso)',
+        module: 'event',
+      },
+      { id: uuidv4(), name: 'Aprovado', description: 'Pagamento Aprovado', module: 'payment' },
+      { id: uuidv4(), name: 'Disponível', description: 'Disponível para check-in', module: 'ticket' },
+      {
+        id: uuidv4(),
+        name: 'Validado',
+        description: 'Indisponível para uso; Ingresso já validado na portaria',
+        module: 'ticket',
+      },
     ]);
 
     // Ratings
     await Rating.createMany([
-      { id: uuidv4(), name: 'General Audience' },
-      { id: uuidv4(), name: '18+' },
+      { id: uuidv4(), name: 'Livre', description: 'Livre para todas as idades' },
+      { id: uuidv4(), name: '18+', description: 'Proibido para menores de 18 anos' },
     ]);
 
     // Events
     const events = await Event.createMany([
       {
         id: uuidv4(),
-        name: 'Music Festival',
-        status_id: statuses[0].id,
-        promoter_id: users[1].id,
+        name: 'Festival de Música',
+        status_id: statuses[2].id,
+        address_id: address[0].id,
+        promoter_id: users[0].id,
         start_date: DateTime.now(),
-        type: 'Ingresso',
+        sale_type: 'Ingresso',
+        event_type: 'Presencial',
       },
       {
         id: uuidv4(),
-        name: 'Football Match',
-        status_id: statuses[0].id,
+        name: 'Partida de Futebol',
+        status_id: statuses[2].id,
+        address_id: address[1].id,
         promoter_id: users[1].id,
         start_date: DateTime.now(),
-        type: 'Ingresso',
+        sale_type: 'Ingresso',
+        event_type: 'Online',
       },
     ]);
 
     const assistant = await Role.findBy('name', 'Assistant');
 
     await EventCollaborator.createMany([
-      { id: uuidv4(), event_id: events[0].id, user_id: users[1].id, role_id: assistant?.$attributes.id },
-      { id: uuidv4(), event_id: events[1].id, user_id: users[1].id, role_id: assistant?.$attributes.id },
+      { id: uuidv4(), event_id: events[1].id, user_id: users[0].id, role_id: assistant?.$attributes.id },
     ]);
 
     // Event Fees
@@ -160,22 +231,38 @@ export default class DatabaseSeeder extends BaseSeeder {
 
     // Event Attachments
     await EventAttachment.createMany([
-      { id: uuidv4(), event_id: events[0].id, name: 'Banner', type: 'image', image_url: 'banner1.jpg' },
-      { id: uuidv4(), event_id: events[1].id, name: 'Poster', type: 'image', image_url: 'poster1.jpg' },
+      {
+        id: uuidv4(),
+        event_id: events[0].id,
+        name: 'banner',
+        type: 'image',
+        image_url:
+          'https://d2s7f8q1bxluur.cloudfront.net/gYXnIIwLdURfffTGlV4yNiHTGLs=/545x286/https%3A//s3-sa-east-1.amazonaws.com/s3-eventos-saas/media/eventos/481c26e8-1fdb-4c6d-8c1c-cd73f27c5f09.png',
+      },
+      {
+        id: uuidv4(),
+        event_id: events[1].id,
+        name: 'banner',
+        type: 'image',
+        image_url:
+          'https://d2s7f8q1bxluur.cloudfront.net/s0cm4rOhDrRqKHiQzBZGDfkJae4=/545x286/https%3A//s3-sa-east-1.amazonaws.com/s3-eventos-saas/media/eventos/12d2eece-0439-410c-a0fa-a9da8a3d4402.png',
+      },
     ]);
 
     const ticketEventCategories = await TicketEventCategory.createMany([
       { id: uuidv4(), name: 'VIP', event_id: events[0].id },
-      { id: uuidv4(), name: 'General', event_id: events[1].id },
+      { id: uuidv4(), name: 'Pista', event_id: events[0].id },
+      { id: uuidv4(), name: 'VIP', event_id: events[1].id },
+      { id: uuidv4(), name: 'Camarote', event_id: events[1].id },
     ]);
 
     // Tickets
-    await Ticket.createMany([
+    const ticket = await Ticket.createMany([
       {
         id: uuidv4(),
         event_id: events[0].id,
         ticket_event_category_id: ticketEventCategories[0].id,
-        name: 'VIP',
+        name: 'Masculino',
         total_quantity: 100,
         remaining_quantity: 80,
         price: 150.0,
@@ -185,15 +272,69 @@ export default class DatabaseSeeder extends BaseSeeder {
       },
       {
         id: uuidv4(),
-        event_id: events[1].id,
-        ticket_event_category_id: ticketEventCategories[1].id,
-        name: 'Standard',
-        total_quantity: 200,
-        remaining_quantity: 180,
-        price: 50.0,
+        event_id: events[0].id,
+        ticket_event_category_id: ticketEventCategories[0].id,
+        name: 'Feminino',
+        total_quantity: 50,
+        remaining_quantity: 50,
+        price: 100.0,
         status_id: statuses[0].id,
         start_date: DateTime.now(),
         end_date: DateTime.now().plus({ days: 10 }),
+      },
+      {
+        id: uuidv4(),
+        event_id: events[1].id,
+        ticket_event_category_id: ticketEventCategories[3].id,
+        name: 'Camarote',
+        total_quantity: 10,
+        remaining_quantity: 8,
+        price: 500.0,
+        status_id: statuses[0].id,
+        start_date: DateTime.now(),
+        end_date: DateTime.now().plus({ days: 10 }),
+      },
+    ]);
+
+    const payment = await Payments.createMany([
+      {
+        id: uuidv4(),
+        user_id: users[2].id,
+        status_id: statuses[5].id,
+        payment_method: 'pix',
+        gross_value: 20.0,
+        net_value: 19.0,
+        created_at: DateTime.now(),
+      },
+      {
+        id: uuidv4(),
+        user_id: users[2].id,
+        status_id: statuses[5].id,
+        payment_method: 'credit',
+        gross_value: 29.0,
+        net_value: 25.0,
+        created_at: DateTime.now(),
+      },
+    ]);
+
+    await CustomerTickets.createMany([
+      {
+        id: uuidv4(),
+        ticket_id: ticket[0].id,
+        current_owner_id: users[2].id,
+        status_id: statuses[7].id,
+        payment_id: payment[0].id,
+        ticket_identifier: 'ARG5AD',
+        created_at: DateTime.now(),
+      },
+      {
+        id: uuidv4(),
+        ticket_id: ticket[1].id,
+        current_owner_id: users[2].id,
+        status_id: statuses[8].id,
+        payment_id: payment[1].id,
+        ticket_identifier: '1AGTAD',
+        created_at: DateTime.now(),
       },
     ]);
 

@@ -45,6 +45,9 @@ export default class Events extends BaseModel {
   public opening_hour: string | null;
 
   @column()
+  public ending_hour: string | null;
+
+  @column()
   public contact: string | null;
 
   @column()
@@ -60,7 +63,10 @@ export default class Events extends BaseModel {
   public availability: 'Publico' | 'Oculto';
 
   @column()
-  public type: 'Ingresso' | 'Inscrição';
+  public sale_type: 'Ingresso' | 'Inscrição';
+
+  @column()
+  public event_type: 'Presencial' | 'Online';
 
   @column()
   public promoter_id: string;
