@@ -3,7 +3,7 @@ import { DateTime } from 'luxon';
 
 interface AliasValidationResult {
   alias: string;
-  isValid: boolean;
+  is_valid: boolean;
 }
 
 export default class EventService {
@@ -42,7 +42,7 @@ export default class EventService {
     const events = await Database.from('events').where('alias', alias);
 
     if (!events || events.length === 0) {
-      return { alias, isValid: true };
+      return { alias, is_valid: true };
     }
 
     const now = DateTime.now();
@@ -58,10 +58,10 @@ export default class EventService {
         (eventEndDateOnly.equals(currentDateOnly) && eventEndingHour < currentHour);
 
       if (!isEventFinished) {
-        return { alias, isValid: false };
+        return { alias, is_valid: false };
       }
     }
 
-    return { alias, isValid: true };
+    return { alias, is_valid: true };
   }
 }
