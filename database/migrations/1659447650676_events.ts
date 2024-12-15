@@ -6,7 +6,7 @@ export default class EventsSchema extends BaseSchema {
   public async up() {
     this.schema.createTable(this.tableName, (table) => {
       table.uuid('id').primary();
-      table.string('alias', 255).unique().notNullable();
+      table.string('alias', 255).notNullable();
       table.string('name', 100).notNullable();
       table.text('description').nullable();
       table.uuid('status_id').notNullable().references('id').inTable('statuses').onDelete('RESTRICT');
@@ -21,7 +21,7 @@ export default class EventsSchema extends BaseSchema {
       table.string('location_name', 150).nullable();
       table.text('general_information').nullable();
       table.integer('max_capacity').nullable();
-      table.enum('availability', ['Publico', 'Oculto']).notNullable().defaultTo('Publico');
+      table.enum('availability', ['Publico', 'Privado', 'Página']).notNullable().defaultTo('Publico');
       table.enum('sale_type', ['Ingresso', 'Inscrição']).notNullable().defaultTo('Ingresso');
       table.enum('event_type', ['Presencial', 'Online']).notNullable().defaultTo('Presencial');
       table.uuid('promoter_id').notNullable().references('id').inTable('users').onDelete('CASCADE');

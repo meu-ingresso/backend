@@ -8,7 +8,7 @@ class CreateEventValidator {
   public reporter = ReportHandler;
 
   public schema = schema.create({
-    alias: schema.string({ trim: true }, [rules.unique({ table: 'events', column: 'alias' })]),
+    alias: schema.string({ trim: true }),
     name: schema.string({ trim: true }),
     description: schema.string.optional({ trim: true }),
     status_id: schema.string({ trim: true }, [rules.exists({ table: 'statuses', column: 'id' })]),
@@ -23,7 +23,7 @@ class CreateEventValidator {
     location_name: schema.string.optional({ trim: true }),
     general_information: schema.string.optional({ trim: true }),
     max_capacity: schema.number.optional(),
-    availability: schema.enum(['Publico', 'Oculto']),
+    availability: schema.enum(['Publico', 'Privado', 'Página']),
     sale_type: schema.enum(['Ingresso', 'Inscrição']),
     event_type: schema.enum(['Presencial', 'Online']),
     promoter_id: schema.string({ trim: true }, [rules.exists({ table: 'users', column: 'id' })]),
@@ -31,11 +31,10 @@ class CreateEventValidator {
 
   public messages = {
     'alias.required': 'O campo "alias" é obrigatório.',
-    'alias.unique': 'O valor do campo "alias" já está em uso.',
     'name.required': 'O campo "name" é obrigatório.',
     'status_id.required': 'O campo "status_id" é obrigatório.',
     'start_date.required': 'O campo "start_date" é obrigatório.',
-    'availability.enum': 'O campo "availability" deve ser Publico ou Oculto.',
+    'availability.enum': 'O campo "availability" deve ser Publico, Privado ou Página.',
     'sale_type.enum': 'O campo "sale_type" deve ser Ingresso ou Inscrição.',
     'event_type.enum': 'O campo "event_type" deve ser Presencial ou Online.',
     'promoter_id.required': 'O campo "promoter_id" é obrigatório.',
@@ -49,9 +48,7 @@ class UpdateEventValidator {
 
   public schema = schema.create({
     id: schema.string({ trim: true }),
-    alias: schema.string.optional({ trim: true }, [
-      rules.unique({ table: 'events', column: 'alias', whereNot: { id: this.context.request.input('id') } }),
-    ]),
+    alias: schema.string.optional({ trim: true }),
     name: schema.string.optional({ trim: true }),
     description: schema.string.optional({ trim: true }),
     status_id: schema.string.optional({ trim: true }, [rules.exists({ table: 'statuses', column: 'id' })]),
@@ -74,7 +71,6 @@ class UpdateEventValidator {
 
   public messages = {
     'id.required': 'O campo "id" é obrigatório.',
-    'alias.unique': 'O valor do campo "alias" já está em uso.',
     'availability.enum': 'O campo "availability" deve ser Publico ou Oculto.',
     'sale_type.enum': 'O campo "sale_type" deve ser Ingresso ou Inscrição.',
     'event_type.enum': 'O campo "event_type" deve ser Presencial ou Online.',

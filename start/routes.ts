@@ -61,6 +61,7 @@ Route.group(() => {
 
     Route.get('/events', 'v1/EventsController.search');
     Route.post('/event', 'v1/EventsController.create');
+    Route.get('/event/validate-alias/:alias', 'v1/EventsController.validateAlias');
     Route.patch('/event', 'v1/EventsController.update');
 
     Route.get('/event-collaborators', 'v1/EventCollaboratorsController.search');

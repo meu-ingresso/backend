@@ -1,6 +1,11 @@
 import Database from '@ioc:Adonis/Lucid/Database';
 import { DateTime } from 'luxon';
 
+interface AliasValidationResult {
+  alias: string;
+  isValid: boolean;
+}
+
 export default class EventService {
   public async getTotalizers(event_id: string): Promise<any> {
     const totalizers = await Database.from('customer_tickets')
@@ -9,6 +14,8 @@ export default class EventService {
       .where('tickets.event_id', event_id)
       .select('payments.net_value as net_value', 'customer_tickets.created_at as created_at');
 
+    const today = DateTime.now().startOf('day');
+
     let total = {
       totalSales: 0,
       totalSalesToday: 0,
@@ -16,23 +23,45 @@ export default class EventService {
       totalSalesAmountToday: 0,
     };
 
-    const today = DateTime.now();
-
     for (const totalizer of totalizers) {
       total.totalSales += 1;
       total.totalSalesAmout += Number(totalizer.net_value);
 
-      const createdAt = DateTime.fromJSDate(totalizer.created_at);
+      const createdAt = DateTime.fromJSDate(totalizer.created_at).startOf('day');
 
-      const created = `${createdAt.day}/${createdAt.month}/${createdAt.year}`;
-      const todayDate = `${today.day}/${today.month}/${today.year}`;
-
-      if (created === todayDate) {
+      if (createdAt.equals(today)) {
         total.totalSalesToday += 1;
         total.totalSalesAmountToday += Number(totalizer.net_value);
       }
     }
 
     return total;
+  }
+
+  public async validateAlias(alias: string): Promise<AliasValidationResult> {
+    const events = await Database.from('events').where('alias', alias);
+
+    if (!events || events.length === 0) {
+      return { alias, isValid: true };
+    }
+
+    const now = DateTime.now();
+    const currentDateOnly = now.startOf('day');
+    const currentHour = now.toFormat('HH:mm');
+
+    for (const event of events) {
+      const eventEndDateOnly = DateTime.fromISO(event.end_date).startOf('day');
+      const eventEndingHour = event.ending_hour;
+
+      const isEventFinished =
+        eventEndDateOnly < currentDateOnly ||
+        (eventEndDateOnly.equals(currentDateOnly) && eventEndingHour < currentHour);
+
+      if (!isEventFinished) {
+        return { alias, isValid: false };
+      }
+    }
+
+    return { alias, isValid: true };
   }
 }

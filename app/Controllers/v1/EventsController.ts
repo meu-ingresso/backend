@@ -21,6 +21,18 @@ export default class EventsController {
     utils.getResponse(context, 200, headers, body);
   }
 
+  public async validateAlias(context: HttpContextContract) {
+    const alias = context.request.params().alias;
+
+    const result = await this.eventService.validateAlias(alias);
+
+    const headers = utils.getHeaders();
+
+    const body = utils.getBody('VALIDATE_SUCCESS', result);
+
+    utils.getResponse(context, 200, headers, body);
+  }
+
   public async update(context: HttpContextContract) {
     const payload = await context.request.validate(UpdateEventValidator);
 
