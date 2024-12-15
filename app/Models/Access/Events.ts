@@ -63,7 +63,7 @@ export default class Events extends BaseModel {
   public max_capacity: number | null;
 
   @column()
-  public availability: 'Publico' | 'Oculto';
+  public availability: 'Publico' | 'Privado' | 'Página';
 
   @column()
   public sale_type: 'Ingresso' | 'Inscrição';
