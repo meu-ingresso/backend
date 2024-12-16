@@ -67,7 +67,7 @@ export default class EventService {
   }
 
   public async getEventByIdWithAllPreloads(event_id: string): Promise<any> {
-    const event = await Event.query()
+    return Event.query()
       .where('id', event_id)
       .preload('tickets')
       .preload('attachments')
@@ -76,7 +76,5 @@ export default class EventService {
       .preload('checkoutFields')
       .preload('guests')
       .first();
-
-    return event;
   }
 }
