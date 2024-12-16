@@ -6,4 +6,5 @@ Server.middleware.registerNamed({
   auth: () => import('App/Middlewares/Auth'),
   authApiKey: () => import('App/Middlewares/AuthApiKey'),
   externalAuth: () => import('App/Middlewares/ExternalAuth'),
+  EventAccess: () => import('App/Middlewares/EventAccess'),
 });

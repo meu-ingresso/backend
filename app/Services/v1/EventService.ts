@@ -1,5 +1,6 @@
 import Database from '@ioc:Adonis/Lucid/Database';
 import { DateTime } from 'luxon';
+import Event from 'App/Models/Access/Events';
 
 interface AliasValidationResult {
   alias: string;
@@ -63,5 +64,19 @@ export default class EventService {
     }
 
     return { alias, is_valid: true };
+  }
+
+  public async getEventByIdWithAllPreloads(event_id: string): Promise<any> {
+    const event = await Event.query()
+      .where('id', event_id)
+      .preload('tickets')
+      .preload('attachments')
+      .preload('collaborators')
+      .preload('coupons')
+      .preload('checkoutFields')
+      .preload('guests')
+      .first();
+
+    return event;
   }
 }
