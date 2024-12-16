@@ -57,9 +57,11 @@ export default class EventsController {
       }
     }
 
+    const resultByRole = await utils.getInfosByRole(context.auth.user!.id, result, 'Event');
+
     const headers = utils.getHeaders();
 
-    const body = utils.getBody('SEARCH_SUCCESS', result);
+    const body = utils.getBody('SEARCH_SUCCESS', resultByRole);
 
     utils.getResponse(context, 200, headers, body);
   }
