@@ -60,32 +60,34 @@ async function createAudity(
   }
 }
 
-async function getInfosByRole(userId: string, data: any, module: string) {
+async function getInfosByRole(userId: string, data: any, module: string): Promise<typeof data> {
   const user = await userService.getUserInfos(userId);
 
-  let result = data;
-
-  if (user && user?.$preloaded?.role?.$attributes?.name === 'Admin') return result;
-
-  const res: typeof result.data = [];
-
-  for (let i = 0; i < result.data.length; i++) {
-    const event_id = module === 'Event' ? result.data[i].id : result.data[i].event_id;
-    const event = await eventService.getEventByIdWithAllPreloads(event_id);
-
-    const isPromoter = event.promoter_id === user.id;
-
-    const isCollaborator = event.collaborators?.some((collaborator: any) => collaborator.user_id === user.id);
-
-    if (isPromoter || isCollaborator) {
-      res.push(result.data[i]);
-    }
+  if (user?.$preloaded?.role?.$attributes?.name === 'Admin') {
+    return data;
   }
 
-  result.meta.total = res.length;
-  result.data = res;
+  const res: typeof data.data = [];
 
-  return result;
+  const filteredData = await Promise.all(
+    data.data.map(async (item) => {
+      const event_id = module === 'Event' ? item.id : item.event_id;
+
+      const event = await eventService.getEventByIdWithAllPreloads(event_id);
+
+      const isPromoter = event.promoter_id === user.id;
+      const isCollaborator = event.collaborators?.some((collaborator: any) => collaborator.user_id === user.id);
+
+      return isPromoter || isCollaborator ? item : null;
+    })
+  );
+
+  res.push(...filteredData.filter((item) => item !== null));
+
+  data.meta.total = res.length;
+  data.data = res;
+
+  return data;
 }
 
 export default { getHeaders, getBody, getResponse, createAudity, getInfosByRole };
