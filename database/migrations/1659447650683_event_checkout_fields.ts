@@ -23,6 +23,7 @@ export default class EventCheckoutFieldsSchema extends BaseSchema {
         ])
         .notNullable()
         .defaultTo('TEXTO');
+      table.enum('person_type', ['PF', 'PJ', 'ESTRANGEIRO']).notNullable().defaultTo('PF');
       table.boolean('required').notNullable().defaultTo(false);
       table.boolean('is_unique').notNullable().defaultTo(false);
       table.boolean('visible_on_ticket').notNullable().defaultTo(false);
