@@ -6,6 +6,9 @@
     "dev": "node ace serve --watch",
     "build": "node ace build --production",
     "pm2": "pm2 start yarn --name meu-ingresso-api --interpreter bash -- start",
+    "migration:run": "node ace migration:run",
+    "migration:rollback": "node ace migration:rollback",
+    "db:seed": "node ace db:seed",
     "start": "node server.js"
   },
   "devDependencies": {

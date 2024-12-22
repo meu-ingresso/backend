@@ -25,6 +25,12 @@ export default class Coupons extends BaseModel {
   @column()
   public uses: number;
 
+  @column.dateTime()
+  public start_date: DateTime;
+
+  @column.dateTime()
+  public end_date: DateTime;
+
   @column.dateTime({ autoCreate: true })
   public created_at: DateTime;
 
