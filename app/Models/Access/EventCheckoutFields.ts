@@ -17,6 +17,9 @@ export default class EventCheckoutFields extends BaseModel {
   public type: string;
 
   @column()
+  public person_type: string;
+
+  @column()
   public required: boolean;
 
   @column()
