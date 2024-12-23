@@ -200,9 +200,10 @@ export default class DatabaseSeeder extends BaseSeeder {
 
     // Ratings
     const rating = await Rating.createMany([
-      { id: uuidv4(), name: 'Livre', description: 'Livre para todas as idades' },
       { id: uuidv4(), name: '18+', description: 'Proibido para menores de 18 anos' },
       { id: uuidv4(), name: '16+', description: 'Maiores de 16 anos' },
+      { id: uuidv4(), name: '14+', description: 'Maiores de 14 anos' },
+      { id: uuidv4(), name: 'Livre', description: 'Livre para todas as idades' },
     ]);
 
     console.log('Ratings created');
