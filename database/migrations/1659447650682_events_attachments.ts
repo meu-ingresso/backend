@@ -11,6 +11,7 @@ export default class EventAttachmentsSchema extends BaseSchema {
       table.string('type', 50).nullable();
       table.string('image_url', 255).nullable();
       table.timestamp('created_at', { useTz: true }).notNullable().defaultTo(this.now());
+      table.timestamp('deleted_at', { useTz: true }).nullable();
     });
   }
 
