@@ -1,6 +1,5 @@
 import { HttpContextContract } from '@ioc:Adonis/Core/HttpContext';
 import { CreateCityValidator, UpdateCityValidator } from 'App/Validators/v1/CitiesValidator';
-import { DeleteValidator } from 'App/Validators/v1/DynamicValidator';
 import DynamicService from 'App/Services/v1/DynamicService';
 import utils from 'Utils/utils';
 
