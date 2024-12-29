@@ -1,5 +1,6 @@
 import { HttpContextContract } from '@ioc:Adonis/Core/HttpContext';
 import { CreateCityValidator, UpdateCityValidator } from 'App/Validators/v1/CitiesValidator';
+import { DeleteValidator } from 'App/Validators/v1/DynamicValidator';
 import DynamicService from 'App/Services/v1/DynamicService';
 import utils from 'Utils/utils';
 
@@ -37,6 +38,18 @@ export default class AddressesController {
 
     const headers = utils.getHeaders();
     const body = utils.getBody('SEARCH_SUCCESS', result);
+
+    utils.getResponse(context, 200, headers, body);
+  }
+
+  public async delete(context: HttpContextContract) {
+    const id = context.request.params().id;
+
+    const result = await this.dynamicService.softDelete('City', { id });
+
+    const headers = utils.getHeaders();
+
+    const body = utils.getBody('DELETE_SUCCESS', result);
 
     utils.getResponse(context, 200, headers, body);
   }

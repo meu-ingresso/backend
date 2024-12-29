@@ -65,4 +65,16 @@ export default class EventsController {
 
     utils.getResponse(context, 200, headers, body);
   }
+
+  public async delete(context: HttpContextContract) {
+    const id = context.request.params().id;
+
+    const result = await this.dynamicService.softDelete('Event', { id });
+
+    const headers = utils.getHeaders();
+
+    const body = utils.getBody('DELETE_SUCCESS', result);
+
+    utils.getResponse(context, 200, headers, body);
+  }
 }

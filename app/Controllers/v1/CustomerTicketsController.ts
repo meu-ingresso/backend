@@ -45,4 +45,16 @@ export default class CustomerTicketsController {
 
     utils.getResponse(context, 200, headers, body);
   }
+
+  public async delete(context: HttpContextContract) {
+    const id = context.request.params().id;
+
+    const result = await this.dynamicService.softDelete('CustomerTicket', { id });
+
+    const headers = utils.getHeaders();
+
+    const body = utils.getBody('DELETE_SUCCESS', result);
+
+    utils.getResponse(context, 200, headers, body);
+  }
 }
