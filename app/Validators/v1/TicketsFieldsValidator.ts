@@ -12,7 +12,6 @@ class CreateTicketsFieldValidator {
     field_id: schema.string({ trim: true }, [rules.exists({ table: 'checkout_fields', column: 'id' })]),
     order: schema.number.optional(),
     value: schema.string({ trim: true }),
-    is_active: schema.boolean.optional(),
   });
 
   public messages = {
@@ -38,7 +37,6 @@ class UpdateTicketsFieldValidator {
     field_id: schema.string.optional({ trim: true }, [rules.exists({ table: 'checkout_fields', column: 'id' })]),
     order: schema.number.optional(),
     value: schema.string.optional({ trim: true }),
-    is_active: schema.boolean.optional(),
   });
 
   public messages = {

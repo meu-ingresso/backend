@@ -23,7 +23,6 @@ class CreateTicketValidator {
     availability: schema.enum(['Privado', 'Publico', 'PDV']),
     min_quantity_per_user: schema.number.optional(),
     max_quantity_per_user: schema.number.optional(),
-    is_active: schema.boolean.optional(),
   });
 
   public messages = {
@@ -44,8 +43,6 @@ class CreateTicketValidator {
     'availability.enum': 'O campo "availability" deve ser Privado, Público ou PDV.',
     'min_quantity_per_user.number': 'O min_quantity_per_user precisa ser um número válido.',
     'max_quantity_per_user.number': 'O min_quantity_per_user precisa ser um número válido.',
-    'is_active.required': 'O campo de estado ativo/inativo é obrigatório.',
-    'is_active.boolean': 'O estado ativo/inativo deve ser um valor booleano.',
   };
 }
 
@@ -72,7 +69,6 @@ class UpdateTicketValidator {
     availability: schema.enum.optional(['Privado', 'Publico', 'PDV']),
     min_quantity_per_user: schema.number.optional(),
     max_quantity_per_user: schema.number.optional(),
-    is_active: schema.boolean.optional(),
   });
 
   public messages = {
@@ -87,7 +83,6 @@ class UpdateTicketValidator {
     'total_quantity.number': 'A quantidade total deve ser um número.',
     'remaining_quantity.number': 'A quantidade restante deve ser um número.',
     'price.number': 'O preço deve ser um número.',
-    'is_active.boolean': 'O estado ativo/inativo deve ser um valor booleano.',
   };
 }
 

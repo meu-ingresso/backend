@@ -20,14 +20,14 @@ export default class TicketsFields extends BaseModel {
   @column()
   public value: string;
 
-  @column()
-  public is_active: boolean;
-
   @column.dateTime({ autoCreate: true })
   public created_at: DateTime;
 
   @column.dateTime({ autoCreate: true, autoUpdate: true })
   public updated_at: DateTime;
+
+  @column.dateTime()
+  public deleted_at: DateTime | null;
 
   @belongsTo(() => CustomerTickets, {
     foreignKey: 'customer_ticket_id',

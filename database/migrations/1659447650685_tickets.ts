@@ -24,7 +24,6 @@ export default class TicketsSchema extends BaseSchema {
       table.enum('availability', ['Privado', 'Publico', 'PDV']).notNullable().defaultTo('Publico');
       table.integer('min_quantity_per_user').notNullable().defaultTo(1);
       table.integer('max_quantity_per_user').notNullable().defaultTo(5);
-      table.boolean('is_active').notNullable().defaultTo(true);
       table.timestamp('created_at', { useTz: true }).defaultTo(this.now());
       table.timestamp('updated_at', { useTz: true }).defaultTo(this.now());
       table.timestamp('deleted_at', { useTz: true }).nullable();

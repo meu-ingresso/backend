@@ -94,7 +94,6 @@ export default class DatabaseSeeder extends BaseSeeder {
         alias: 'jean-promotor',
         password: await Hash.make('123456'),
         role_id: roles[1].id,
-        is_active: true,
       },
       {
         id: uuidv4(),
@@ -103,7 +102,6 @@ export default class DatabaseSeeder extends BaseSeeder {
         alias: 'system-administrator',
         password: await Hash.make('123456'),
         role_id: roles[0].id,
-        is_active: true,
       },
       {
         id: uuidv4(),
@@ -112,7 +110,6 @@ export default class DatabaseSeeder extends BaseSeeder {
         alias: 'cliente-final',
         password: await Hash.make('123456'),
         role_id: roles[2].id,
-        is_active: true,
       },
     ]);
 
@@ -158,8 +155,8 @@ export default class DatabaseSeeder extends BaseSeeder {
 
     // Categories
     const category = await Category.createMany([
-      { id: uuidv4(), name: 'Música', is_active: true },
-      { id: uuidv4(), name: 'Esportes', is_active: true },
+      { id: uuidv4(), name: 'Música' },
+      { id: uuidv4(), name: 'Esportes' },
     ]);
 
     console.log('Categories created');

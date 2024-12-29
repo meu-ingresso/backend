@@ -44,6 +44,9 @@ export default class CustomerTickets extends BaseModel {
   @column.dateTime({ autoCreate: true, autoUpdate: true })
   public updated_at: DateTime;
 
+  @column.dateTime()
+  public deleted_at: DateTime | null;
+
   @belongsTo(() => Tickets, {
     foreignKey: 'ticket_id',
   })
