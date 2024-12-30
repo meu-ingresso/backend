@@ -20,6 +20,7 @@ import RolePermission from 'App/Models/Access/RolePermissions';
 import Role from 'App/Models/Access/Roles';
 import Status from 'App/Models/Access/Statuses';
 import Ticket from 'App/Models/Access/Tickets';
+import TicketEventCategory from 'App/Models/Access/TicketEventCategories';
 import User from 'App/Models/Access/Users';
 import AuditLog from 'App/Models/Access/AuditLogs';
 
@@ -45,6 +46,7 @@ export default class DynamicService {
     Role,
     Status,
     Ticket,
+    TicketEventCategory,
     User,
     AuditLog,
   };
