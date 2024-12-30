@@ -11,9 +11,8 @@ export default class UsersSchema extends BaseSchema {
       table.string('alias', 30).unique().notNullable();
       table.string('password', 100).nullable();
       table.uuid('role_id').nullable().references('id').inTable('roles').onDelete('SET NULL');
-      table.boolean('is_active').notNullable().defaultTo(true);
-      table.timestamp('created_at', { useTz: true }).nullable();
-      table.timestamp('updated_at', { useTz: true }).nullable();
+      table.timestamp('created_at', { useTz: true }).defaultTo(this.now());
+      table.timestamp('updated_at', { useTz: true }).defaultTo(this.now());
       table.timestamp('deleted_at', { useTz: true }).nullable();
     });
   }

@@ -16,6 +16,9 @@ export default class States extends BaseModel {
   @column.dateTime({ autoCreate: true })
   public created_at: DateTime;
 
+  @column.dateTime()
+  public deleted_at: DateTime | null;
+
   @hasMany(() => Cities, {
     foreignKey: 'state_id',
   })

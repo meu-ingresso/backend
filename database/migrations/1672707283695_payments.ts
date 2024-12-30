@@ -14,6 +14,7 @@ export default class PaymentsSchema extends BaseSchema {
       table.uuid('coupon_id').nullable().references('id').inTable('coupons').onDelete('SET NULL');
       table.timestamp('paid_at', { useTz: true }).nullable();
       table.timestamp('created_at', { useTz: true }).defaultTo(this.now());
+      table.timestamp('deleted_at', { useTz: true }).nullable();
     });
   }
 

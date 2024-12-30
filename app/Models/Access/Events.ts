@@ -93,13 +93,16 @@ export default class Events extends BaseModel {
   public is_featured: boolean;
 
   @column()
-  public is_active: boolean;
+  public absorb_service_fee: boolean;
 
   @column.dateTime({ autoCreate: true })
   public created_at: DateTime;
 
   @column.dateTime({ autoCreate: true, autoUpdate: true })
   public updated_at: DateTime;
+
+  @column.dateTime()
+  public deleted_at: DateTime | null;
 
   @belongsTo(() => Statuses, { foreignKey: 'status_id' })
   public status: BelongsTo<typeof Statuses>;

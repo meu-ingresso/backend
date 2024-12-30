@@ -9,6 +9,7 @@ export default class StatesSchema extends BaseSchema {
       table.string('name', 255).notNullable();
       table.string('acronym', 5).notNullable();
       table.timestamp('created_at', { useTz: true }).defaultTo(this.now());
+      table.timestamp('deleted_at', { useTz: true }).nullable();
     });
   }
 

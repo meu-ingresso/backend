@@ -12,6 +12,8 @@ export default class TicketsController {
 
     const result = await this.dynamicService.create('Ticket', payload);
 
+    await utils.createAudity('CREATE', 'TICKET', result.id, context.auth.user?.$attributes.id, null, result);
+
     const headers = utils.getHeaders();
 
     const body = utils.getBody('CREATE_SUCCESS', result);
@@ -22,7 +24,18 @@ export default class TicketsController {
   public async update(context: HttpContextContract) {
     const payload = await context.request.validate(UpdateTicketValidator);
 
+    const oldData = await this.dynamicService.getById('Ticket', payload.id);
+
     const result = await this.dynamicService.update('Ticket', payload);
+
+    await utils.createAudity(
+      'UPDATE',
+      'TICKET',
+      result.id,
+      context.auth.user?.$attributes.id,
+      oldData.$attributes,
+      result
+    );
 
     const headers = utils.getHeaders();
 
@@ -41,6 +54,22 @@ export default class TicketsController {
     const headers = utils.getHeaders();
 
     const body = utils.getBody('SEARCH_SUCCESS', resultByRole);
+
+    utils.getResponse(context, 200, headers, body);
+  }
+
+  public async delete(context: HttpContextContract) {
+    const id = context.request.params().id;
+
+    const oldData = await this.dynamicService.getById('Ticket', id);
+
+    const result = await this.dynamicService.softDelete('Ticket', { id });
+
+    await utils.createAudity('DELETE', 'TICKET', id, context.auth.user?.$attributes.id, oldData.$attributes, result);
+
+    const headers = utils.getHeaders();
+
+    const body = utils.getBody('DELETE_SUCCESS', result);
 
     utils.getResponse(context, 200, headers, body);
   }

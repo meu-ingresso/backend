@@ -23,12 +23,14 @@ export default class EventCheckoutFieldsSchema extends BaseSchema {
         ])
         .notNullable()
         .defaultTo('TEXTO');
+      table.enum('person_type', ['PF', 'PJ', 'ESTRANGEIRO']).notNullable().defaultTo('PF');
       table.boolean('required').notNullable().defaultTo(false);
       table.boolean('is_unique').notNullable().defaultTo(false);
       table.boolean('visible_on_ticket').notNullable().defaultTo(false);
       table.string('help_text', 255).nullable();
       table.timestamp('created_at', { useTz: true }).defaultTo(this.now());
       table.timestamp('updated_at', { useTz: true }).defaultTo(this.now());
+      table.timestamp('deleted_at', { useTz: true }).nullable();
     });
   }
 

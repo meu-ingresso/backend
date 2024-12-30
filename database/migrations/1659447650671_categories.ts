@@ -8,9 +8,9 @@ export default class CategoriesSchema extends BaseSchema {
       table.uuid('id').primary();
       table.string('name', 100).notNullable().unique();
       table.text('description').nullable();
-      table.boolean('is_active').notNullable().defaultTo(true);
       table.timestamp('created_at', { useTz: true }).defaultTo(this.now());
       table.timestamp('updated_at', { useTz: true }).defaultTo(this.now());
+      table.timestamp('deleted_at', { useTz: true }).nullable();
     });
   }
 

@@ -25,11 +25,20 @@ export default class Coupons extends BaseModel {
   @column()
   public uses: number;
 
+  @column.dateTime()
+  public start_date: DateTime;
+
+  @column.dateTime()
+  public end_date: DateTime;
+
   @column.dateTime({ autoCreate: true })
   public created_at: DateTime;
 
   @column.dateTime({ autoCreate: true, autoUpdate: true })
   public updated_at: DateTime;
+
+  @column.dateTime()
+  public deleted_at: DateTime | null;
 
   @belongsTo(() => Events, {
     foreignKey: 'event_id',

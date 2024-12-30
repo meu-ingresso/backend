@@ -21,6 +21,9 @@ export default class Parameters extends BaseModel {
   @column.dateTime({ autoCreate: true, autoUpdate: true })
   public updated_at: DateTime;
 
+  @column.dateTime()
+  public deleted_at: DateTime | null;
+
   @beforeCreate()
   public static assignUuid(parameter: Parameters) {
     parameter.id = uuidv4();

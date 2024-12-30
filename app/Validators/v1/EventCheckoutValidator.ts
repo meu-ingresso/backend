@@ -22,6 +22,7 @@ class CreateEventCheckoutFieldValidator {
       'MESA',
       'ASSENTO',
     ] as const),
+    person_type: schema.enum(['PF', 'PJ', 'ESTRANGEIRO'] as const),
     required: schema.boolean(),
     is_unique: schema.boolean(),
     visible_on_ticket: schema.boolean(),

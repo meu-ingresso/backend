@@ -8,7 +8,7 @@ export default class AuthService {
   public async login(payload: LoginRequest): Promise<User | null> {
     const user = await User.query().where('email', payload.email).preload('role').preload('people').first();
 
-    if (!user || !user.is_active || !(await Hash.verify(user.password || '', payload.password))) {
+    if (!user || user.deleted_at || !(await Hash.verify(user.password || '', payload.password))) {
       return null;
     }
 

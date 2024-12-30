@@ -18,6 +18,8 @@ class CreateCouponValidator {
     ]),
     discount_type: schema.enum(['percentage', 'fixed']),
     discount_value: schema.number(),
+    start_date: schema.date.optional(),
+    end_date: schema.date.optional(),
     max_uses: schema.number(),
   });
 
@@ -30,6 +32,8 @@ class CreateCouponValidator {
     'discount_type.enum': 'O campo "discount_type" deve ser "percentage" ou "fixed".',
     'discount_value.required': 'O campo "discount_value" é obrigatório.',
     'discount_value.number': 'O campo "discount_value" deve ser um número válido.',
+    'start_date.date': 'A data de início deve ser uma data válida.',
+    'end_date.date': 'A data de fim deve ser uma data válida.',
     'max_uses.required': 'O campo "max_uses" é obrigatório.',
     'max_uses.number': 'O campo "max_uses" deve ser um número válido.',
   };
@@ -53,6 +57,8 @@ class UpdateCouponValidator {
     ]),
     discount_type: schema.enum.optional(['percentage', 'fixed']),
     discount_value: schema.number.optional(),
+    start_date: schema.date.optional(),
+    end_date: schema.date.optional(),
     max_uses: schema.number.optional(),
   });
 
@@ -62,6 +68,8 @@ class UpdateCouponValidator {
     'event_id.exists': 'O evento especificado não existe.',
     'code.unique': 'Já existe um cupom com este código para o mesmo evento.',
     'discount_type.enum': 'O campo "discount_type" deve ser "percentage" ou "fixed".',
+    'start_date.date': 'A data de início deve ser uma data válida.',
+    'end_date.date': 'A data de fim deve ser uma data válida.',
   };
 }
 

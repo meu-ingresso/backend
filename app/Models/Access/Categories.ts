@@ -13,14 +13,14 @@ export default class Categories extends BaseModel {
   @column()
   public description: string | null;
 
-  @column()
-  public is_active: boolean;
-
   @column.dateTime({ autoCreate: true })
   public created_at: DateTime;
 
   @column.dateTime({ autoCreate: true, autoUpdate: true })
   public updated_at: DateTime;
+
+  @column.dateTime()
+  public deleted_at: DateTime | null;
 
   @hasMany(() => Events, {
     foreignKey: 'category_id',

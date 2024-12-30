@@ -11,6 +11,7 @@ export default class ParametersSchema extends BaseSchema {
       table.string('description', 255).nullable();
       table.timestamp('created_at', { useTz: true }).defaultTo(this.now());
       table.timestamp('updated_at', { useTz: true }).defaultTo(this.now());
+      table.timestamp('deleted_at', { useTz: true }).nullable();
     });
   }
 
