@@ -28,7 +28,7 @@ class UpdateTicketEventCategoryValidator {
   public schema = schema.create({
     id: schema.string({ trim: true }),
     event_id: schema.string.optional({ trim: true }, [rules.exists({ table: 'events', column: 'id' })]),
-    name: schema.string.optional({ trim: true }),,
+    name: schema.string.optional({ trim: true }),
   });
 
   public messages = {
