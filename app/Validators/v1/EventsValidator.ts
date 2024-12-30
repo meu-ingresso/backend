@@ -23,6 +23,7 @@ class CreateEventValidator {
     location_name: schema.string.optional({ trim: true }),
     general_information: schema.string.optional({ trim: true }),
     max_capacity: schema.number.optional(),
+    absorb_service_fee: schema.boolean.optional(),
     availability: schema.enum(['Publico', 'Privado', 'Página']),
     sale_type: schema.enum(['Ingresso', 'Inscrição']),
     event_type: schema.enum(['Presencial', 'Online']),
@@ -38,6 +39,7 @@ class CreateEventValidator {
     'sale_type.enum': 'O campo "sale_type" deve ser Ingresso ou Inscrição.',
     'event_type.enum': 'O campo "event_type" deve ser Presencial ou Online.',
     'promoter_id.required': 'O campo "promoter_id" é obrigatório.',
+    'absorb_service_fee.boolean': 'O campo "absorb_service_fee" deve ser um booleano.',
   };
 }
 
@@ -63,6 +65,7 @@ class UpdateEventValidator {
     location_name: schema.string.optional({ trim: true }),
     general_information: schema.string.optional({ trim: true }),
     max_capacity: schema.number.optional(),
+    absorb_service_fee: schema.boolean.optional(),
     availability: schema.enum.optional(['Publico', 'Oculto']),
     sale_type: schema.enum.optional(['Ingresso', 'Inscrição']),
     event_type: schema.enum.optional(['Presencial', 'Online']),
@@ -74,6 +77,7 @@ class UpdateEventValidator {
     'availability.enum': 'O campo "availability" deve ser Publico ou Oculto.',
     'sale_type.enum': 'O campo "sale_type" deve ser Ingresso ou Inscrição.',
     'event_type.enum': 'O campo "event_type" deve ser Presencial ou Online.',
+    'absorb_service_fee.boolean': 'O campo "absorb_service_fee" deve ser um booleano.',
   };
 }
 

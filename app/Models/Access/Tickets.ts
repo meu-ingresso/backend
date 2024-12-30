@@ -44,6 +44,9 @@ export default class Tickets extends BaseModel {
   public availability: 'Privado' | 'Publico' | 'PDV';
 
   @column()
+  public display_order: number;
+
+  @column()
   public min_quantity_per_user: number;
 
   @column()

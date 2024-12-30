@@ -13,7 +13,7 @@ export default class StatusesSchema extends BaseSchema {
       table.timestamp('updated_at', { useTz: true }).defaultTo(this.now());
       table.timestamp('deleted_at', { useTz: true }).nullable();
 
-      table.unique(['name', 'module'], 'unique_status_name_module');
+      table.unique(['name', 'module']);
     });
   }
 

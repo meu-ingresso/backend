@@ -92,6 +92,9 @@ export default class Events extends BaseModel {
   @column()
   public is_featured: boolean;
 
+  @column()
+  public absorb_service_fee: boolean;
+
   @column.dateTime({ autoCreate: true })
   public created_at: DateTime;
 

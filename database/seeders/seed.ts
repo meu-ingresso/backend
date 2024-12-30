@@ -326,6 +326,7 @@ export default class DatabaseSeeder extends BaseSeeder {
         price: 150.0,
         status_id: statuses[0].id,
         start_date: DateTime.now(),
+        display_order: 1,
         end_date: DateTime.now().plus({ days: 10 }),
       },
       {
@@ -339,6 +340,7 @@ export default class DatabaseSeeder extends BaseSeeder {
         status_id: statuses[0].id,
         start_date: DateTime.now(),
         end_date: DateTime.now().plus({ days: 10 }),
+        display_order: 2,
       },
       {
         id: uuidv4(),
@@ -351,6 +353,7 @@ export default class DatabaseSeeder extends BaseSeeder {
         status_id: statuses[0].id,
         start_date: DateTime.now(),
         end_date: DateTime.now().plus({ days: 10 }),
+        display_order: 1,
       },
     ]);
 
