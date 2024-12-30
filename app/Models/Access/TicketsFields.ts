@@ -20,9 +20,6 @@ export default class TicketsFields extends BaseModel {
   @column()
   public value: string;
 
-  @column()
-  public is_active: boolean;
-
   @column.dateTime({ autoCreate: true })
   public created_at: DateTime;
 

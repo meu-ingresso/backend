@@ -15,6 +15,7 @@ export default class AddressesSchema extends BaseSchema {
       table.decimal('longitude', 11, 8).nullable();
       table.uuid('city_id').notNullable().references('id').inTable('cities').onDelete('CASCADE');
       table.timestamp('created_at', { useTz: true }).defaultTo(this.now());
+      table.timestamp('deleted_at', { useTz: true });
     });
   }
 

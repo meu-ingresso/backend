@@ -12,6 +12,8 @@ export default class RolesController {
 
     const result = await this.dynamicService.create('Role', payload);
 
+    await utils.createAudity('CREATE', 'ROLE', result.id, context.auth.user?.$attributes.id, null, result);
+
     const headers = utils.getHeaders();
 
     const body = utils.getBody('CREATE_SUCCESS', result);
@@ -22,7 +24,18 @@ export default class RolesController {
   public async update(context: HttpContextContract) {
     const payload = await context.request.validate(UpdateRoleValidator);
 
+    const oldData = await this.dynamicService.getById('Role', payload.id);
+
     const result = await this.dynamicService.update('Role', payload);
+
+    await utils.createAudity(
+      'UPDATE',
+      'ROLE',
+      result.id,
+      context.auth.user?.$attributes.id,
+      oldData.$attributes,
+      result
+    );
 
     const headers = utils.getHeaders();
 
@@ -39,6 +52,22 @@ export default class RolesController {
     const headers = utils.getHeaders();
 
     const body = utils.getBody('SEARCH_SUCCESS', result);
+
+    utils.getResponse(context, 200, headers, body);
+  }
+
+  public async delete(context: HttpContextContract) {
+    const id = context.request.params().id;
+
+    const oldData = await this.dynamicService.getById('Role', id);
+
+    const result = await this.dynamicService.softDelete('Role', { id });
+
+    await utils.createAudity('DELETE', 'ROLE', id, context.auth.user?.$attributes.id, oldData.$attributes, result);
+
+    const headers = utils.getHeaders();
+
+    const body = utils.getBody('DELETE_SUCCESS', result);
 
     utils.getResponse(context, 200, headers, body);
   }

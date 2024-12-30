@@ -12,7 +12,6 @@ class CreateUserValidator {
     alias: schema.string.optional(),
     password: schema.string(),
     role_id: schema.string({}, [rules.exists({ table: 'roles', column: 'id' })]),
-    is_active: schema.boolean(),
   });
 
   public messages = {
@@ -24,8 +23,6 @@ class CreateUserValidator {
     'password.string': 'O campo "password" deve ser uma string válida.',
     'role_id.required': 'O campo "role_id" é obrigatório.',
     'role_id.string': 'O campo "role_id" deve ser uma string válida.',
-    'is_active.required': 'O campo "is_active" é obrigatório.',
-    'is_active.boolean': 'O campo "is_active" deve ser um valor booleano.',
   };
 }
 
@@ -40,7 +37,6 @@ class UpdateUserValidator {
     alias: schema.string.optional(),
     password: schema.string.optional(),
     role_id: schema.string.optional(),
-    is_active: schema.boolean.optional(),
   });
 
   public messages = {
@@ -50,7 +46,6 @@ class UpdateUserValidator {
     'alias.string': 'O campo "alias" deve ser uma string válida.',
     'password.string': 'O campo "password" deve ser uma string válida.',
     'role_id.string': 'O campo "role_id" deve ser uma string válida.',
-    'is_active.boolean': 'O campo "is_active" deve ser um valor booleano.',
   };
 }
 

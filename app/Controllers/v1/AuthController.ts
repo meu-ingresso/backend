@@ -23,7 +23,7 @@ export default class AuthController {
 
     const token = await context.auth.use('api').generate(auth as any, { expiresIn });
 
-    utils.createAudity('login', 'auth', auth.id, auth.id, {}, auth);
+    utils.createAudity('LOGIN', 'AUTH', auth.id, auth.id, {}, auth);
 
     const headers = utils.getHeaders();
 
@@ -43,7 +43,7 @@ export default class AuthController {
       return utils.getResponse(context, 401, headers, body);
     }
 
-    utils.createAudity('logout', 'auth', userId, userId, { revoked: false }, { revoked: true });
+    utils.createAudity('LOGOUT', 'AUTH', userId, userId, { revoked: false }, { revoked: true });
 
     await this.loginService.removeExpiredTokens(userId);
 

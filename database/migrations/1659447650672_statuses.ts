@@ -11,8 +11,9 @@ export default class StatusesSchema extends BaseSchema {
       table.text('description').nullable();
       table.timestamp('created_at', { useTz: true }).defaultTo(this.now());
       table.timestamp('updated_at', { useTz: true }).defaultTo(this.now());
+      table.timestamp('deleted_at', { useTz: true }).nullable();
 
-      table.unique(['name', 'module'], 'unique_status_name_module');
+      table.unique(['name', 'module']);
     });
   }
 

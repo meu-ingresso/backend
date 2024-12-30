@@ -33,6 +33,9 @@ export default class Payments extends BaseModel {
   @column.dateTime({ autoCreate: true })
   public created_at: DateTime;
 
+  @column.dateTime()
+  public deleted_at: DateTime | null;
+
   @belongsTo(() => Users, {
     foreignKey: 'user_id',
   })

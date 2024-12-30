@@ -94,7 +94,6 @@ export default class DatabaseSeeder extends BaseSeeder {
         alias: 'jean-promotor',
         password: await Hash.make('123456'),
         role_id: roles[1].id,
-        is_active: true,
       },
       {
         id: uuidv4(),
@@ -103,7 +102,6 @@ export default class DatabaseSeeder extends BaseSeeder {
         alias: 'system-administrator',
         password: await Hash.make('123456'),
         role_id: roles[0].id,
-        is_active: true,
       },
       {
         id: uuidv4(),
@@ -112,7 +110,6 @@ export default class DatabaseSeeder extends BaseSeeder {
         alias: 'cliente-final',
         password: await Hash.make('123456'),
         role_id: roles[2].id,
-        is_active: true,
       },
     ]);
 
@@ -158,8 +155,8 @@ export default class DatabaseSeeder extends BaseSeeder {
 
     // Categories
     const category = await Category.createMany([
-      { id: uuidv4(), name: 'Música', is_active: true },
-      { id: uuidv4(), name: 'Esportes', is_active: true },
+      { id: uuidv4(), name: 'Música' },
+      { id: uuidv4(), name: 'Esportes' },
     ]);
 
     console.log('Categories created');
@@ -200,8 +197,10 @@ export default class DatabaseSeeder extends BaseSeeder {
 
     // Ratings
     const rating = await Rating.createMany([
-      { id: uuidv4(), name: 'Livre', description: 'Livre para todas as idades' },
       { id: uuidv4(), name: '18+', description: 'Proibido para menores de 18 anos' },
+      { id: uuidv4(), name: '16+', description: 'Maiores de 16 anos' },
+      { id: uuidv4(), name: '14+', description: 'Maiores de 14 anos' },
+      { id: uuidv4(), name: 'Livre', description: 'Livre para todas as idades' },
     ]);
 
     console.log('Ratings created');
@@ -327,6 +326,7 @@ export default class DatabaseSeeder extends BaseSeeder {
         price: 150.0,
         status_id: statuses[0].id,
         start_date: DateTime.now(),
+        display_order: 1,
         end_date: DateTime.now().plus({ days: 10 }),
       },
       {
@@ -340,6 +340,7 @@ export default class DatabaseSeeder extends BaseSeeder {
         status_id: statuses[0].id,
         start_date: DateTime.now(),
         end_date: DateTime.now().plus({ days: 10 }),
+        display_order: 2,
       },
       {
         id: uuidv4(),
@@ -352,6 +353,7 @@ export default class DatabaseSeeder extends BaseSeeder {
         status_id: statuses[0].id,
         start_date: DateTime.now(),
         end_date: DateTime.now().plus({ days: 10 }),
+        display_order: 1,
       },
     ]);
 

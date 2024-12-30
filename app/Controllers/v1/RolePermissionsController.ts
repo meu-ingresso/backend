@@ -15,6 +15,8 @@ export default class RolePermissionsController {
 
     const result = await this.dynamicService.create('RolePermission', payload);
 
+    await utils.createAudity('CREATE', 'ROLE_PERMISSION', result.id, context.auth.user?.$attributes.id, null, result);
+
     const headers = utils.getHeaders();
 
     const body = utils.getBody('CREATE_SUCCESS', result);
@@ -25,7 +27,18 @@ export default class RolePermissionsController {
   public async update(context: HttpContextContract) {
     const payload = await context.request.validate(UpdateRolePermissionValidator);
 
+    const oldData = await this.dynamicService.getById('RolePermission', payload.id);
+
     const result = await this.dynamicService.update('RolePermission', payload);
+
+    await utils.createAudity(
+      'UPDATE',
+      'ROLE_PERMISSION',
+      result.id,
+      context.auth.user?.$attributes.id,
+      oldData.$attributes,
+      result
+    );
 
     const headers = utils.getHeaders();
 
