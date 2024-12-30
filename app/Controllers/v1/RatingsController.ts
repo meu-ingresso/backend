@@ -12,6 +12,8 @@ export default class RatingsController {
 
     const result = await this.dynamicService.create('Rating', payload);
 
+    await utils.createAudity('CREATE', 'RATING', result.id, context.auth.user?.$attributes.id, null, result);
+
     const headers = utils.getHeaders();
 
     const body = utils.getBody('CREATE_SUCCESS', result);
@@ -22,7 +24,18 @@ export default class RatingsController {
   public async update(context: HttpContextContract) {
     const payload = await context.request.validate(UpdateRatingValidator);
 
+    const oldData = await this.dynamicService.getById('Rating', payload.id);
+
     const result = await this.dynamicService.update('Rating', payload);
+
+    await utils.createAudity(
+      'UPDATE',
+      'RATING',
+      result.id,
+      context.auth.user?.$attributes.id,
+      oldData.$attributes,
+      result
+    );
 
     const headers = utils.getHeaders();
 
@@ -46,7 +59,11 @@ export default class RatingsController {
   public async delete(context: HttpContextContract) {
     const id = context.request.params().id;
 
+    const oldData = await this.dynamicService.getById('Rating', id);
+
     const result = await this.dynamicService.softDelete('Rating', { id });
+
+    await utils.createAudity('DELETE', 'RATING', id, context.auth.user?.$attributes.id, oldData.$attributes, result);
 
     const headers = utils.getHeaders();
 

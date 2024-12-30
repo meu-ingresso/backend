@@ -14,6 +14,8 @@ export default class EventsController {
 
     const result = await this.dynamicService.create('Event', payload);
 
+    await utils.createAudity('CREATE', 'EVENT', result.id, context.auth.user?.$attributes.id, null, result);
+
     const headers = utils.getHeaders();
 
     const body = utils.getBody('CREATE_SUCCESS', result);
@@ -36,7 +38,18 @@ export default class EventsController {
   public async update(context: HttpContextContract) {
     const payload = await context.request.validate(UpdateEventValidator);
 
+    const oldData = await this.dynamicService.getById('Event', payload.id);
+
     const result = await this.dynamicService.update('Event', payload);
+
+    await utils.createAudity(
+      'UPDATE',
+      'EVENT',
+      result.id,
+      context.auth.user?.$attributes.id,
+      oldData.$attributes,
+      result
+    );
 
     const headers = utils.getHeaders();
 
@@ -69,7 +82,11 @@ export default class EventsController {
   public async delete(context: HttpContextContract) {
     const id = context.request.params().id;
 
+    const oldData = await this.dynamicService.getById('Event', id);
+
     const result = await this.dynamicService.softDelete('Event', { id });
+
+    await utils.createAudity('DELETE', 'EVENT', id, context.auth.user?.$attributes.id, oldData.$attributes, result);
 
     const headers = utils.getHeaders();
 

@@ -15,6 +15,15 @@ export default class EventCollaboratorsController {
 
     const result = await this.dynamicService.create('EventCollaborator', payload);
 
+    await utils.createAudity(
+      'CREATE',
+      'EVENT_COLLABORATOR',
+      result.id,
+      context.auth.user?.$attributes.id,
+      null,
+      result
+    );
+
     const headers = utils.getHeaders();
 
     const body = utils.getBody('CREATE_SUCCESS', result);
@@ -25,7 +34,18 @@ export default class EventCollaboratorsController {
   public async update(context: HttpContextContract) {
     const payload = await context.request.validate(UpdateEventCollaboratorValidator);
 
+    const oldData = await this.dynamicService.getById('EventCollaborator', payload.id);
+
     const result = await this.dynamicService.update('EventCollaborator', payload);
+
+    await utils.createAudity(
+      'UPDATE',
+      'EVENT_COLLABORATOR',
+      result.id,
+      context.auth.user?.$attributes.id,
+      oldData.$attributes,
+      result
+    );
 
     const headers = utils.getHeaders();
 
@@ -49,7 +69,18 @@ export default class EventCollaboratorsController {
   public async delete(context: HttpContextContract) {
     const id = context.request.params().id;
 
+    const oldData = await this.dynamicService.getById('EventCollaborator', id);
+
     const result = await this.dynamicService.softDelete('EventCollaborator', { id });
+
+    await utils.createAudity(
+      'DELETE',
+      'EVENT_COLLABORATOR',
+      id,
+      context.auth.user?.$attributes.id,
+      oldData.$attributes,
+      result
+    );
 
     const headers = utils.getHeaders();
 

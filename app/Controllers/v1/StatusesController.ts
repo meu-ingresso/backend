@@ -12,6 +12,8 @@ export default class StatusesController {
 
     const result = await this.dynamicService.create('Status', payload);
 
+    await utils.createAudity('CREATE', 'STATUS', result.id, context.auth.user?.$attributes.id, null, result);
+
     const headers = utils.getHeaders();
 
     const body = utils.getBody('CREATE_SUCCESS', result);
@@ -22,7 +24,18 @@ export default class StatusesController {
   public async update(context: HttpContextContract) {
     const payload = await context.request.validate(UpdateStatusValidator);
 
+    const oldData = await this.dynamicService.getById('Status', payload.id);
+
     const result = await this.dynamicService.update('Status', payload);
+
+    await utils.createAudity(
+      'UPDATE',
+      'STATUS',
+      result.id,
+      context.auth.user?.$attributes.id,
+      oldData.$attributes,
+      result
+    );
 
     const headers = utils.getHeaders();
 
@@ -46,7 +59,11 @@ export default class StatusesController {
   public async delete(context: HttpContextContract) {
     const id = context.request.params().id;
 
+    const oldData = await this.dynamicService.getById('Status', id);
+
     const result = await this.dynamicService.softDelete('Status', { id });
+
+    await utils.createAudity('DELETE', 'STATUS', id, context.auth.user?.$attributes.id, oldData.$attributes, result);
 
     const headers = utils.getHeaders();
 

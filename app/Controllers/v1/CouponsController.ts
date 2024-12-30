@@ -12,6 +12,8 @@ export default class CouponsController {
 
     const result = await this.dynamicService.create('Coupon', payload);
 
+    await utils.createAudity('CREATE', 'COUPON', result.id, context.auth.user?.$attributes.id, null, result);
+
     const headers = utils.getHeaders();
 
     const body = utils.getBody('CREATE_SUCCESS', result);
@@ -22,7 +24,18 @@ export default class CouponsController {
   public async update(context: HttpContextContract) {
     const payload = await context.request.validate(UpdateCouponValidator);
 
+    const oldData = await this.dynamicService.getById('Coupon', payload.id);
+
     const result = await this.dynamicService.update('Coupon', payload);
+
+    await utils.createAudity(
+      'UPDATE',
+      'COUPON',
+      result.id,
+      context.auth.user?.$attributes.id,
+      oldData.$attributes,
+      result
+    );
 
     const headers = utils.getHeaders();
 
@@ -48,7 +61,11 @@ export default class CouponsController {
   public async delete(context: HttpContextContract) {
     const id = context.request.params().id;
 
+    const oldData = await this.dynamicService.getById('Coupon', id);
+
     const result = await this.dynamicService.softDelete('Coupon', { id });
+
+    await utils.createAudity('DELETE', 'COUPON', id, context.auth.user?.$attributes.id, oldData.$attributes, result);
 
     const headers = utils.getHeaders();
 

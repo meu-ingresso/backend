@@ -86,6 +86,16 @@ export default class DynamicService {
     return model;
   }
 
+  public async getById(dynamicModel: string, id: string): Promise<ModelObject> {
+    const ModelClass = this.modelMap[dynamicModel];
+
+    if (!ModelClass) {
+      throw new Error(`Model ${dynamicModel} not found`);
+    }
+
+    return await ModelClass.findOrFail(id);
+  }
+
   public async search(dynamicModel: string, query?: any): Promise<{ meta?: any; data: ModelObject[] }> {
     const ModelClass = this.modelMap[dynamicModel];
 
