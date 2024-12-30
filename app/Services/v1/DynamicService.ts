@@ -23,6 +23,8 @@ import Ticket from 'App/Models/Access/Tickets';
 import User from 'App/Models/Access/Users';
 import AuditLog from 'App/Models/Access/AuditLogs';
 
+import { DateTime } from 'luxon';
+
 export default class DynamicService {
   private modelMap: Record<string, typeof BaseModel> = {
     State,
@@ -84,6 +86,16 @@ export default class DynamicService {
     return model;
   }
 
+  public async getById(dynamicModel: string, id: string): Promise<ModelObject> {
+    const ModelClass = this.modelMap[dynamicModel];
+
+    if (!ModelClass) {
+      throw new Error(`Model ${dynamicModel} not found`);
+    }
+
+    return await ModelClass.findOrFail(id);
+  }
+
   public async search(dynamicModel: string, query?: any): Promise<{ meta?: any; data: ModelObject[] }> {
     const ModelClass = this.modelMap[dynamicModel];
 
@@ -94,5 +106,27 @@ export default class DynamicService {
     const dataAccessService = new DataAccessService<typeof ModelClass>(ModelClass);
 
     return dataAccessService.search(query);
+  }
+
+  public async softDelete(dynamicModel: string, record: Record<string, any>): Promise<any> {
+    const ModelClass = this.modelMap[dynamicModel];
+
+    if (!ModelClass) {
+      throw new Error(`Model ${dynamicModel} not found`);
+    }
+
+    const model = await ModelClass.findOrFail(record.id);
+
+    record.deleted_at = DateTime.now();
+
+    await Database.transaction(async (trx) => {
+      model.useTransaction(trx);
+
+      model.merge({ ...record });
+
+      await model.save();
+    });
+
+    return model;
   }
 }

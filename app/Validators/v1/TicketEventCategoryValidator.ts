@@ -10,7 +10,6 @@ class CreateTicketEventCategoryValidator {
   public schema = schema.create({
     event_id: schema.string({ trim: true }, [rules.exists({ table: 'events', column: 'id' })]),
     name: schema.string({ trim: true }),
-    is_active: schema.boolean.optional(),
   });
 
   public messages = {
@@ -30,7 +29,6 @@ class UpdateTicketEventCategoryValidator {
     id: schema.string({ trim: true }),
     event_id: schema.string.optional({ trim: true }, [rules.exists({ table: 'events', column: 'id' })]),
     name: schema.string.optional({ trim: true }),
-    is_active: schema.boolean.optional(),
   });
 
   public messages = {

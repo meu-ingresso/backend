@@ -8,9 +8,9 @@ export default class TicketEventCategoriesSchema extends BaseSchema {
       table.uuid('id').primary();
       table.uuid('event_id').notNullable().references('id').inTable('events').onDelete('CASCADE');
       table.string('name', 50).notNullable();
-      table.boolean('is_active').notNullable().defaultTo(true);
       table.timestamp('created_at', { useTz: true }).defaultTo(this.now());
       table.timestamp('updated_at', { useTz: true }).defaultTo(this.now());
+      table.timestamp('deleted_at', { useTz: true }).nullable();
     });
   }
 

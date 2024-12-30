@@ -44,19 +44,22 @@ export default class Tickets extends BaseModel {
   public availability: 'Privado' | 'Publico' | 'PDV';
 
   @column()
+  public display_order: number;
+
+  @column()
   public min_quantity_per_user: number;
 
   @column()
   public max_quantity_per_user: number;
-
-  @column()
-  public is_active: boolean;
 
   @column.dateTime({ autoCreate: true })
   public created_at: DateTime;
 
   @column.dateTime({ autoCreate: true, autoUpdate: true })
   public updated_at: DateTime;
+
+  @column.dateTime()
+  public deleted_at: DateTime | null;
 
   @belongsTo(() => Events, {
     foreignKey: 'event_id',

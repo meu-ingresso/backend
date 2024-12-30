@@ -19,6 +19,9 @@ export default class Ratings extends BaseModel {
   @column.dateTime({ autoCreate: true, autoUpdate: true })
   public updated_at: DateTime;
 
+  @column.dateTime()
+  public deleted_at: DateTime | null;
+
   @hasMany(() => Events, {
     foreignKey: 'rating_id',
   })

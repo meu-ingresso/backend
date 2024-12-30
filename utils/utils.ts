@@ -49,11 +49,6 @@ async function createAudity(
       await dynamicService.create('AuditLog', payload);
     } else {
       console.error('Missing User ID for Audit Log');
-      console.error('Module ->', module);
-      console.error('Action ->', entity);
-      console.error('Entity ID ->', entity_id);
-      console.error('Old Data ->', old_data);
-      console.error('New Data ->', new_data);
     }
   } catch (error) {
     console.error('Error creating audit log:', error);

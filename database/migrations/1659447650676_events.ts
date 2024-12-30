@@ -31,9 +31,10 @@ export default class EventsSchema extends BaseSchema {
       table.text('id_google_ads').nullable();
       table.text('ads_conversion_label').nullable();
       table.boolean('is_featured').notNullable().defaultTo(false);
-      table.boolean('is_active').notNullable().defaultTo(true);
+      table.boolean('absorb_service_fee').notNullable().defaultTo(true).after('ads_conversion_label');
       table.timestamp('created_at', { useTz: true }).defaultTo(this.now());
       table.timestamp('updated_at', { useTz: true }).defaultTo(this.now());
+      table.timestamp('deleted_at', { useTz: true }).nullable();
 
       // Índices para consultas frequentes
       table.index(['alias'], 'events_alias_index');

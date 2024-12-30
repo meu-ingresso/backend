@@ -9,6 +9,7 @@ export default class CitiesSchema extends BaseSchema {
       table.uuid('state_id').notNullable().references('id').inTable('states').onDelete('CASCADE');
       table.string('name', 255).notNullable();
       table.timestamp('created_at', { useTz: true }).defaultTo(this.now());
+      table.timestamp('deleted_at', { useTz: true }).nullable();
     });
   }
 

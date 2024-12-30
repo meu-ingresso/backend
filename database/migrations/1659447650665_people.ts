@@ -15,6 +15,7 @@ export default class PeopleSchema extends BaseSchema {
       table.string('email', 254).notNullable().unique();
       table.timestamp('created_at', { useTz: true }).defaultTo(this.now());
       table.timestamp('updated_at', { useTz: true }).defaultTo(this.now());
+      table.timestamp('deleted_at', { useTz: true }).nullable();
     });
   }
 

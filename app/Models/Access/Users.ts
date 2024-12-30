@@ -20,9 +20,6 @@ export default class Users extends BaseModel {
   public password: string | null;
 
   @column()
-  public is_active: boolean;
-
-  @column()
   public role_id: string | null;
 
   @column()
