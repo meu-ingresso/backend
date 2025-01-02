@@ -60,9 +60,6 @@ export default class Events extends BaseModel {
   public general_information: string | null;
 
   @column()
-  public max_capacity: number | null;
-
-  @column()
   public availability: 'Publico' | 'Privado' | 'Página';
 
   @column()

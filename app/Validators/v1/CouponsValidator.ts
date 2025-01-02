@@ -60,6 +60,7 @@ class UpdateCouponValidator {
     start_date: schema.date.optional(),
     end_date: schema.date.optional(),
     max_uses: schema.number.optional(),
+    uses: schema.number.optional(),
   });
 
   public messages = {
@@ -70,6 +71,8 @@ class UpdateCouponValidator {
     'discount_type.enum': 'O campo "discount_type" deve ser "percentage" ou "fixed".',
     'start_date.date': 'A data de início deve ser uma data válida.',
     'end_date.date': 'A data de fim deve ser uma data válida.',
+    'max_uses.number': 'O campo "max_uses" deve ser um número válido.',
+    'uses.number': 'O campo "uses" deve ser um número válido.',
   };
 }
 

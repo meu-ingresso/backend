@@ -20,7 +20,6 @@ export default class EventsSchema extends BaseSchema {
       table.string('contact', 100).nullable();
       table.string('location_name', 150).nullable();
       table.text('general_information').nullable();
-      table.integer('max_capacity').nullable();
       table.enum('availability', ['Publico', 'Privado', 'Página']).notNullable().defaultTo('Publico');
       table.enum('sale_type', ['Ingresso', 'Inscrição']).notNullable().defaultTo('Ingresso');
       table.enum('event_type', ['Presencial', 'Online']).notNullable().defaultTo('Presencial');
