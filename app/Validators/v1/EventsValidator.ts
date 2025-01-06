@@ -25,7 +25,7 @@ class CreateEventValidator {
     absorb_service_fee: schema.boolean.optional(),
     availability: schema.enum(['Publico', 'Privado', 'Página']),
     sale_type: schema.enum(['Ingresso', 'Inscrição']),
-    event_type: schema.enum(['Presencial', 'Online']),
+    event_type: schema.enum(['Presencial', 'Online', 'Híbrido']),
     promoter_id: schema.string({ trim: true }, [rules.exists({ table: 'users', column: 'id' })]),
   });
 
@@ -36,7 +36,7 @@ class CreateEventValidator {
     'start_date.required': 'O campo "start_date" é obrigatório.',
     'availability.enum': 'O campo "availability" deve ser Publico, Privado ou Página.',
     'sale_type.enum': 'O campo "sale_type" deve ser Ingresso ou Inscrição.',
-    'event_type.enum': 'O campo "event_type" deve ser Presencial ou Online.',
+    'event_type.enum': 'O campo "event_type" deve ser Presencial, Online ou Híbrido.',
     'promoter_id.required': 'O campo "promoter_id" é obrigatório.',
     'absorb_service_fee.boolean': 'O campo "absorb_service_fee" deve ser um booleano.',
   };
@@ -66,7 +66,7 @@ class UpdateEventValidator {
     absorb_service_fee: schema.boolean.optional(),
     availability: schema.enum.optional(['Publico', 'Oculto']),
     sale_type: schema.enum.optional(['Ingresso', 'Inscrição']),
-    event_type: schema.enum.optional(['Presencial', 'Online']),
+    event_type: schema.enum.optional(['Presencial', 'Online', 'Híbrido']),
     promoter_id: schema.string.optional({ trim: true }, [rules.exists({ table: 'users', column: 'id' })]),
   });
 
@@ -74,7 +74,7 @@ class UpdateEventValidator {
     'id.required': 'O campo "id" é obrigatório.',
     'availability.enum': 'O campo "availability" deve ser Publico ou Oculto.',
     'sale_type.enum': 'O campo "sale_type" deve ser Ingresso ou Inscrição.',
-    'event_type.enum': 'O campo "event_type" deve ser Presencial ou Online.',
+    'event_type.enum': 'O campo "event_type" deve ser Presencial, Online ou Híbrido.',
     'absorb_service_fee.boolean': 'O campo "absorb_service_fee" deve ser um booleano.',
   };
 }
