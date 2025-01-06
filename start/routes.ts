@@ -22,15 +22,15 @@ Route.group(() => {
     Route.patch('/address', 'v1/AddressesController.update');
     Route.delete('/address/:id', 'v1/AddressesController.delete');
 
-    Route.get('/cities', 'v1/CitiesController.search');
-    Route.post('/city', 'v1/CitiesController.create');
-    Route.patch('/city', 'v1/CitiesController.update');
-    Route.delete('/city/:id', 'v1/CitiesController.delete');
-
     Route.get('/states', 'v1/StatesController.search');
     Route.post('/state', 'v1/StatesController.create');
     Route.patch('/state', 'v1/StatesController.update');
     Route.delete('/state/:id', 'v1/StatesController.delete');
+
+    Route.get('/cities', 'v1/CitiesController.search');
+    Route.post('/city', 'v1/CitiesController.create');
+    Route.patch('/city', 'v1/CitiesController.update');
+    Route.delete('/city/:id', 'v1/CitiesController.delete');
 
     Route.get('/roles', 'v1/RolesController.search');
     Route.post('/role', 'v1/RolesController.create');
