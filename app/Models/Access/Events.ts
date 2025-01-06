@@ -66,7 +66,7 @@ export default class Events extends BaseModel {
   public sale_type: 'Ingresso' | 'Inscrição';
 
   @column()
-  public event_type: 'Presencial' | 'Online';
+  public event_type: 'Presencial' | 'Online' | 'Híbrido';
 
   @column()
   public promoter_id: string;

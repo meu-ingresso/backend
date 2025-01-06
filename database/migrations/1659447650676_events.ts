@@ -22,7 +22,7 @@ export default class EventsSchema extends BaseSchema {
       table.text('general_information').nullable();
       table.enum('availability', ['Publico', 'Privado', 'Página']).notNullable().defaultTo('Publico');
       table.enum('sale_type', ['Ingresso', 'Inscrição']).notNullable().defaultTo('Ingresso');
-      table.enum('event_type', ['Presencial', 'Online']).notNullable().defaultTo('Presencial');
+      table.enum('event_type', ['Presencial', 'Online', 'Híbrido']).notNullable().defaultTo('Presencial');
       table.uuid('promoter_id').notNullable().references('id').inTable('users').onDelete('CASCADE');
       table.text('id_pixel').nullable();
       table.text('id_tag_manager').nullable();
