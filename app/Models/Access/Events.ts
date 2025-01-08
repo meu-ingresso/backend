@@ -9,6 +9,7 @@ import Ratings from './Ratings';
 import Statuses from './Statuses';
 import Addresses from './Addresses';
 import EventAttachments from './EventAttachments';
+import EventViews from './EventViews';
 import EventCollaborators from './EventCollaborators';
 import Promoters from './Users';
 import Coupons from './Coupons';
@@ -121,6 +122,9 @@ export default class Events extends BaseModel {
 
   @hasMany(() => EventAttachments, { foreignKey: 'event_id' })
   public attachments: HasMany<typeof EventAttachments>;
+
+  @hasMany(() => EventViews, { foreignKey: 'event_id' })
+  public views: HasMany<typeof EventViews>;
 
   @hasMany(() => EventCollaborators, { foreignKey: 'event_id' })
   public collaborators: HasMany<typeof EventCollaborators>;

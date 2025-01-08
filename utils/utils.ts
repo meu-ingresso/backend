@@ -31,25 +31,21 @@ async function createAudity(
   action: string,
   entity: string,
   entity_id: string | null = null,
-  user_id: string | null,
+  user_id: string | null = null,
   old_data: Record<string, any> | null = null,
   new_data: Record<string, any> | null = null
 ): Promise<void> {
   try {
-    if (user_id) {
-      const payload = {
-        action,
-        entity,
-        entity_id,
-        user_id,
-        old_data: old_data ? JSON.stringify(old_data) : null,
-        new_data: new_data ? JSON.stringify(new_data) : null,
-      };
+    const payload = {
+      action,
+      entity,
+      entity_id,
+      user_id,
+      old_data: old_data ? JSON.stringify(old_data) : null,
+      new_data: new_data ? JSON.stringify(new_data) : null,
+    };
 
-      await dynamicService.create('AuditLog', payload);
-    } else {
-      console.error('Missing User ID for Audit Log');
-    }
+    await dynamicService.create('AuditLog', payload);
   } catch (error) {
     console.error('Error creating audit log:', error);
   }
