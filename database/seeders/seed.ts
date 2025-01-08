@@ -22,6 +22,7 @@ import Parameter from 'App/Models/Access/Parameters';
 import Addresses from 'App/Models/Access/Addresses';
 import Payments from 'App/Models/Access/Payments';
 import CustomerTickets from 'App/Models/Access/CustomerTickets';
+import Coupon from 'App/Models/Access/Coupons';
 
 export default class DatabaseSeeder extends BaseSeeder {
   public async run() {
@@ -191,6 +192,8 @@ export default class DatabaseSeeder extends BaseSeeder {
         description: 'Indisponível para uso; Ingresso já validado na portaria',
         module: 'ticket',
       },
+      { id: uuidv4(), name: 'Disponível', description: 'Cupom Disponível para uso', module: 'coupon' },
+      { id: uuidv4(), name: 'Esgotado', description: 'Cupom Indisponível para uso', module: 'coupon' },
     ]);
 
     console.log('Statuses created');
@@ -432,5 +435,32 @@ export default class DatabaseSeeder extends BaseSeeder {
     ]);
 
     console.log('Parameters created');
+
+    await Coupon.createMany([
+      {
+        id: uuidv4(),
+        event_id: events[0].id,
+        code: 'KELVYN10',
+        discount_type: 'PERCENTAGE',
+        discount_value: 10,
+        max_uses: 100,
+        start_date: DateTime.now(),
+        end_date: DateTime.now().plus({ days: 10 }),
+        status_id: statuses[8].id,
+      },
+      {
+        id: uuidv4(),
+        event_id: events[0].id,
+        code: 'JEAN15',
+        discount_type: 'FIXED',
+        discount_value: 15,
+        max_uses: 2,
+        start_date: DateTime.now(),
+        end_date: DateTime.now().plus({ days: 10 }),
+        status_id: statuses[8].id,
+      },
+    ]);
+
+    console.log('Coupons created');
   }
 }

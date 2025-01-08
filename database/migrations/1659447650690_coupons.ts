@@ -7,6 +7,7 @@ export default class CouponsSchema extends BaseSchema {
     this.schema.createTable(this.tableName, (table) => {
       table.uuid('id').primary();
       table.uuid('event_id').notNullable().references('id').inTable('events').onDelete('CASCADE');
+      table.uuid('status_id').notNullable().references('id').inTable('statuses').onDelete('CASCADE');
       table.string('code', 50).notNullable();
       table.string('discount_type', 50).notNullable();
       table.decimal('discount_value', 10, 2).notNullable();
