@@ -17,11 +17,14 @@ export default class EventService {
 
     const today = DateTime.now().startOf('day');
 
+    const totalViews = await Database.from('event_views').where('event_id', event_id).count('* as total');
+
     let total = {
       totalSales: 0,
       totalSalesToday: 0,
       totalSalesAmout: 0,
       totalSalesAmountToday: 0,
+      totalViews: Number(totalViews[0].total),
     };
 
     for (const totalizer of totalizers) {
