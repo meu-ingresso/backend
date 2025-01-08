@@ -13,6 +13,9 @@ export default class Ratings extends BaseModel {
   @column()
   public description: string | null;
 
+  @column()
+  public image: string;
+
   @column.dateTime({ autoCreate: true })
   public created_at: DateTime;
 

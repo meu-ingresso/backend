@@ -10,12 +10,14 @@ class CreateRatingValidator {
   public schema = schema.create({
     name: schema.string(),
     description: schema.string.optional(),
+    image: schema.string.optional(),
   });
 
   public messages = {
     'name.required': 'O campo "name" é obrigatório.',
     'name.string': 'O campo "name" deve ser uma string válida.',
     'description.string': 'O campo "description" deve ser uma string válida.',
+    'image.string': 'O campo "image" deve ser uma string válida.',
   };
 }
 
@@ -28,6 +30,7 @@ class UpdateRatingValidator {
     id: schema.string(),
     name: schema.string.optional(),
     description: schema.string.optional(),
+    image: schema.string.optional(),
   });
 
   public messages = {
@@ -35,6 +38,7 @@ class UpdateRatingValidator {
     'id.string': 'O campo "id" deve ser uma string válida.',
     'name.string': 'O campo "name" deve ser uma string válida.',
     'description.string': 'O campo "description" deve ser uma string válida.',
+    'image.string': 'O campo "image" deve ser uma string válida.',
   };
 }
 
