@@ -2,10 +2,12 @@ import { HttpContextContract } from '@ioc:Adonis/Core/HttpContext';
 import QueryModelValidator from 'App/Validators/v1/QueryModelValidator';
 import { CreateTicketValidator, UpdateTicketValidator } from 'App/Validators/v1/TicketsValidator';
 import DynamicService from 'App/Services/v1/DynamicService';
+import StatusService from 'App/Services/v1/StatusService';
 import utils from 'Utils/utils';
 
 export default class TicketsController {
   private dynamicService: DynamicService = new DynamicService();
+  private statusService: StatusService = new StatusService();
 
   public async create(context: HttpContextContract) {
     const payload = await context.request.validate(CreateTicketValidator);
@@ -25,6 +27,14 @@ export default class TicketsController {
     const payload = await context.request.validate(UpdateTicketValidator);
 
     const oldData = await this.dynamicService.getById('Ticket', payload.id);
+
+    if (payload.total_quantity === payload.remaining_quantity) {
+      const status = await this.statusService.searchStatusByName('Esgotado', 'ticket');
+
+      if (status) {
+        payload.status_id = status.id;
+      }
+    }
 
     const result = await this.dynamicService.update('Ticket', payload);
 

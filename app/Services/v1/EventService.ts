@@ -51,15 +51,11 @@ export default class EventService {
 
     const now = DateTime.now();
     const currentDateOnly = now.startOf('day');
-    const currentHour = now.toFormat('HH:mm');
 
     for (const event of events) {
       const eventEndDateOnly = DateTime.fromISO(event.end_date).startOf('day');
-      const eventEndingHour = event.ending_hour;
 
-      const isEventFinished =
-        eventEndDateOnly < currentDateOnly ||
-        (eventEndDateOnly.equals(currentDateOnly) && eventEndingHour < currentHour);
+      const isEventFinished = eventEndDateOnly < currentDateOnly || eventEndDateOnly.equals(currentDateOnly);
 
       if (!isEventFinished) {
         return { alias, is_valid: false };
