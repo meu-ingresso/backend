@@ -13,6 +13,8 @@ Route.group(() => {
   Route.post('/people', 'v1/PeopleController.create');
   Route.post('/user', 'v1/UsersController.create');
 
+  Route.post('/event/view', 'v1/EventViewsController.create');
+
   // ROTAS COM AUTENTICAÇÃO
   Route.group(() => {
     Route.get('/logout', 'v1/AuthController.logout');
