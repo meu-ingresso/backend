@@ -8,6 +8,7 @@ export default class RatingsSchema extends BaseSchema {
       table.uuid('id').primary();
       table.string('name', 50).notNullable().unique();
       table.text('description').nullable();
+      table.text('image').nullable();
       table.timestamp('created_at', { useTz: true }).defaultTo(this.now());
       table.timestamp('updated_at', { useTz: true }).defaultTo(this.now());
       table.timestamp('deleted_at', { useTz: true }).nullable();
