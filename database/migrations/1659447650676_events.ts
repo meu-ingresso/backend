@@ -15,8 +15,6 @@ export default class EventsSchema extends BaseSchema {
       table.uuid('rating_id').nullable().references('id').inTable('ratings').onDelete('SET NULL');
       table.dateTime('start_date').notNullable();
       table.dateTime('end_date').nullable();
-      table.string('opening_hour', 20).nullable();
-      table.string('ending_hour', 20).nullable();
       table.string('contact', 100).nullable();
       table.string('location_name', 150).nullable();
       table.text('general_information').nullable();
