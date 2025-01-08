@@ -37,7 +37,7 @@ export default class EventViews extends BaseModel {
   public user: BelongsTo<typeof Users>;
 
   @beforeCreate()
-  public static assignUuid(eventAttachment: EventAttachments) {
+  public static assignUuid(eventAttachment: EventViews) {
     eventAttachment.id = uuidv4();
   }
 }
