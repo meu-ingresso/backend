@@ -3,6 +3,8 @@ import { v4 as uuidv4 } from 'uuid';
 import { BaseModel, column, beforeCreate, hasMany, HasMany } from '@ioc:Adonis/Lucid/Orm';
 import Events from './Events';
 import Payments from './Payments';
+import Coupons from './Coupons';
+import Tickets from './Tickets';
 
 export default class Statuses extends BaseModel {
   @column({ isPrimary: true })
@@ -35,6 +37,16 @@ export default class Statuses extends BaseModel {
     foreignKey: 'status_id',
   })
   public payments: HasMany<typeof Payments>;
+
+  @hasMany(() => Coupons, {
+    foreignKey: 'status_id',
+  })
+  public coupons: HasMany<typeof Coupons>;
+
+  @hasMany(() => Tickets, {
+    foreignKey: 'status_id',
+  })
+  public tickets: HasMany<typeof Tickets>;
 
   @beforeCreate()
   public static assignUuid(status: Statuses) {
