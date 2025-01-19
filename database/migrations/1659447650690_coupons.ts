@@ -13,8 +13,8 @@ export default class CouponsSchema extends BaseSchema {
       table.decimal('discount_value', 10, 2).notNullable();
       table.integer('max_uses').notNullable();
       table.integer('uses').defaultTo(0);
-      table.dateTime('start_date').notNullable();
-      table.dateTime('end_date').notNullable();
+      table.dateTime('start_date').nullable();
+      table.dateTime('end_date').nullable();
       table.timestamp('created_at', { useTz: true }).defaultTo(this.now());
       table.timestamp('updated_at', { useTz: true }).defaultTo(this.now());
       table.timestamp('deleted_at', { useTz: true }).nullable();
