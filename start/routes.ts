@@ -87,10 +87,20 @@ Route.group(() => {
     Route.patch('/event-fee', 'v1/EventFeesController.update');
     Route.delete('/event-fee/:id', 'v1/EventFeesController.delete');
 
+    Route.get('/event-checkout-fields', 'v1/EventCheckoutFieldsController.search');
+    Route.post('/event-checkout-field', 'v1/EventCheckoutFieldsController.create');
+    Route.patch('/event-checkout-field', 'v1/EventCheckoutFieldsController.update');
+    Route.delete('/event-checkout-field/:id', 'v1/EventCheckoutFieldsController.delete');
+
     Route.get('/tickets', 'v1/TicketsController.search');
     Route.post('/ticket', 'v1/TicketsController.create');
     Route.patch('/ticket', 'v1/TicketsController.update');
     Route.delete('/ticket/:id', 'v1/TicketsController.delete');
+
+    Route.get('/ticket-fields', 'v1/TicketFieldsController.search');
+    Route.post('/ticket-field', 'v1/TicketFieldsController.create');
+    Route.patch('/ticket-field', 'v1/TicketFieldsController.update');
+    Route.delete('/ticket-field/:id', 'v1/TicketFieldsController.delete');
 
     Route.get('/ticket-event-categories', 'v1/TicketEventCategoriesController.search');
     Route.post('/ticket-event-category', 'v1/TicketEventCategoriesController.create');

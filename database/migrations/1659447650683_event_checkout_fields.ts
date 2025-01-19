@@ -28,6 +28,7 @@ export default class EventCheckoutFieldsSchema extends BaseSchema {
       table.boolean('is_unique').notNullable().defaultTo(false);
       table.boolean('visible_on_ticket').notNullable().defaultTo(false);
       table.string('help_text', 255).nullable();
+      table.integer('order').notNullable().defaultTo(1);
       table.timestamp('created_at', { useTz: true }).defaultTo(this.now());
       table.timestamp('updated_at', { useTz: true }).defaultTo(this.now());
       table.timestamp('deleted_at', { useTz: true }).nullable();

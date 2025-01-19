@@ -23,6 +23,8 @@ import Ticket from 'App/Models/Access/Tickets';
 import TicketEventCategory from 'App/Models/Access/TicketEventCategories';
 import User from 'App/Models/Access/Users';
 import AuditLog from 'App/Models/Access/AuditLogs';
+import EventCheckoutField from 'App/Models/Access/EventCheckoutFields';
+import TicketField from 'App/Models/Access/TicketFields';
 
 import { DateTime } from 'luxon';
 
@@ -49,6 +51,8 @@ export default class DynamicService {
     TicketEventCategory,
     User,
     AuditLog,
+    EventCheckoutField,
+    TicketField,
   };
 
   public async create(dynamicModel: string, record: Record<string, any>): Promise<any> {
