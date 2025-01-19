@@ -13,7 +13,7 @@ export default class TicketsFieldsSchema extends BaseSchema {
       table.timestamp('updated_at', { useTz: true }).defaultTo(this.now());
       table.timestamp('deleted_at', { useTz: true }).nullable();
 
-      table.unique(['customer_ticket_id', 'field_id', 'order']);
+      table.unique(['customer_ticket_id', 'field_id']);
     });
   }
 
