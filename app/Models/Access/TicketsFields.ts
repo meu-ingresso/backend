@@ -15,9 +15,6 @@ export default class TicketsFields extends BaseModel {
   public field_id: string;
 
   @column()
-  public order: number | null;
-
-  @column()
   public value: string;
 
   @column.dateTime({ autoCreate: true })
