@@ -8,7 +8,6 @@ export default class TicketsFieldsSchema extends BaseSchema {
       table.uuid('id').primary();
       table.uuid('customer_ticket_id').notNullable().references('id').inTable('customer_tickets').onDelete('CASCADE');
       table.uuid('field_id').notNullable().references('id').inTable('event_checkout_fields').onDelete('CASCADE');
-      table.integer('order').notNullable().defaultTo(1);
       table.text('value').notNullable();
       table.timestamp('created_at', { useTz: true }).defaultTo(this.now());
       table.timestamp('updated_at', { useTz: true }).defaultTo(this.now());
