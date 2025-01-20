@@ -27,7 +27,7 @@ export default class CustomerTicketsController {
   public async update(context: HttpContextContract) {
     const payload = await context.request.validate(UpdateCustomerTicketValidator);
 
-    const ticket_identifier = Array(7)
+    const ticket_identifier = Array(11)
       .fill(0)
       .map(() => {
         const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
