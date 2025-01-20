@@ -116,6 +116,10 @@ Route.group(() => {
     Route.patch('/coupon', 'v1/CouponsController.update');
     Route.delete('/coupon/:id', 'v1/CouponsController.delete');
 
+    Route.get('/coupons-tickets', 'v1/CouponsTicketsController.search');
+    Route.post('/coupon-ticket', 'v1/CouponsTicketsController.create');
+    Route.delete('/coupon-ticket/:id', 'v1/CouponsTicketsController.delete');
+
     Route.get('/customer-tickets', 'v1/CustomerTicketsController.search');
     Route.post('/customer-ticket', 'v1/CustomerTicketsController.create');
     Route.patch('/customer-ticket', 'v1/CustomerTicketsController.update');

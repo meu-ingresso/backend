@@ -53,6 +53,6 @@ export default class EventViewsController {
 
     const body = utils.getBody('CREATE_SUCCESS', result);
 
-    utils.getResponse(context, 200, headers, body);
+    utils.getResponse(context, 201, headers, body);
   }
 }
