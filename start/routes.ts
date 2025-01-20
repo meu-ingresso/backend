@@ -77,6 +77,8 @@ Route.group(() => {
     Route.patch('/event', 'v1/EventsController.update');
     Route.delete('/event/:id', 'v1/EventsController.delete');
 
+    Route.post('/event/improve-description', 'v1/OpenAiController.create');
+
     Route.get('/event-collaborators', 'v1/EventCollaboratorsController.search');
     Route.post('/event-collaborator', 'v1/EventCollaboratorsController.create');
     Route.patch('/event-collaborator', 'v1/EventCollaboratorsController.update');
