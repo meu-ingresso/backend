@@ -24,6 +24,7 @@ class CreateEventValidator {
     availability: schema.enum(['Publico', 'Privado', 'Página']),
     sale_type: schema.enum(['Ingresso', 'Inscrição']),
     event_type: schema.enum(['Presencial', 'Online', 'Híbrido']),
+    is_featured: schema.boolean.optional(),
     promoter_id: schema.string({ trim: true }, [rules.exists({ table: 'users', column: 'id' })]),
   });
 
@@ -37,6 +38,7 @@ class CreateEventValidator {
     'event_type.enum': 'O campo "event_type" deve ser Presencial, Online ou Híbrido.',
     'promoter_id.required': 'O campo "promoter_id" é obrigatório.',
     'absorb_service_fee.boolean': 'O campo "absorb_service_fee" deve ser um booleano.',
+    'is_featured.boolean': 'O campo "is_featured" deve ser um booleano.',
   };
 }
 
@@ -63,6 +65,7 @@ class UpdateEventValidator {
     availability: schema.enum.optional(['Publico', 'Oculto']),
     sale_type: schema.enum.optional(['Ingresso', 'Inscrição']),
     event_type: schema.enum.optional(['Presencial', 'Online', 'Híbrido']),
+    is_featured: schema.boolean.optional(),
     promoter_id: schema.string.optional({ trim: true }, [rules.exists({ table: 'users', column: 'id' })]),
   });
 
@@ -72,6 +75,7 @@ class UpdateEventValidator {
     'sale_type.enum': 'O campo "sale_type" deve ser Ingresso ou Inscrição.',
     'event_type.enum': 'O campo "event_type" deve ser Presencial, Online ou Híbrido.',
     'absorb_service_fee.boolean': 'O campo "absorb_service_fee" deve ser um booleano.',
+    'is_featured.boolean': 'O campo "is_featured" deve ser um booleano.',
   };
 }
 
