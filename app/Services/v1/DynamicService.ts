@@ -28,6 +28,7 @@ import TicketField from 'App/Models/Access/TicketFields';
 import EventCheckoutFieldTicket from 'App/Models/Access/EventCheckoutFieldsTickets';
 import CouponsTickets from 'App/Models/Access/CouponsTickets';
 import EventAttachment from 'App/Models/Access/EventAttachments';
+import EventCheckoutFieldOption from 'App/Models/Access/EventCheckoutFieldOptions';
 
 import { DateTime } from 'luxon';
 
@@ -59,6 +60,7 @@ export default class DynamicService {
     EventCheckoutFieldTicket,
     CouponsTickets,
     EventAttachment,
+    EventCheckoutFieldOption,
   };
 
   public async create(dynamicModel: string, record: Record<string, any>): Promise<any> {
