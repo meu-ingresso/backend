@@ -1,0 +1,25 @@
+import BaseSchema from '@ioc:Adonis/Lucid/Schema';
+
+export default class EventCheckoutFieldOptionsSchema extends BaseSchema {
+  protected tableName = 'event_checkout_field_options';
+
+  public async up() {
+    this.schema.createTable(this.tableName, (table) => {
+      table.uuid('id').primary();
+      table
+        .uuid('event_checkout_field_id')
+        .notNullable()
+        .references('id')
+        .inTable('event_checkout_fields')
+        .onDelete('CASCADE');
+      table.string('name', 50).notNullable();
+      table.timestamp('created_at', { useTz: true }).defaultTo(this.now());
+      table.timestamp('updated_at', { useTz: true }).defaultTo(this.now());
+      table.timestamp('deleted_at', { useTz: true }).nullable();
+    });
+  }
+
+  public async down() {
+    this.schema.dropTable(this.tableName);
+  }
+}
