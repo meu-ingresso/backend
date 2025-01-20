@@ -81,4 +81,18 @@ async function getInfosByRole(userId: string, data: any, module: string): Promis
   return data;
 }
 
-export default { getHeaders, getBody, getResponse, createAudity, getInfosByRole };
+async function handleError(context: HttpContextContract, status: number, type: string, message: string) {
+  const headers = getHeaders();
+  const body = getBody(type, message);
+
+  return getResponse(context, status, headers, body);
+}
+
+async function handleSuccess(context: HttpContextContract, result: any, code: string, statusCode: number) {
+  const headers = getHeaders();
+  const body = getBody(code, result);
+
+  return getResponse(context, statusCode, headers, body);
+}
+
+export default { getHeaders, getBody, getResponse, createAudity, getInfosByRole, handleError, handleSuccess };
