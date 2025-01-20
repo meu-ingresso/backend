@@ -12,6 +12,7 @@ export default class EventCheckoutFieldsSchema extends BaseSchema {
         .enum('type', [
           'CPF',
           'CNPJ',
+          'EMAIL',
           'TELEFONE',
           'DATA',
           'TEXTO',
@@ -20,6 +21,7 @@ export default class EventCheckoutFieldsSchema extends BaseSchema {
           'TERMO',
           'MESA',
           'ASSENTO',
+          'PARAGRAFO',
         ])
         .notNullable()
         .defaultTo('TEXTO');
@@ -33,7 +35,7 @@ export default class EventCheckoutFieldsSchema extends BaseSchema {
       table.timestamp('updated_at', { useTz: true }).defaultTo(this.now());
       table.timestamp('deleted_at', { useTz: true }).nullable();
 
-      table.unique(['event_id', 'order']);
+      table.unique(['event_id', 'person_type', 'order']);
     });
   }
 

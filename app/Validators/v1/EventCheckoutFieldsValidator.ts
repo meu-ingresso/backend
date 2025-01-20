@@ -13,6 +13,7 @@ class CreateEventCheckoutFieldValidator {
     type: schema.enum([
       'CPF',
       'CNPJ',
+      'EMAIL',
       'TELEFONE',
       'DATA',
       'TEXTO',
@@ -21,6 +22,7 @@ class CreateEventCheckoutFieldValidator {
       'TERMO',
       'MESA',
       'ASSENTO',
+      'PARAGRAFO',
     ] as const),
     person_type: schema.enum(['PF', 'PJ', 'ESTRANGEIRO'] as const),
     required: schema.boolean(),
@@ -55,6 +57,7 @@ class UpdateEventCheckoutFieldValidator {
     type: schema.enum.optional([
       'CPF',
       'CNPJ',
+      'EMAIL',
       'TELEFONE',
       'DATA',
       'TEXTO',
@@ -63,6 +66,7 @@ class UpdateEventCheckoutFieldValidator {
       'TERMO',
       'MESA',
       'ASSENTO',
+      'PARAGRAFO',
     ] as const),
     required: schema.boolean.optional(),
     is_unique: schema.boolean.optional(),
