@@ -16,10 +16,9 @@ class CreateEventCheckoutFieldTicketValidator {
 
   public messages = {
     'event_checkout_field_id.required': 'O campo "event_checkout_field_id" é obrigatório.',
-    'event_checkout_field_id.exists':
-      'O "event_checkout_field_id" fornecido não existe na tabela de campos de checkout.',
+    'event_checkout_field_id.exists': 'O "event_checkout_field_id" fornecido não existe.',
     'ticket_id.required': 'O campo "ticket_id" é obrigatório.',
-    'ticket_id.exists': 'O "ticket_id" fornecido não existe na tabela de tickets.',
+    'ticket_id.exists': 'O "ticket_id" fornecido não existe.',
   };
 }
 
