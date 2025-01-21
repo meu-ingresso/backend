@@ -9,7 +9,7 @@ class CreateTicketValidator {
 
   public schema = schema.create({
     event_id: schema.string({ trim: true }, [rules.exists({ table: 'events', column: 'id' })]),
-    ticket_event_category_id: schema.string({ trim: true }, [
+    ticket_event_category_id: schema.string.optional({ trim: true }, [
       rules.exists({ table: 'ticket_event_categories', column: 'id' }),
     ]),
     name: schema.string({ trim: true }),
@@ -37,6 +37,7 @@ class CreateTicketValidator {
   public messages = {
     'event_id.required': 'O campo "event_id" é obrigatório.',
     'event_id.exists': 'O evento especificado não existe.',
+    'ticket_event_category_id.exists': 'A categoria de ticket especificado não existe.',
     'name.required': 'O campo "name" é obrigatório.',
     'description.string': 'O campo "description" precisa ser uma string válida.',
     'total_quantity.required': 'A quantidade total é obrigatória.',
