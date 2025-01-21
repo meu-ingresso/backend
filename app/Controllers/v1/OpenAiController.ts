@@ -11,7 +11,7 @@ export default class TicketsController {
 
     const baseRequest = `Você tem a seguinte descrição do evento: \n\n`;
 
-    const finalRequest = `\n\n Melhore e me entregue a melhor e mais sucinta versão em português, seguindo um padrão e deixando um texto único. Não altere o contexto, não omita e nem invente dados em nenhuma hipótese. Apenas melhore o texto com as informações repassadas. \n\n`;
+    const finalRequest = `\n\n Melhore e me entregue a melhor versão em português, seguindo o padrão de comunicação que o promotor tentou fazer. Não altere o contexto, não omita e nem invente dados em nenhuma hipótese. Apenas melhore o texto com as informações repassadas. \n\n`;
 
     const request = baseRequest + payload.event_description + finalRequest;
 
