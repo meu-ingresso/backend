@@ -140,7 +140,8 @@ export default class DatabaseSeeder extends BaseSeeder {
         zipcode: '88309305',
         number: '102',
         neighborhood: 'São Vicente',
-        city_id: city[0].id,
+        city: city[0].name,
+        state: states[0].name,
       },
       {
         id: uuidv4(),
@@ -148,7 +149,8 @@ export default class DatabaseSeeder extends BaseSeeder {
         zipcode: '88309305',
         number: '456',
         neighborhood: 'Centro',
-        city_id: city[0].id,
+        city: city[1].name,
+        state: states[1].name,
       },
     ]);
 
