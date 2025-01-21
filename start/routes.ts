@@ -1,14 +1,16 @@
 import Route from '@ioc:Adonis/Core/Route';
 
 Route.group(() => {
-  Route.get('/health', async () => {
-    return { status: 'UP' };
-  });
-
   Route.get('/', async () => {
     return { status: 'API is running' };
   });
 
+  Route.get('/health', async () => {
+    return { status: 'UP' };
+  });
+});
+
+Route.group(() => {
   Route.post('/login', 'v1/AuthController.login');
   Route.post('/people', 'v1/PeopleController.create');
   Route.post('/user', 'v1/UsersController.create');

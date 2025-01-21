@@ -1,7 +1,7 @@
 import { DateTime } from 'luxon';
 import { v4 as uuidv4 } from 'uuid';
-import { BaseModel, column, beforeCreate, belongsTo, BelongsTo, hasMany, HasMany } from '@ioc:Adonis/Lucid/Orm';
-import Cities from './Cities';
+import { BaseModel, column, beforeCreate, hasMany, HasMany } from '@ioc:Adonis/Lucid/Orm';
+// import Cities from './Cities';
 import Events from './Events';
 
 export default class Addresses extends BaseModel {
@@ -30,7 +30,10 @@ export default class Addresses extends BaseModel {
   public longitude: number | null;
 
   @column()
-  public city_id: string;
+  public city: string;
+
+  @column()
+  public state: string;
 
   @column.dateTime({ autoCreate: true })
   public created_at: DateTime;
@@ -38,10 +41,10 @@ export default class Addresses extends BaseModel {
   @column.dateTime()
   public deleted_at: DateTime | null;
 
-  @belongsTo(() => Cities, {
-    foreignKey: 'city_id',
-  })
-  public city: BelongsTo<typeof Cities>;
+  // @belongsTo(() => Cities, {
+  //   foreignKey: 'city_id',
+  // })
+  // public city: BelongsTo<typeof Cities>;
 
   @hasMany(() => Events, {
     foreignKey: 'address_id',

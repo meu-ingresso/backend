@@ -15,15 +15,18 @@ class CreateAddressValidator {
     neighborhood: schema.string(),
     latitude: schema.number.optional(),
     longitude: schema.number.optional(),
-    city_id: schema.string({}, [rules.exists({ table: 'cities', column: 'id' })]),
+    city: schema.string(),
+    state: schema.string(),
   });
 
   public messages = {
     'street.required': 'O campo "street" é obrigatório.',
     'zipcode.required': 'O campo "zipcode" é obrigatório.',
     'neighborhood.required': 'O campo "neighborhood" é obrigatório.',
-    'city_id.required': 'O campo "city_id" é obrigatório.',
-    'city_id.exists': 'O "city_id" informado não existe na tabela de cidades.',
+    'city.required': 'O campo "city" é obrigatório.',
+    'city.string': 'O campo "city" deve ser uma string.',
+    'state.required': 'O campo "state" é obrigatório.',
+    'state.string': 'O campo "state" deve ser uma string.',
     'latitude.number': 'O campo "latitude" deve ser um número válido.',
     'longitude.number': 'O campo "longitude" deve ser um número válido.',
   };
@@ -43,12 +46,14 @@ class UpdateAddressValidator {
     neighborhood: schema.string.optional(),
     latitude: schema.number.optional(),
     longitude: schema.number.optional(),
-    city_id: schema.string.optional({}, [rules.exists({ table: 'cities', column: 'id' })]),
+    city: schema.string.optional(),
+    state: schema.string.optional(),
   });
 
   public messages = {
     'id.required': 'O campo "id" é obrigatório.',
-    'city_id.exists': 'O "city_id" informado não existe na tabela de cidades.',
+    'city.string': 'O campo "city" deve ser uma string.',
+    'state.string': 'O campo "state" deve ser uma string.',
     'latitude.number': 'O campo "latitude" deve ser um número válido.',
     'longitude.number': 'O campo "longitude" deve ser um número válido.',
   };
