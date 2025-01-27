@@ -158,8 +158,17 @@ export default class DatabaseSeeder extends BaseSeeder {
 
     // Categories
     const category = await Category.createMany([
-      { id: uuidv4(), name: 'Música' },
-      { id: uuidv4(), name: 'Esportes' },
+      { id: uuidv4(), name: 'Show, música e festa' },
+      { id: uuidv4(), name: 'Esportivo' },
+      { id: uuidv4(), name: 'Congresso e seminários' },
+      { id: uuidv4(), name: 'Curso e workshop' },
+      { id: uuidv4(), name: 'Encontro e networking' },
+      { id: uuidv4(), name: 'Feira e exposição' },
+      { id: uuidv4(), name: 'Filme, cinema e teatro' },
+      { id: uuidv4(), name: 'Gastronômico' },
+      { id: uuidv4(), name: 'Religioso e espiritual' },
+      { id: uuidv4(), name: 'E-sports' },
+      { id: uuidv4(), name: 'Outros' },
     ]);
 
     console.log('Categories created');
@@ -196,6 +205,7 @@ export default class DatabaseSeeder extends BaseSeeder {
       },
       { id: uuidv4(), name: 'Disponível', description: 'Cupom Disponível para uso', module: 'coupon' },
       { id: uuidv4(), name: 'Esgotado', description: 'Cupom Indisponível para uso', module: 'coupon' },
+      { id: uuidv4(), name: 'Reprovado', description: 'Evento reprovado pela equipe Meu Ingresso', module: 'event' },
     ]);
 
     console.log('Statuses created');

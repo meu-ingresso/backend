@@ -9,6 +9,8 @@ export default class AddressesController {
   public async create(context: HttpContextContract) {
     const payload = await context.request.validate(CreateAddressValidator);
 
+    payload.zipcode = payload.zipcode.replace(/\D/g, '');
+
     const result = await this.dynamicService.create('Address', payload);
 
     await utils.createAudity('CREATE', 'ADDRESS', result.id, context.auth.user?.$attributes.id, null, result);
