@@ -46,9 +46,6 @@ export default class Events extends BaseModel {
   public end_date: DateTime | null;
 
   @column()
-  public contact: string | null;
-
-  @column()
   public location_name: string | null;
 
   @column()
