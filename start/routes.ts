@@ -96,6 +96,11 @@ Route.group(() => {
     Route.patch('/event-attachment', 'v1/EventAttachmentsController.update');
     Route.delete('/event-attachment/:id', 'v1/EventAttachmentsController.delete');
 
+    Route.get('/event-guests', 'v1/EventGuestsController.search');
+    Route.post('/event-guest', 'v1/EventGuestsController.create');
+    Route.patch('/event-guest', 'v1/EventGuestsController.update');
+    Route.delete('/event-guest/:id', 'v1/EventGuestsController.delete');
+
     Route.get('/event-checkout-fields', 'v1/EventCheckoutFieldsController.search');
     Route.post('/event-checkout-field', 'v1/EventCheckoutFieldsController.create');
     Route.patch('/event-checkout-field', 'v1/EventCheckoutFieldsController.update');

@@ -28,10 +28,30 @@ export default class DatabaseSeeder extends BaseSeeder {
   public async run() {
     // Roles
     const roles = await Role.createMany([
-      { id: uuidv4(), name: 'Admin', created_at: DateTime.now(), updated_at: DateTime.now() },
-      { id: uuidv4(), name: 'Promoter', created_at: DateTime.now(), updated_at: DateTime.now() },
-      { id: uuidv4(), name: 'Assistant', created_at: DateTime.now(), updated_at: DateTime.now() },
-      { id: uuidv4(), name: 'Cliente', created_at: DateTime.now(), updated_at: DateTime.now() },
+      {
+        id: uuidv4(),
+        name: 'Admin',
+        created_at: DateTime.now().setZone('America/Sao_Paulo'),
+        updated_at: DateTime.now().setZone('America/Sao_Paulo'),
+      },
+      {
+        id: uuidv4(),
+        name: 'Promoter',
+        created_at: DateTime.now().setZone('America/Sao_Paulo'),
+        updated_at: DateTime.now().setZone('America/Sao_Paulo'),
+      },
+      {
+        id: uuidv4(),
+        name: 'Assistant',
+        created_at: DateTime.now().setZone('America/Sao_Paulo'),
+        updated_at: DateTime.now().setZone('America/Sao_Paulo'),
+      },
+      {
+        id: uuidv4(),
+        name: 'Cliente',
+        created_at: DateTime.now().setZone('America/Sao_Paulo'),
+        updated_at: DateTime.now().setZone('America/Sao_Paulo'),
+      },
     ]);
 
     console.log('Roles created');
@@ -61,8 +81,8 @@ export default class DatabaseSeeder extends BaseSeeder {
         last_name: 'Promotor',
         email: 'jean@gmail.com',
         person_type: 'PF',
-        created_at: DateTime.now(),
-        updated_at: DateTime.now(),
+        created_at: DateTime.now().setZone('America/Sao_Paulo'),
+        updated_at: DateTime.now().setZone('America/Sao_Paulo'),
       },
       {
         id: uuidv4(),
@@ -70,8 +90,8 @@ export default class DatabaseSeeder extends BaseSeeder {
         last_name: 'Administrator',
         email: 'admin@gmail.com',
         person_type: 'PJ',
-        created_at: DateTime.now(),
-        updated_at: DateTime.now(),
+        created_at: DateTime.now().setZone('America/Sao_Paulo'),
+        updated_at: DateTime.now().setZone('America/Sao_Paulo'),
       },
       {
         id: uuidv4(),
@@ -79,8 +99,8 @@ export default class DatabaseSeeder extends BaseSeeder {
         last_name: 'Final',
         email: 'cliente@gmail.com',
         person_type: 'PJ',
-        created_at: DateTime.now(),
-        updated_at: DateTime.now(),
+        created_at: DateTime.now().setZone('America/Sao_Paulo'),
+        updated_at: DateTime.now().setZone('America/Sao_Paulo'),
       },
     ]);
 
@@ -252,8 +272,8 @@ export default class DatabaseSeeder extends BaseSeeder {
         status_id: statuses[2].id,
         address_id: address[0].id,
         promoter_id: users[0].id,
-        start_date: DateTime.now(),
-        end_date: DateTime.now().plus({ days: 10 }),
+        start_date: DateTime.now().setZone('America/Sao_Paulo'),
+        end_date: DateTime.now().setZone('America/Sao_Paulo').plus({ days: 10 }),
         location_name: 'Green Valley',
         general_information: 'O evento é uma produção de GDO',
         is_featured: true,
@@ -270,8 +290,8 @@ export default class DatabaseSeeder extends BaseSeeder {
         status_id: statuses[2].id,
         address_id: address[1].id,
         promoter_id: users[1].id,
-        start_date: DateTime.now(),
-        end_date: DateTime.now().plus({ days: 10 }),
+        start_date: DateTime.now().setZone('America/Sao_Paulo'),
+        end_date: DateTime.now().setZone('America/Sao_Paulo').plus({ days: 10 }),
         location_name: 'Estádio do Morumbi',
         general_information: 'Ultimo jogo do campeonato Brasileiro',
         is_featured: false,
@@ -352,9 +372,9 @@ export default class DatabaseSeeder extends BaseSeeder {
         remaining_quantity: 80,
         price: 150.0,
         status_id: statuses[0].id,
-        start_date: DateTime.now(),
+        start_date: DateTime.now().setZone('America/Sao_Paulo'),
         display_order: 1,
-        end_date: DateTime.now().plus({ days: 10 }),
+        end_date: DateTime.now().setZone('America/Sao_Paulo').plus({ days: 10 }),
       },
       {
         id: uuidv4(),
@@ -365,8 +385,8 @@ export default class DatabaseSeeder extends BaseSeeder {
         remaining_quantity: 50,
         price: 100.0,
         status_id: statuses[0].id,
-        start_date: DateTime.now(),
-        end_date: DateTime.now().plus({ days: 10 }),
+        start_date: DateTime.now().setZone('America/Sao_Paulo'),
+        end_date: DateTime.now().setZone('America/Sao_Paulo').plus({ days: 10 }),
         display_order: 2,
       },
       {
@@ -378,8 +398,8 @@ export default class DatabaseSeeder extends BaseSeeder {
         remaining_quantity: 8,
         price: 500.0,
         status_id: statuses[0].id,
-        start_date: DateTime.now(),
-        end_date: DateTime.now().plus({ days: 10 }),
+        start_date: DateTime.now().setZone('America/Sao_Paulo'),
+        end_date: DateTime.now().setZone('America/Sao_Paulo').plus({ days: 10 }),
         display_order: 1,
       },
     ]);
@@ -395,7 +415,7 @@ export default class DatabaseSeeder extends BaseSeeder {
         payment_method: 'pix',
         gross_value: 20.0,
         net_value: 19.0,
-        created_at: DateTime.now(),
+        created_at: DateTime.now().setZone('America/Sao_Paulo'),
       },
       {
         id: uuidv4(),
@@ -404,7 +424,7 @@ export default class DatabaseSeeder extends BaseSeeder {
         payment_method: 'credit',
         gross_value: 29.0,
         net_value: 25.0,
-        created_at: DateTime.now(),
+        created_at: DateTime.now().setZone('America/Sao_Paulo'),
       },
     ]);
 
@@ -419,7 +439,7 @@ export default class DatabaseSeeder extends BaseSeeder {
         status_id: statuses[6].id,
         payment_id: payment[0].id,
         ticket_identifier: 'ARG5AD',
-        created_at: DateTime.now(),
+        created_at: DateTime.now().setZone('America/Sao_Paulo'),
       },
       {
         id: uuidv4(),
@@ -428,7 +448,7 @@ export default class DatabaseSeeder extends BaseSeeder {
         status_id: statuses[7].id,
         payment_id: payment[1].id,
         ticket_identifier: '1AGTAD',
-        created_at: DateTime.now(),
+        created_at: DateTime.now().setZone('America/Sao_Paulo'),
       },
     ]);
 
@@ -450,8 +470,8 @@ export default class DatabaseSeeder extends BaseSeeder {
         discount_type: 'PERCENTAGE',
         discount_value: 10,
         max_uses: 100,
-        start_date: DateTime.now(),
-        end_date: DateTime.now().plus({ days: 10 }),
+        start_date: DateTime.now().setZone('America/Sao_Paulo'),
+        end_date: DateTime.now().setZone('America/Sao_Paulo').plus({ days: 10 }),
         status_id: statuses[8].id,
       },
       {
@@ -461,8 +481,8 @@ export default class DatabaseSeeder extends BaseSeeder {
         discount_type: 'FIXED',
         discount_value: 15,
         max_uses: 2,
-        start_date: DateTime.now(),
-        end_date: DateTime.now().plus({ days: 10 }),
+        start_date: DateTime.now().setZone('America/Sao_Paulo'),
+        end_date: DateTime.now().setZone('America/Sao_Paulo').plus({ days: 10 }),
         status_id: statuses[8].id,
       },
     ]);
