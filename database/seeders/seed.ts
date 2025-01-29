@@ -226,6 +226,8 @@ export default class DatabaseSeeder extends BaseSeeder {
       { id: uuidv4(), name: 'Disponível', description: 'Cupom Disponível para uso', module: 'coupon' },
       { id: uuidv4(), name: 'Esgotado', description: 'Cupom Indisponível para uso', module: 'coupon' },
       { id: uuidv4(), name: 'Reprovado', description: 'Evento reprovado pela equipe Meu Ingresso', module: 'event' },
+      { id: uuidv4(), name: 'Enviada', description: 'Notificação enviada', module: 'notification' },
+      { id: uuidv4(), name: 'Lida', description: 'Notificação lida', module: 'notification' },
     ]);
 
     console.log('Statuses created');

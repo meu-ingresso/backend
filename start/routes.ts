@@ -154,6 +154,11 @@ Route.group(() => {
     Route.patch('/parameter', 'v1/ParametersController.update');
     Route.delete('/parameter/:id', 'v1/ParametersController.delete');
 
+    Route.get('/notifications', 'v1/NotificationsController.search');
+    Route.post('/notification', 'v1/NotificationsController.create');
+    Route.patch('/notification/', 'v1/NotificationsController.update');
+    Route.delete('/notification/:id', 'v1/NotificationsController.delete');
+
     Route.post('/upload', 'v1/AwsController.create');
   }).middleware(['auth']);
 }).prefix('v1');
