@@ -26,6 +26,14 @@ export default class PeopleController {
 
     const oldData = await this.dynamicService.getById('People', payload.id);
 
+    const ableToUpdate = await utils.checkHasAdminPermission(context.auth.user!.id);
+
+    const isOwnPeople = oldData.id === context.auth.user!.id;
+
+    if (!ableToUpdate && !isOwnPeople) {
+      return utils.getResponse(context, 403, utils.getHeaders(), utils.getBody('FORBIDDEN', null));
+    }
+
     const result = await this.dynamicService.update('People', payload);
 
     await utils.createAudity(
@@ -60,6 +68,14 @@ export default class PeopleController {
     const id = context.request.params().id;
 
     const oldData = await this.dynamicService.getById('People', id);
+
+    const ableToDelete = await utils.checkHasAdminPermission(context.auth.user!.id);
+
+    const isOwnPeople = oldData.id === context.auth.user!.id;
+
+    if (!ableToDelete && !isOwnPeople) {
+      return utils.getResponse(context, 403, utils.getHeaders(), utils.getBody('FORBIDDEN', null));
+    }
 
     const result = await this.dynamicService.softDelete('People', { id });
 

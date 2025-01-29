@@ -10,6 +10,12 @@ export default class PermissionsController {
   public async create(context: HttpContextContract) {
     const payload = await context.request.validate(CreatePermissionValidator);
 
+    const ableToCreate = await utils.checkHasAdminPermission(context.auth.user!.id);
+
+    if (!ableToCreate) {
+      return utils.getResponse(context, 403, utils.getHeaders(), utils.getBody('FORBIDDEN', null));
+    }
+
     const result = await this.dynamicService.create('Permission', payload);
 
     await utils.createAudity('CREATE', 'PERMISSION', result.id, context.auth.user?.$attributes.id, null, result);
@@ -25,6 +31,12 @@ export default class PermissionsController {
     const payload = await context.request.validate(UpdatePermissionValidator);
 
     const oldData = await this.dynamicService.getById('Permission', payload.id);
+
+    const ableToUpdate = await utils.checkHasAdminPermission(context.auth.user!.id);
+
+    if (!ableToUpdate) {
+      return utils.getResponse(context, 403, utils.getHeaders(), utils.getBody('FORBIDDEN', null));
+    }
 
     const result = await this.dynamicService.update('Permission', payload);
 
@@ -60,6 +72,12 @@ export default class PermissionsController {
     const id = context.request.params().id;
 
     const oldData = await this.dynamicService.getById('Permission', id);
+
+    const ableToDelete = await utils.checkHasAdminPermission(context.auth.user!.id);
+
+    if (!ableToDelete) {
+      return utils.getResponse(context, 403, utils.getHeaders(), utils.getBody('FORBIDDEN', null));
+    }
 
     const result = await this.dynamicService.softDelete('Permission', { id });
 

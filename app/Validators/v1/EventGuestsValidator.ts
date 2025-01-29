@@ -12,7 +12,7 @@ class CreateEventGuestValidator {
     first_name: schema.string({ trim: true }),
     last_name: schema.string.optional({ trim: true }),
     quantity: schema.number([rules.range(1, 100)]),
-    guest_by: schema.string({}, [rules.exists({ table: 'users', column: 'id' })]),
+    guest_by: schema.string.optional({}, [rules.exists({ table: 'users', column: 'id' })]),
     validated: schema.boolean.optional(),
     validated_by: schema.string.optional({}, [rules.exists({ table: 'users', column: 'id' })]),
     validated_at: schema.date.optional(),

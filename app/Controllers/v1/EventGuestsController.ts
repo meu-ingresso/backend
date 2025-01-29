@@ -1,14 +1,15 @@
 import { HttpContextContract } from '@ioc:Adonis/Core/HttpContext';
 import QueryModelValidator from 'App/Validators/v1/QueryModelValidator';
-import { CreateEventFeeValidator, UpdateEventFeeValidator } from 'App/Validators/v1/EventFeesValidator';
+import { CreateEventGuestValidator, UpdateEventGuestValidator } from 'App/Validators/v1/EventGuestsValidator';
 import DynamicService from 'App/Services/v1/DynamicService';
 import utils from 'Utils/utils';
+import { DateTime } from 'luxon';
 
-export default class EventFeesController {
+export default class EventGuestsController {
   private dynamicService: DynamicService = new DynamicService();
 
   public async create(context: HttpContextContract) {
-    const payload = await context.request.validate(CreateEventFeeValidator);
+    const payload = await context.request.validate(CreateEventGuestValidator);
 
     const ableToCreate = await utils.checkHasEventPermission(context.auth.user!.id, payload.event_id);
 
@@ -16,9 +17,9 @@ export default class EventFeesController {
       return utils.getResponse(context, 403, utils.getHeaders(), utils.getBody('FORBIDDEN', null));
     }
 
-    const result = await this.dynamicService.create('EventFee', payload);
+    const result = await this.dynamicService.create('EventGuest', payload);
 
-    await utils.createAudity('CREATE', 'EVENT_FEE', result.id, context.auth.user?.$attributes.id, null, result);
+    await utils.createAudity('CREATE', 'EVENT_GUEST', result.id, context.auth.user?.$attributes.id, null, result);
 
     const headers = utils.getHeaders();
 
@@ -28,9 +29,9 @@ export default class EventFeesController {
   }
 
   public async update(context: HttpContextContract) {
-    const payload = await context.request.validate(UpdateEventFeeValidator);
+    const payload = await context.request.validate(UpdateEventGuestValidator);
 
-    const oldData = await this.dynamicService.getById('EventFee', payload.id);
+    const oldData = await this.dynamicService.getById('EventGuest', payload.id);
 
     const ableToUpdate = await utils.checkHasEventPermission(context.auth.user!.id, oldData.event_id);
 
@@ -38,11 +39,16 @@ export default class EventFeesController {
       return utils.getResponse(context, 403, utils.getHeaders(), utils.getBody('FORBIDDEN', null));
     }
 
-    const result = await this.dynamicService.update('EventFee', payload);
+    if (payload.validated) {
+      payload.validated_by = context.auth.user?.$attributes.id;
+      payload.validated_at = DateTime.now().setZone('America/Sao_Paulo');
+    }
+
+    const result = await this.dynamicService.update('EventGuest', payload);
 
     await utils.createAudity(
       'UPDATE',
-      'EVENT_FEE',
+      'EVENT_GUEST',
       result.id,
       context.auth.user?.$attributes.id,
       oldData.$attributes,
@@ -59,7 +65,7 @@ export default class EventFeesController {
   public async search(context: HttpContextContract) {
     const payload = await context.request.validate(QueryModelValidator);
 
-    const result = await this.dynamicService.search('EventFee', payload);
+    const result = await this.dynamicService.search('EventGuest', payload);
 
     const headers = utils.getHeaders();
 
@@ -71,7 +77,7 @@ export default class EventFeesController {
   public async delete(context: HttpContextContract) {
     const id = context.request.params().id;
 
-    const oldData = await this.dynamicService.getById('EventFee', id);
+    const oldData = await this.dynamicService.getById('EventGuest', id);
 
     const ableToDelete = await utils.checkHasEventPermission(context.auth.user!.id, oldData.event_id);
 
@@ -79,9 +85,16 @@ export default class EventFeesController {
       return utils.getResponse(context, 403, utils.getHeaders(), utils.getBody('FORBIDDEN', null));
     }
 
-    const result = await this.dynamicService.softDelete('EventFee', { id });
+    const result = await this.dynamicService.softDelete('EventGuest', { id });
 
-    await utils.createAudity('DELETE', 'EVENT_FEE', id, context.auth.user?.$attributes.id, oldData.$attributes, result);
+    await utils.createAudity(
+      'DELETE',
+      'EVENT_GUEST',
+      id,
+      context.auth.user?.$attributes.id,
+      oldData.$attributes,
+      result
+    );
 
     const headers = utils.getHeaders();
 

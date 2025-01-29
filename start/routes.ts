@@ -96,6 +96,11 @@ Route.group(() => {
     Route.patch('/event-attachment', 'v1/EventAttachmentsController.update');
     Route.delete('/event-attachment/:id', 'v1/EventAttachmentsController.delete');
 
+    Route.get('/event-guests', 'v1/EventGuestsController.search');
+    Route.post('/event-guest', 'v1/EventGuestsController.create');
+    Route.patch('/event-guest', 'v1/EventGuestsController.update');
+    Route.delete('/event-guest/:id', 'v1/EventGuestsController.delete');
+
     Route.get('/event-checkout-fields', 'v1/EventCheckoutFieldsController.search');
     Route.post('/event-checkout-field', 'v1/EventCheckoutFieldsController.create');
     Route.patch('/event-checkout-field', 'v1/EventCheckoutFieldsController.update');
@@ -148,6 +153,11 @@ Route.group(() => {
     Route.post('/parameter', 'v1/ParametersController.create');
     Route.patch('/parameter', 'v1/ParametersController.update');
     Route.delete('/parameter/:id', 'v1/ParametersController.delete');
+
+    Route.get('/notifications', 'v1/NotificationsController.search');
+    Route.post('/notification', 'v1/NotificationsController.create');
+    Route.patch('/notification/', 'v1/NotificationsController.update');
+    Route.delete('/notification/:id', 'v1/NotificationsController.delete');
 
     Route.post('/upload', 'v1/AwsController.create');
   }).middleware(['auth']);

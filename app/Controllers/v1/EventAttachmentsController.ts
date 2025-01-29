@@ -13,6 +13,12 @@ export default class EventAttachmentsController {
   public async create(context: HttpContextContract) {
     const payload = await context.request.validate(CreateEventAttachmentValidator);
 
+    const ableToCreate = await utils.checkHasEventPermission(context.auth.user!.id, payload.event_id);
+
+    if (!ableToCreate) {
+      return utils.getResponse(context, 403, utils.getHeaders(), utils.getBody('FORBIDDEN', null));
+    }
+
     const result = await this.dynamicService.create('EventAttachment', payload);
 
     await utils.createAudity('CREATE', 'EVENT_ATTACHMENT', result.id, context.auth.user?.$attributes.id, null, result);
@@ -28,6 +34,12 @@ export default class EventAttachmentsController {
     const payload = await context.request.validate(UpdateEventAttachmentValidator);
 
     const oldData = await this.dynamicService.getById('EventAttachment', payload.id);
+
+    const ableToUpdate = await utils.checkHasEventPermission(context.auth.user!.id, oldData.event_id);
+
+    if (!ableToUpdate) {
+      return utils.getResponse(context, 403, utils.getHeaders(), utils.getBody('FORBIDDEN', null));
+    }
 
     const result = await this.dynamicService.update('EventAttachment', payload);
 
@@ -63,6 +75,12 @@ export default class EventAttachmentsController {
     const id = context.request.params().id;
 
     const oldData = await this.dynamicService.getById('EventAttachment', id);
+
+    const ableToDelete = await utils.checkHasEventPermission(context.auth.user!.id, oldData.event_id);
+
+    if (!ableToDelete) {
+      return utils.getResponse(context, 403, utils.getHeaders(), utils.getBody('FORBIDDEN', null));
+    }
 
     const result = await this.dynamicService.softDelete('EventAttachment', { id });
 
