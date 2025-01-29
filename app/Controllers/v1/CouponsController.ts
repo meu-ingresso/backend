@@ -12,6 +12,12 @@ export default class CouponsController {
   public async create(context: HttpContextContract) {
     const payload = await context.request.validate(CreateCouponValidator);
 
+    const ableToCreate = await utils.checkHasEventPermission(context.auth.user!.id, payload.event_id);
+
+    if (!ableToCreate) {
+      return utils.getResponse(context, 403, utils.getHeaders(), utils.getBody('FORBIDDEN', null));
+    }
+
     const result = await this.dynamicService.create('Coupon', payload);
 
     await utils.createAudity('CREATE', 'COUPON', result.id, context.auth.user?.$attributes.id, null, result);
@@ -27,6 +33,12 @@ export default class CouponsController {
     const payload = await context.request.validate(UpdateCouponValidator);
 
     const oldData = await this.dynamicService.getById('Coupon', payload.id);
+
+    const ableToUpdate = await utils.checkHasEventPermission(context.auth.user!.id, oldData.event_id);
+
+    if (!ableToUpdate) {
+      return utils.getResponse(context, 403, utils.getHeaders(), utils.getBody('FORBIDDEN', null));
+    }
 
     if (payload.uses === payload.max_uses) {
       const status = await this.statusService.searchStatusByName('Esgotado', 'coupon');
@@ -72,6 +84,12 @@ export default class CouponsController {
     const id = context.request.params().id;
 
     const oldData = await this.dynamicService.getById('Coupon', id);
+
+    const ableToDelete = await utils.checkHasEventPermission(context.auth.user!.id, oldData.event_id);
+
+    if (!ableToDelete) {
+      return utils.getResponse(context, 403, utils.getHeaders(), utils.getBody('FORBIDDEN', null));
+    }
 
     const result = await this.dynamicService.softDelete('Coupon', { id });
 
