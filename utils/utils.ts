@@ -95,4 +95,85 @@ async function handleSuccess(context: HttpContextContract, result: any, code: st
   return getResponse(context, statusCode, headers, body);
 }
 
-export default { getHeaders, getBody, getResponse, createAudity, getInfosByRole, handleError, handleSuccess };
+async function getUserWithRole(userId: string): Promise<any | null> {
+  if (!userId) {
+    return null;
+  }
+
+  const user = await dynamicService.search('User', {
+    where: { id: { v: userId } },
+    preloads: ['role'],
+  });
+
+  return user?.data?.[0] || null;
+}
+
+async function checkHasEventPermission(userId: string, eventId?: string): Promise<boolean> {
+  try {
+    const userData = await getUserWithRole(userId);
+
+    if (!userData) {
+      return false;
+    }
+
+    if (userData.role?.name === 'Admin') {
+      console.log('ADMIN');
+      return true;
+    }
+
+    if (!eventId) {
+      console.log('NO EVENT ID');
+      return true;
+    }
+
+    const event = await dynamicService.search('Event', {
+      where: { id: { v: eventId } },
+      preloads: ['collaborators'],
+    });
+
+    const eventData = event?.data?.[0];
+    if (!eventData) {
+      return false;
+    }
+
+    if (eventData.promoter_id === userId) {
+      console.log('EVENTO PROPRIO');
+      return true;
+    }
+
+    return (
+      eventData.collaborators?.some((collaborator) => collaborator.user_id === userId && !collaborator.deleted_at) ??
+      false
+    );
+  } catch (error) {
+    console.error('Error checking event permission:', error);
+    return false;
+  }
+}
+
+async function checkHasAdminPermission(userId: string): Promise<boolean> {
+  try {
+    const userData = await getUserWithRole(userId);
+
+    if (!userData) {
+      return false;
+    }
+
+    return userData.role?.name === 'Admin';
+  } catch (error) {
+    console.error('Error checking admin permission:', error);
+    return false;
+  }
+}
+
+export default {
+  getHeaders,
+  getBody,
+  getResponse,
+  createAudity,
+  getInfosByRole,
+  handleError,
+  handleSuccess,
+  checkHasEventPermission,
+  checkHasAdminPermission,
+};

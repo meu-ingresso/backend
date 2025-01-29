@@ -13,6 +13,12 @@ export default class EventCollaboratorsController {
   public async create(context: HttpContextContract) {
     const payload = await context.request.validate(CreateEventCollaboratorValidator);
 
+    const ableToCreate = await utils.checkHasEventPermission(context.auth.user!.id, payload.event_id);
+
+    if (!ableToCreate) {
+      return utils.getResponse(context, 403, utils.getHeaders(), utils.getBody('FORBIDDEN', null));
+    }
+
     const result = await this.dynamicService.create('EventCollaborator', payload);
 
     await utils.createAudity(
@@ -35,6 +41,12 @@ export default class EventCollaboratorsController {
     const payload = await context.request.validate(UpdateEventCollaboratorValidator);
 
     const oldData = await this.dynamicService.getById('EventCollaborator', payload.id);
+
+    const ableToUpdate = await utils.checkHasEventPermission(context.auth.user!.id, oldData.event_id);
+
+    if (!ableToUpdate) {
+      return utils.getResponse(context, 403, utils.getHeaders(), utils.getBody('FORBIDDEN', null));
+    }
 
     const result = await this.dynamicService.update('EventCollaborator', payload);
 
@@ -70,6 +82,12 @@ export default class EventCollaboratorsController {
     const id = context.request.params().id;
 
     const oldData = await this.dynamicService.getById('EventCollaborator', id);
+
+    const ableToDelete = await utils.checkHasEventPermission(context.auth.user!.id, oldData.event_id);
+
+    if (!ableToDelete) {
+      return utils.getResponse(context, 403, utils.getHeaders(), utils.getBody('FORBIDDEN', null));
+    }
 
     const result = await this.dynamicService.softDelete('EventCollaborator', { id });
 

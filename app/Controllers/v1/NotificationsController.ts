@@ -1,18 +1,20 @@
 import { HttpContextContract } from '@ioc:Adonis/Core/HttpContext';
 import QueryModelValidator from 'App/Validators/v1/QueryModelValidator';
-import { CreateRoleValidator, UpdateRoleValidator } from 'App/Validators/v1/RolesValidator';
+import { CreateNotificationValidator, UpdateNotificationValidator } from 'App/Validators/v1/NotificationsValidator';
 import DynamicService from 'App/Services/v1/DynamicService';
 import utils from 'Utils/utils';
 
-export default class RolesController {
+export default class NotificationsController {
   private dynamicService: DynamicService = new DynamicService();
 
   public async create(context: HttpContextContract) {
-    const payload = await context.request.validate(CreateRoleValidator);
+    const payload = await context.request.validate(CreateNotificationValidator);
 
-    const result = await this.dynamicService.create('Role', payload);
+    payload.sender_id = context.auth.user?.$attributes.id;
 
-    await utils.createAudity('CREATE', 'ROLE', result.id, context.auth.user?.$attributes.id, null, result);
+    const result = await this.dynamicService.create('Notification', payload);
+
+    await utils.createAudity('CREATE', 'NOTIFICATION', result.id, context.auth.user?.$attributes.id, null, result);
 
     const headers = utils.getHeaders();
 
@@ -22,21 +24,15 @@ export default class RolesController {
   }
 
   public async update(context: HttpContextContract) {
-    const payload = await context.request.validate(UpdateRoleValidator);
+    const payload = await context.request.validate(UpdateNotificationValidator);
 
-    const oldData = await this.dynamicService.getById('Role', payload.id);
+    const oldData = await this.dynamicService.getById('Notification', payload.id);
 
-    const ableToUpdate = await utils.checkHasAdminPermission(context.auth.user!.id);
-
-    if (!ableToUpdate) {
-      return utils.getResponse(context, 403, utils.getHeaders(), utils.getBody('FORBIDDEN', null));
-    }
-
-    const result = await this.dynamicService.update('Role', payload);
+    const result = await this.dynamicService.update('Notification', payload);
 
     await utils.createAudity(
       'UPDATE',
-      'ROLE',
+      'NOTIFICATION',
       result.id,
       context.auth.user?.$attributes.id,
       oldData.$attributes,
@@ -53,7 +49,7 @@ export default class RolesController {
   public async search(context: HttpContextContract) {
     const payload = await context.request.validate(QueryModelValidator);
 
-    const result = await this.dynamicService.search('Role', payload);
+    const result = await this.dynamicService.search('Notification', payload);
 
     const headers = utils.getHeaders();
 
@@ -65,17 +61,18 @@ export default class RolesController {
   public async delete(context: HttpContextContract) {
     const id = context.request.params().id;
 
-    const oldData = await this.dynamicService.getById('Role', id);
+    const oldData = await this.dynamicService.getById('Notification', id);
 
-    const ableToDelete = await utils.checkHasAdminPermission(context.auth.user!.id);
+    const result = await this.dynamicService.softDelete('Notification', { id });
 
-    if (!ableToDelete) {
-      return utils.getResponse(context, 403, utils.getHeaders(), utils.getBody('FORBIDDEN', null));
-    }
-
-    const result = await this.dynamicService.softDelete('Role', { id });
-
-    await utils.createAudity('DELETE', 'ROLE', id, context.auth.user?.$attributes.id, oldData.$attributes, result);
+    await utils.createAudity(
+      'DELETE',
+      'NOTIFICATION',
+      id,
+      context.auth.user?.$attributes.id,
+      oldData.$attributes,
+      result
+    );
 
     const headers = utils.getHeaders();
 

@@ -5,6 +5,7 @@ import Roles from './Roles';
 import Tokens from './Tokens';
 import Events from './Events';
 import People from './People';
+import Notifications from './Notifications';
 
 export default class Users extends BaseModel {
   @column({ isPrimary: true })
@@ -53,6 +54,11 @@ export default class Users extends BaseModel {
     foreignKey: 'promoter_id',
   })
   public events: HasMany<typeof Events>;
+
+  @hasMany(() => Notifications, {
+    foreignKey: 'sender_id',
+  })
+  public notifications: HasMany<typeof Notifications>;
 
   @beforeCreate()
   public static assignUuid(user: Users) {

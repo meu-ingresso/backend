@@ -29,6 +29,8 @@ import EventCheckoutFieldTicket from 'App/Models/Access/EventCheckoutFieldsTicke
 import CouponsTickets from 'App/Models/Access/CouponsTickets';
 import EventAttachment from 'App/Models/Access/EventAttachments';
 import EventCheckoutFieldOption from 'App/Models/Access/EventCheckoutFieldOptions';
+import EventGuest from 'App/Models/Access/EventGuests';
+import Notification from 'App/Models/Access/Notifications';
 
 import { DateTime } from 'luxon';
 
@@ -61,6 +63,8 @@ export default class DynamicService {
     CouponsTickets,
     EventAttachment,
     EventCheckoutFieldOption,
+    EventGuest,
+    Notification,
   };
 
   public async create(dynamicModel: string, record: Record<string, any>): Promise<any> {
@@ -131,7 +135,7 @@ export default class DynamicService {
 
     const model = await ModelClass.findOrFail(record.id);
 
-    record.deleted_at = DateTime.now();
+    record.deleted_at = DateTime.now().setZone('America/Sao_Paulo');
 
     await Database.transaction(async (trx) => {
       model.useTransaction(trx);

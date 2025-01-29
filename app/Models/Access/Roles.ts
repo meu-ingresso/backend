@@ -11,6 +11,9 @@ export default class Roles extends BaseModel {
   @column()
   public name: string;
 
+  @column()
+  public description: string;
+
   @column.dateTime({ autoCreate: true })
   public created_at: DateTime;
 
