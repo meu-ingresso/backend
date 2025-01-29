@@ -3,7 +3,6 @@ import { v4 as uuidv4 } from 'uuid';
 import { BaseModel, column, belongsTo, BelongsTo, beforeCreate } from '@ioc:Adonis/Lucid/Orm';
 import Status from 'App/Models/Access/Statuses';
 import User from 'App/Models/Access/Users';
-import Addresses from './Addresses';
 
 export default class Notifications extends BaseModel {
   @column({ isPrimary: true })
