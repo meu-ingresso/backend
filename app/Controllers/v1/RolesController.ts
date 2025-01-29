@@ -26,6 +26,12 @@ export default class RolesController {
 
     const oldData = await this.dynamicService.getById('Role', payload.id);
 
+    const ableToUpdate = await utils.checkHasAdminPermission(context.auth.user!.id);
+
+    if (!ableToUpdate) {
+      return utils.getResponse(context, 403, utils.getHeaders(), utils.getBody('FORBIDDEN', null));
+    }
+
     const result = await this.dynamicService.update('Role', payload);
 
     await utils.createAudity(
@@ -60,6 +66,12 @@ export default class RolesController {
     const id = context.request.params().id;
 
     const oldData = await this.dynamicService.getById('Role', id);
+
+    const ableToDelete = await utils.checkHasAdminPermission(context.auth.user!.id);
+
+    if (!ableToDelete) {
+      return utils.getResponse(context, 403, utils.getHeaders(), utils.getBody('FORBIDDEN', null));
+    }
 
     const result = await this.dynamicService.softDelete('Role', { id });
 

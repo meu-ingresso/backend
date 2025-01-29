@@ -95,18 +95,22 @@ async function handleSuccess(context: HttpContextContract, result: any, code: st
   return getResponse(context, statusCode, headers, body);
 }
 
+async function getUserWithRole(userId: string): Promise<any | null> {
+  if (!userId) {
+    return null;
+  }
+
+  const user = await dynamicService.search('User', {
+    where: { id: { v: userId } },
+    preloads: ['role'],
+  });
+
+  return user?.data?.[0] || null;
+}
+
 async function checkHasEventPermission(userId: string, eventId?: string): Promise<boolean> {
   try {
-    if (!userId) {
-      return false;
-    }
-
-    const user = await dynamicService.search('User', {
-      where: { id: { v: userId } },
-      preloads: ['role'],
-    });
-
-    const userData = user?.data?.[0];
+    const userData = await getUserWithRole(userId);
 
     if (!userData) {
       return false;
@@ -147,6 +151,21 @@ async function checkHasEventPermission(userId: string, eventId?: string): Promis
   }
 }
 
+async function checkHasAdminPermission(userId: string): Promise<boolean> {
+  try {
+    const userData = await getUserWithRole(userId);
+
+    if (!userData) {
+      return false;
+    }
+
+    return userData.role?.name === 'Admin';
+  } catch (error) {
+    console.error('Error checking admin permission:', error);
+    return false;
+  }
+}
+
 export default {
   getHeaders,
   getBody,
@@ -156,4 +175,5 @@ export default {
   handleError,
   handleSuccess,
   checkHasEventPermission,
+  checkHasAdminPermission,
 };

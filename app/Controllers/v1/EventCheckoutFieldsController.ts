@@ -13,6 +13,12 @@ export default class EventCheckoutFieldsController {
   public async create(context: HttpContextContract) {
     const payload = await context.request.validate(CreateEventCheckoutFieldValidator);
 
+    const ableToCreate = await utils.checkHasEventPermission(context.auth.user!.id, payload.event_id);
+
+    if (!ableToCreate) {
+      return utils.getResponse(context, 403, utils.getHeaders(), utils.getBody('FORBIDDEN', null));
+    }
+
     const result = await this.dynamicService.create('EventCheckoutField', payload);
 
     await utils.createAudity(
@@ -35,6 +41,12 @@ export default class EventCheckoutFieldsController {
     const payload = await context.request.validate(UpdateEventCheckoutFieldValidator);
 
     const oldData = await this.dynamicService.getById('EventCheckoutField', payload.id);
+
+    const ableToUpdate = await utils.checkHasEventPermission(context.auth.user!.id, oldData.event_id);
+
+    if (!ableToUpdate) {
+      return utils.getResponse(context, 403, utils.getHeaders(), utils.getBody('FORBIDDEN', null));
+    }
 
     const result = await this.dynamicService.update('EventCheckoutField', payload);
 
@@ -70,6 +82,12 @@ export default class EventCheckoutFieldsController {
     const id = context.request.params().id;
 
     const oldData = await this.dynamicService.getById('EventCheckoutField', id);
+
+    const ableToDelete = await utils.checkHasEventPermission(context.auth.user!.id, oldData.event_id);
+
+    if (!ableToDelete) {
+      return utils.getResponse(context, 403, utils.getHeaders(), utils.getBody('FORBIDDEN', null));
+    }
 
     const result = await this.dynamicService.softDelete('EventCheckoutField', { id });
 

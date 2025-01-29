@@ -11,6 +11,12 @@ export default class EventGuestsController {
   public async create(context: HttpContextContract) {
     const payload = await context.request.validate(CreateEventGuestValidator);
 
+    const ableToCreate = await utils.checkHasEventPermission(context.auth.user!.id, payload.event_id);
+
+    if (!ableToCreate) {
+      return utils.getResponse(context, 403, utils.getHeaders(), utils.getBody('FORBIDDEN', null));
+    }
+
     const result = await this.dynamicService.create('EventGuest', payload);
 
     await utils.createAudity('CREATE', 'EVENT_GUEST', result.id, context.auth.user?.$attributes.id, null, result);
@@ -26,6 +32,12 @@ export default class EventGuestsController {
     const payload = await context.request.validate(UpdateEventGuestValidator);
 
     const oldData = await this.dynamicService.getById('EventGuest', payload.id);
+
+    const ableToUpdate = await utils.checkHasEventPermission(context.auth.user!.id, oldData.event_id);
+
+    if (!ableToUpdate) {
+      return utils.getResponse(context, 403, utils.getHeaders(), utils.getBody('FORBIDDEN', null));
+    }
 
     if (payload.validated) {
       payload.validated_by = context.auth.user?.$attributes.id;
@@ -66,6 +78,12 @@ export default class EventGuestsController {
     const id = context.request.params().id;
 
     const oldData = await this.dynamicService.getById('EventGuest', id);
+
+    const ableToDelete = await utils.checkHasEventPermission(context.auth.user!.id, oldData.event_id);
+
+    if (!ableToDelete) {
+      return utils.getResponse(context, 403, utils.getHeaders(), utils.getBody('FORBIDDEN', null));
+    }
 
     const result = await this.dynamicService.softDelete('EventGuest', { id });
 

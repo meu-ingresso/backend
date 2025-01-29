@@ -12,6 +12,12 @@ export default class TicketsController {
   public async create(context: HttpContextContract) {
     const payload = await context.request.validate(CreateTicketValidator);
 
+    const ableToCreate = await utils.checkHasEventPermission(context.auth.user!.id, payload.event_id);
+
+    if (!ableToCreate) {
+      return utils.getResponse(context, 403, utils.getHeaders(), utils.getBody('FORBIDDEN', null));
+    }
+
     const result = await this.dynamicService.create('Ticket', payload);
 
     await utils.createAudity('CREATE', 'TICKET', result.id, context.auth.user?.$attributes.id, null, result);
@@ -27,6 +33,12 @@ export default class TicketsController {
     const payload = await context.request.validate(UpdateTicketValidator);
 
     const oldData = await this.dynamicService.getById('Ticket', payload.id);
+
+    const ableToUpdate = await utils.checkHasEventPermission(context.auth.user!.id, oldData.event_id);
+
+    if (!ableToUpdate) {
+      return utils.getResponse(context, 403, utils.getHeaders(), utils.getBody('FORBIDDEN', null));
+    }
 
     if (payload.total_quantity === payload.remaining_quantity) {
       const status = await this.statusService.searchStatusByName('Esgotado', 'ticket');
@@ -72,6 +84,12 @@ export default class TicketsController {
     const id = context.request.params().id;
 
     const oldData = await this.dynamicService.getById('Ticket', id);
+
+    const ableToDelete = await utils.checkHasEventPermission(context.auth.user!.id, oldData.event_id);
+
+    if (!ableToDelete) {
+      return utils.getResponse(context, 403, utils.getHeaders(), utils.getBody('FORBIDDEN', null));
+    }
 
     const result = await this.dynamicService.softDelete('Ticket', { id });
 
