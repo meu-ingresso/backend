@@ -19,17 +19,12 @@ export default class AwsService {
     });
   }
 
-  public async upload(
-    name: string,
-    type: string,
-    fileContent: Buffer,
-    event_attachment_id?: string | null
-  ): Promise<any> {
+  public async upload(name: string, type: string, fileContent: Buffer, attachment_id?: string | null): Promise<any> {
     if (!name || !type || !fileContent) {
       throw new Error('Nome do arquivo, tipo e conteúdo são obrigatórios');
     }
 
-    const fileKey = event_attachment_id ? `${event_attachment_id}${name}` : name;
+    const fileKey = attachment_id ? `${attachment_id}${name}` : name;
     const encodedKey = encodeURIComponent(fileKey).replace(/%20/g, '+');
 
     const putObjectParams = {
