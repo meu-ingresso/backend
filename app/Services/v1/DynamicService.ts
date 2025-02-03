@@ -31,6 +31,7 @@ import EventAttachment from 'App/Models/Access/EventAttachments';
 import EventCheckoutFieldOption from 'App/Models/Access/EventCheckoutFieldOptions';
 import EventGuest from 'App/Models/Access/EventGuests';
 import Notification from 'App/Models/Access/Notifications';
+import UserAttachment from 'App/Models/Access/UserAttachments';
 
 import { DateTime } from 'luxon';
 
@@ -65,6 +66,7 @@ export default class DynamicService {
     EventCheckoutFieldOption,
     EventGuest,
     Notification,
+    UserAttachment,
   };
 
   public async create(dynamicModel: string, record: Record<string, any>): Promise<any> {

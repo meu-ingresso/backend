@@ -26,6 +26,9 @@ export default class Users extends BaseModel {
   @column()
   public people_id: string;
 
+  @column()
+  public account_verified: boolean;
+
   @column.dateTime({ autoCreate: true })
   public created_at: DateTime | null;
 

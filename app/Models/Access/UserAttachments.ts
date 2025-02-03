@@ -1,14 +1,14 @@
 import { DateTime } from 'luxon';
 import { BaseModel, column, belongsTo, BelongsTo, beforeCreate } from '@ioc:Adonis/Lucid/Orm';
-import Events from './Events';
+import Users from './Users';
 import { v4 as uuidv4 } from 'uuid';
 
-export default class EventAttachments extends BaseModel {
+export default class UserAttachments extends BaseModel {
   @column({ isPrimary: true })
   public id: string;
 
   @column()
-  public event_id: string;
+  public user_id: string;
 
   @column()
   public name: string;
@@ -25,13 +25,13 @@ export default class EventAttachments extends BaseModel {
   @column.dateTime()
   public deleted_at: DateTime | null;
 
-  @belongsTo(() => Events, {
-    foreignKey: 'event_id',
+  @belongsTo(() => Users, {
+    foreignKey: 'user_id',
   })
-  public event: BelongsTo<typeof Events>;
+  public user: BelongsTo<typeof Users>;
 
   @beforeCreate()
-  public static assignUuid(eventAttachment: EventAttachments) {
-    eventAttachment.id = uuidv4();
+  public static assignUuid(userAttachment: UserAttachments) {
+    userAttachment.id = uuidv4();
   }
 }
