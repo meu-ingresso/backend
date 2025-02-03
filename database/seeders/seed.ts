@@ -329,10 +329,10 @@ export default class DatabaseSeeder extends BaseSeeder {
 
     console.log('Events created');
 
-    const assistant = await Role.findBy('name', 'Assistant');
+    const coordinator = await Role.findBy('name', 'Coordenador de Check-in');
 
     await EventCollaborator.createMany([
-      { id: uuidv4(), event_id: events[1].id, user_id: users[0].id, role_id: assistant?.$attributes.id },
+      { id: uuidv4(), event_id: events[1].id, user_id: users[0].id, role_id: coordinator?.$attributes.id },
     ]);
 
     console.log('Event Collaborators created');
