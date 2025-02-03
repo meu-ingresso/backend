@@ -11,7 +11,7 @@ class CreateEventAttachmentValidator {
     event_id: schema.string({ trim: true }, [rules.exists({ table: 'events', column: 'id' })]),
     name: schema.string({ trim: true }, [rules.maxLength(255)]),
     type: schema.string.optional({ trim: true }, [rules.maxLength(50)]),
-    image_url: schema.string.optional({ trim: true }, [rules.url(), rules.maxLength(255)]),
+    url: schema.string.optional({ trim: true }, [rules.url(), rules.maxLength(255)]),
   });
 
   public messages = {
@@ -20,8 +20,8 @@ class CreateEventAttachmentValidator {
     'name.required': 'O campo "name" é obrigatório.',
     'name.maxLength': 'O campo "name" deve ter no máximo 255 caracteres.',
     'type.maxLength': 'O campo "type" deve ter no máximo 50 caracteres.',
-    'image_url.url': 'O campo "image_url" deve ser uma URL válida.',
-    'image_url.maxLength': 'O campo "image_url" deve ter no máximo 255 caracteres.',
+    'url.url': 'O campo "url" deve ser uma URL válida.',
+    'url.maxLength': 'O campo "url" deve ter no máximo 255 caracteres.',
   };
 }
 
@@ -35,7 +35,7 @@ class UpdateEventAttachmentValidator {
     event_id: schema.string.optional({ trim: true }, [rules.exists({ table: 'events', column: 'id' })]),
     name: schema.string.optional({ trim: true }, [rules.maxLength(255)]),
     type: schema.string.optional({ trim: true }, [rules.maxLength(50)]),
-    image_url: schema.string.optional({ trim: true }, [rules.url(), rules.maxLength(255)]),
+    url: schema.string.optional({ trim: true }, [rules.url(), rules.maxLength(255)]),
   });
 
   public messages = {
@@ -44,8 +44,8 @@ class UpdateEventAttachmentValidator {
     'event_id.exists': 'O "event_id" fornecido não existe na tabela de eventos.',
     'name.maxLength': 'O campo "name" deve ter no máximo 255 caracteres.',
     'type.maxLength': 'O campo "type" deve ter no máximo 50 caracteres.',
-    'image_url.url': 'O campo "image_url" deve ser uma URL válida.',
-    'image_url.maxLength': 'O campo "image_url" deve ter no máximo 255 caracteres.',
+    'url.url': 'O campo "url" deve ser uma URL válida.',
+    'url.maxLength': 'O campo "url" deve ter no máximo 255 caracteres.',
   };
 }
 

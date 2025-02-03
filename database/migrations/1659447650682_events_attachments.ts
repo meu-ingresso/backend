@@ -9,7 +9,7 @@ export default class EventAttachmentsSchema extends BaseSchema {
       table.uuid('event_id').notNullable().references('id').inTable('events').onDelete('CASCADE');
       table.string('name', 255).notNullable();
       table.string('type', 50).nullable();
-      table.string('image_url', 255).nullable();
+      table.string('url', 255).nullable();
       table.timestamp('created_at', { useTz: true }).notNullable().defaultTo(this.now());
       table.timestamp('deleted_at', { useTz: true }).nullable();
     });

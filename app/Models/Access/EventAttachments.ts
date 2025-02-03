@@ -17,7 +17,7 @@ export default class EventAttachments extends BaseModel {
   public type: string | null;
 
   @column()
-  public image_url: string | null;
+  public url: string | null;
 
   @column.dateTime({ autoCreate: true })
   public created_at: DateTime;

@@ -364,16 +364,14 @@ export default class DatabaseSeeder extends BaseSeeder {
         event_id: events[0].id,
         name: 'banner',
         type: 'image',
-        image_url:
-          'https://d2s7f8q1bxluur.cloudfront.net/gYXnIIwLdURfffTGlV4yNiHTGLs=/545x286/https%3A//s3-sa-east-1.amazonaws.com/s3-eventos-saas/media/eventos/481c26e8-1fdb-4c6d-8c1c-cd73f27c5f09.png',
+        url: 'https://d2s7f8q1bxluur.cloudfront.net/gYXnIIwLdURfffTGlV4yNiHTGLs=/545x286/https%3A//s3-sa-east-1.amazonaws.com/s3-eventos-saas/media/eventos/481c26e8-1fdb-4c6d-8c1c-cd73f27c5f09.png',
       },
       {
         id: uuidv4(),
         event_id: events[1].id,
         name: 'banner',
         type: 'image',
-        image_url:
-          'https://d2s7f8q1bxluur.cloudfront.net/s0cm4rOhDrRqKHiQzBZGDfkJae4=/545x286/https%3A//s3-sa-east-1.amazonaws.com/s3-eventos-saas/media/eventos/12d2eece-0439-410c-a0fa-a9da8a3d4402.png',
+        url: 'https://d2s7f8q1bxluur.cloudfront.net/s0cm4rOhDrRqKHiQzBZGDfkJae4=/545x286/https%3A//s3-sa-east-1.amazonaws.com/s3-eventos-saas/media/eventos/12d2eece-0439-410c-a0fa-a9da8a3d4402.png',
       },
     ]);
 
