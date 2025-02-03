@@ -58,6 +58,11 @@ Route.group(() => {
     Route.patch('/user', 'v1/UsersController.update');
     Route.delete('/user/:id', 'v1/UsersController.delete');
 
+    Route.get('/user-attachments', 'v1/UserAttachmentsController.search');
+    Route.post('/user-attachment', 'v1/UserAttachmentsController.create');
+    Route.patch('/user-attachment', 'v1/UserAttachmentsController.update');
+    Route.delete('/user-attachment/:id', 'v1/UserAttachmentsController.delete');
+
     Route.get('/categories', 'v1/CategoriesController.search');
     Route.post('/category', 'v1/CategoriesController.create');
     Route.patch('/category', 'v1/CategoriesController.update');
