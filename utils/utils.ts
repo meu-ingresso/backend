@@ -62,7 +62,23 @@ async function getInfosByRole(userId: string, data: any, module: string): Promis
 
   const filteredData = await Promise.all(
     data.data.map(async (item) => {
-      const event_id = module === 'Event' ? item.id : item.event_id;
+      let event_id;
+
+      switch (module) {
+        case 'Event':
+          event_id = item.id;
+          break;
+        case 'CouponsTickets':
+          const coupon = await dynamicService.getById('Coupon', item.coupon_id);
+
+          event_id = coupon?.event_id;
+
+          break;
+        default:
+          event_id = item.event_id;
+      }
+
+      if (!event_id) return null;
 
       const event = await eventService.getEventByIdWithAllPreloads(event_id);
 
