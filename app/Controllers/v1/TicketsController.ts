@@ -30,8 +30,16 @@ export default class TicketsController {
   }
 
   public async update(context: HttpContextContract) {
-    const payload = await context.request.validate(UpdateTicketValidator);
+    const ticketId = context.request.input('id');
 
+    const ticket = await this.dynamicService.getById('Ticket', ticketId);
+
+    context.request.updateBody({
+      ...context.request.body(),
+      event_id: ticket.event_id,
+    });
+
+    const payload = await context.request.validate(UpdateTicketValidator);
     const oldData = await this.dynamicService.getById('Ticket', payload.id);
 
     const ableToUpdate = await utils.checkHasEventPermission(context.auth.user!.id, oldData.event_id);
