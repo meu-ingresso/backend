@@ -41,7 +41,7 @@ export default class EventGuestsController {
 
     if (payload.validated) {
       payload.validated_by = context.auth.user?.$attributes.id;
-      payload.validated_at = DateTime.now().setZone('America/Sao_Paulo');
+      payload.validated_at = DateTime.now().setZone('America/Sao_Paulo') as DateTime<true>;
     }
 
     const result = await this.dynamicService.update('EventGuest', payload);
