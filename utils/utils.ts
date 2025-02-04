@@ -133,12 +133,10 @@ async function checkHasEventPermission(userId: string, eventId?: string): Promis
     }
 
     if (userData.role?.name === 'Admin') {
-      console.log('ADMIN');
       return true;
     }
 
     if (!eventId) {
-      console.log('NO EVENT ID');
       return true;
     }
 
@@ -153,7 +151,6 @@ async function checkHasEventPermission(userId: string, eventId?: string): Promis
     }
 
     if (eventData.promoter_id === userId) {
-      console.log('EVENTO PROPRIO');
       return true;
     }
 

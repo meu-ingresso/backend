@@ -84,9 +84,8 @@ class UpdateTicketValidator {
       rules.unique({
         table: 'tickets',
         column: 'display_order',
-        where: {
-          event_id: this.context.request.input('event_id'),
-        },
+        whereNot: { id: this.context.request.input('id') },
+        where: { event_id: this.context.request.input('event_id') },
       }),
     ]),
     min_quantity_per_user: schema.number.optional(),
