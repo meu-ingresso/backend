@@ -15,7 +15,7 @@ export default class TicketsFields extends BaseModel {
   public field_id: string;
 
   @column()
-  public order: number;
+  public display_order: number;
 
   @column()
   public value: string;

@@ -28,7 +28,7 @@ class CreateEventCheckoutFieldValidator {
     required: schema.boolean(),
     is_unique: schema.boolean(),
     visible_on_ticket: schema.boolean(),
-    order: schema.number(),
+    display_order: schema.number(),
     help_text: schema.string.optional({ trim: true }, [rules.maxLength(255)]),
   });
 
@@ -40,8 +40,8 @@ class CreateEventCheckoutFieldValidator {
     'type.required': 'O campo "type" é obrigatório.',
     'type.enum': 'O campo "type" deve ser um dos valores válidos.',
     'help_text.maxLength': 'O campo "help_text" deve ter no máximo 255 caracteres.',
-    'order.number': 'O campo "order" precisa ser um número válido.',
-    'order.required': 'O campo "order" é obrigatório.',
+    'display_order.number': 'O campo "display_order" precisa ser um número válido.',
+    'display_order.required': 'O campo "display_order" é obrigatório.',
   };
 }
 
@@ -72,7 +72,7 @@ class UpdateEventCheckoutFieldValidator {
     is_unique: schema.boolean.optional(),
     visible_on_ticket: schema.boolean.optional(),
     help_text: schema.string.optional({ trim: true }, [rules.maxLength(255)]),
-    order: schema.number.optional(),
+    display_order: schema.number.optional(),
   });
 
   public messages = {
@@ -81,7 +81,7 @@ class UpdateEventCheckoutFieldValidator {
     'name.maxLength': 'O campo "name" deve ter no máximo 50 caracteres.',
     'type.enum': 'O campo "type" deve ser um dos valores válidos.',
     'help_text.maxLength': 'O campo "help_text" deve ter no máximo 255 caracteres.',
-    'order.number': 'O campo "order" precisa ser um número válido.',
+    'display_order.number': 'O campo "display_order" precisa ser um número válido.',
   };
 }
 

@@ -33,7 +33,7 @@ export default class EventCheckoutFields extends BaseModel {
   public help_text: string | null;
 
   @column()
-  public order: number;
+  public display_order: number;
 
   @column.dateTime({ autoCreate: true })
   public created_at: DateTime;
