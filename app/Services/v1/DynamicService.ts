@@ -125,15 +125,7 @@ export default class DynamicService {
 
     const dataAccessService = new DataAccessService<typeof ModelClass>(ModelClass);
 
-    const result = await dataAccessService.search(query);
-
-    result.data = result.data.filter((item) => !item.deleted_at);
-
-    if (result.meta) {
-      result.meta.total = result.data.length;
-    }
-
-    return result;
+    return await dataAccessService.search(query);
   }
 
   public async searchInactives(dynamicModel: string, query?: any): Promise<{ meta?: any; data: ModelObject[] }> {
