@@ -46,7 +46,7 @@ export default class AddressesController {
   public async search(context: HttpContextContract) {
     const query = context.request.qs();
 
-    const result = await this.dynamicService.search('City', query);
+    const result = await this.dynamicService.searchActives('City', query);
 
     const headers = utils.getHeaders();
     const body = utils.getBody('SEARCH_SUCCESS', result);

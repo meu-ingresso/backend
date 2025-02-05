@@ -27,6 +27,7 @@ class CreateTicketValidator {
         column: 'display_order',
         where: {
           event_id: this.context.request.input('event_id'),
+          deleted_at: null,
         },
       }),
     ]),

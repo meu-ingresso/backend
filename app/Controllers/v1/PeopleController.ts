@@ -55,7 +55,7 @@ export default class PeopleController {
   public async search(context: HttpContextContract) {
     const payload = await context.request.validate(QueryModelValidator);
 
-    const result = await this.dynamicService.search('People', payload);
+    const result = await this.dynamicService.searchActives('People', payload);
 
     const headers = utils.getHeaders();
 

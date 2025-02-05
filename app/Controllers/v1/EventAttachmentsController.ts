@@ -62,7 +62,7 @@ export default class EventAttachmentsController {
   public async search(context: HttpContextContract) {
     const payload = await context.request.validate(QueryModelValidator);
 
-    const result = await this.dynamicService.search('EventAttachment', payload);
+    const result = await this.dynamicService.searchActives('EventAttachment', payload);
 
     const headers = utils.getHeaders();
 

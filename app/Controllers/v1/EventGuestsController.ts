@@ -65,7 +65,7 @@ export default class EventGuestsController {
   public async search(context: HttpContextContract) {
     const payload = await context.request.validate(QueryModelValidator);
 
-    const result = await this.dynamicService.search('EventGuest', payload);
+    const result = await this.dynamicService.searchActives('EventGuest', payload);
 
     const headers = utils.getHeaders();
 

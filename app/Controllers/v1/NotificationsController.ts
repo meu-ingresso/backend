@@ -49,7 +49,7 @@ export default class NotificationsController {
   public async search(context: HttpContextContract) {
     const payload = await context.request.validate(QueryModelValidator);
 
-    const result = await this.dynamicService.search('Notification', payload);
+    const result = await this.dynamicService.searchActives('Notification', payload);
 
     const headers = utils.getHeaders();
 

@@ -116,7 +116,7 @@ async function getUserWithRole(userId: string): Promise<any | null> {
     return null;
   }
 
-  const user = await dynamicService.search('User', {
+  const user = await dynamicService.searchActives('User', {
     where: { id: { v: userId } },
     preloads: ['role'],
   });
@@ -140,7 +140,7 @@ async function checkHasEventPermission(userId: string, eventId?: string): Promis
       return true;
     }
 
-    const event = await dynamicService.search('Event', {
+    const event = await dynamicService.searchActives('Event', {
       where: { id: { v: eventId } },
       preloads: ['collaborators'],
     });

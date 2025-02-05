@@ -61,7 +61,7 @@ export default class CustomerTicketsController {
   public async search(context: HttpContextContract) {
     const payload = await context.request.validate(QueryModelValidator);
 
-    const result = await this.dynamicService.search('CustomerTicket', payload);
+    const result = await this.dynamicService.searchActives('CustomerTicket', payload);
 
     const headers = utils.getHeaders();
 
