@@ -50,7 +50,7 @@ export default class RolePermissionsController {
   public async search(context: HttpContextContract) {
     const payload = await context.request.validate(QueryModelValidator);
 
-    const result = await this.dynamicService.search('RolePermission', payload);
+    const result = await this.dynamicService.searchActives('RolePermission', payload);
 
     const headers = utils.getHeaders();
 

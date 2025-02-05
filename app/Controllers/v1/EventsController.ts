@@ -73,7 +73,7 @@ export default class EventsController {
   public async search(context: HttpContextContract) {
     const payload = await context.request.validate(QueryModelValidator);
 
-    const result = await this.dynamicService.search('Event', payload);
+    const result = await this.dynamicService.searchActives('Event', payload);
 
     if (result && result.data && !!result.data.length) {
       for (let i = 0; i < result.data.length; i++) {

@@ -24,7 +24,7 @@ export default class CouponsTicketsController {
   public async search(context: HttpContextContract) {
     const payload = await context.request.validate(QueryModelValidator);
 
-    const result = await this.dynamicService.search('CouponsTickets', payload);
+    const result = await this.dynamicService.searchActives('CouponsTickets', payload);
 
     const resultByRole = await utils.getInfosByRole(context.auth.user!.id, result, 'CouponsTickets');
 

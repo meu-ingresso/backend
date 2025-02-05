@@ -69,7 +69,7 @@ export default class CouponsController {
   public async search(context: HttpContextContract) {
     const payload = await context.request.validate(QueryModelValidator);
 
-    const result = await this.dynamicService.search('Coupon', payload);
+    const result = await this.dynamicService.searchActives('Coupon', payload);
 
     const resultByRole = await utils.getInfosByRole(context.auth.user!.id, result, 'Coupon');
 
