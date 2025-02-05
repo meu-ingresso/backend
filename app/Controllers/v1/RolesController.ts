@@ -53,7 +53,7 @@ export default class RolesController {
   public async search(context: HttpContextContract) {
     const payload = await context.request.validate(QueryModelValidator);
 
-    const result = await this.dynamicService.search('Role', payload);
+    const result = await this.dynamicService.searchActives('Role', payload);
 
     const headers = utils.getHeaders();
 

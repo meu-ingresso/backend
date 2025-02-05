@@ -47,7 +47,7 @@ export default class ParametersController {
   public async search(context: HttpContextContract) {
     const payload = await context.request.validate(QueryModelValidator);
 
-    const result = await this.dynamicService.search('Parameter', payload);
+    const result = await this.dynamicService.searchActives('Parameter', payload);
 
     const headers = utils.getHeaders();
 
