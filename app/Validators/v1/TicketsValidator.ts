@@ -86,7 +86,10 @@ class UpdateTicketValidator {
         table: 'tickets',
         column: 'display_order',
         whereNot: { id: this.context.request.input('id') },
-        where: { event_id: this.context.request.input('event_id') },
+        where: {
+          event_id: this.context.request.input('event_id'),
+          deleted_at: null,
+        },
       }),
     ]),
     min_quantity_per_user: schema.number.optional(),
