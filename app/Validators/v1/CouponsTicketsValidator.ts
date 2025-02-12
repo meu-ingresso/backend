@@ -13,7 +13,6 @@ class CreateCouponTicketValidator {
       rules.unique({
         table: 'coupons_tickets',
         column: 'coupon_id',
-        whereNot: { id: this.context.request.input('id') },
         where: {
           ticket_id: this.context.request.input('ticket_id'),
           deleted_at: null,

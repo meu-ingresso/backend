@@ -14,7 +14,6 @@ class CreateCouponValidator {
       rules.unique({
         table: 'coupons',
         column: 'code',
-        whereNot: { id: this.context.request.input('id') },
         where: {
           event_id: this.context.request.input('event_id'),
           deleted_at: null,
@@ -66,7 +65,7 @@ class UpdateCouponValidator {
         },
       }),
     ]),
-    discount_type: schema.enum.optional(['percentage', 'fixed']),
+    discount_type: schema.enum.optional(['PERCENTAGE', 'FIXED']),
     discount_value: schema.number.optional(),
     start_date: schema.date.optional(),
     end_date: schema.date.optional(),
@@ -80,7 +79,7 @@ class UpdateCouponValidator {
     'event_id.exists': 'O evento especificado não existe.',
     'status_id.exists': 'O status especificado não existe.',
     'code.unique': 'Já existe um cupom com este código para o mesmo evento.',
-    'discount_type.enum': 'O campo "discount_type" deve ser "percentage" ou "fixed".',
+    'discount_type.enum': 'O campo "discount_type" deve ser "PERCENTAGE" ou "FIXED".',
     'start_date.date': 'A data de início deve ser uma data válida.',
     'end_date.date': 'A data de fim deve ser uma data válida.',
     'max_uses.number': 'O campo "max_uses" deve ser um número válido.',
