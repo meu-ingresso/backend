@@ -65,7 +65,7 @@ class UpdateCouponValidator {
         },
       }),
     ]),
-    discount_type: schema.enum.optional(['percentage', 'fixed']),
+    discount_type: schema.enum.optional(['PERCENTAGE', 'FIXED']),
     discount_value: schema.number.optional(),
     start_date: schema.date.optional(),
     end_date: schema.date.optional(),
