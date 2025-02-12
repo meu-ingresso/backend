@@ -14,7 +14,11 @@ class CreateCouponValidator {
       rules.unique({
         table: 'coupons',
         column: 'code',
-        where: { event_id: this.context.request.input('event_id') },
+        whereNot: { id: this.context.request.input('id') },
+        where: {
+          event_id: this.context.request.input('event_id'),
+          deleted_at: null,
+        },
       }),
     ]),
     discount_type: schema.enum(['PERCENTAGE', 'FIXED']),
@@ -55,8 +59,11 @@ class UpdateCouponValidator {
       rules.unique({
         table: 'coupons',
         column: 'code',
-        where: { event_id: this.context.request.input('event_id') },
         whereNot: { id: this.context.request.input('id') },
+        where: {
+          event_id: this.context.request.input('event_id'),
+          deleted_at: null,
+        },
       }),
     ]),
     discount_type: schema.enum.optional(['percentage', 'fixed']),

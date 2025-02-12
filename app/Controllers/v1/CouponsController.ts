@@ -30,6 +30,15 @@ export default class CouponsController {
   }
 
   public async update(context: HttpContextContract) {
+    const couponId = context.request.input('id');
+
+    const coupon = await this.dynamicService.getById('Coupon', couponId);
+
+    context.request.updateBody({
+      ...context.request.body(),
+      event_id: coupon.event_id,
+    });
+
     const payload = await context.request.validate(UpdateCouponValidator);
 
     const oldData = await this.dynamicService.getById('Coupon', payload.id);
