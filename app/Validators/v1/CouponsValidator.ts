@@ -14,7 +14,6 @@ class CreateCouponValidator {
       rules.unique({
         table: 'coupons',
         column: 'code',
-        whereNot: { id: this.context.request.input('id') },
         where: {
           event_id: this.context.request.input('event_id'),
           deleted_at: null,
