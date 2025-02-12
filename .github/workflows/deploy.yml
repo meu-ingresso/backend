@@ -19,7 +19,7 @@ jobs:
         with:
           ssh-private-key: ${{ secrets.DEPLOY_SSH_KEY }}
 
-      - name: Set Environment Variables
+      - name: Run Deploy Script
         run: |
           BRANCH=${{ github.ref_name }}
           echo "VARIAVEL BRANCH: $BRANCH"
@@ -34,31 +34,14 @@ jobs:
             exit 1
           fi
 
-      - name: Configure SSH connection
-        run: |
-          echo "Configurando conexão SSH com o servidor..."
-          ssh -o StrictHostKeyChecking=no ubuntu@18.207.6.216 "echo 'Conexão SSH estabelecida com sucesso!'"
-
-      - name: Setup server environment
-        run: |
-          ssh -o StrictHostKeyChecking=no ubuntu@18.207.6.216 << 'EOF'
-            echo "Configurando ambiente do servidor..."
-            export NVM_DIR="/home/ubuntu/.nvm"
-            [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
-            export PATH="$PATH:$(yarn global bin)"
-          EOF
-
-      - name: Deploy application
-        env:
-          ENVIRONMENT: ${{ steps.set-env.outputs.environment }}
-          GIT_BRANCH: ${{ steps.set-env.outputs.git_branch }}
-        run: |
           ssh -o StrictHostKeyChecking=no ubuntu@18.207.6.216 << EOF
-            echo "Iniciando deploy da aplicação..."
-            cd /home/ubuntu/Projetos/backend-${ENVIRONMENT}
+            export NVM_DIR="/home/ubuntu/.nvm"
+            [ -s "\$NVM_DIR/nvm.sh" ] && \. "\$NVM_DIR/nvm.sh"
+            export PATH="\$PATH:$(yarn global bin)"
+            export ENVIRONMENT=$ENVIRONMENT
+            cd /home/ubuntu/Projetos/backend-\$ENVIRONMENT
             git fetch
-            git checkout ${GIT_BRANCH}
+            git checkout $GIT_BRANCH
             git pull
-            ENVIRONMENT=${ENVIRONMENT} ./start.sh
-            echo "Deploy finalizado com sucesso!"
+            ENVIRONMENT=\$ENVIRONMENT ./start.sh
           EOF
