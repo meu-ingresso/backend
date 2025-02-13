@@ -16,7 +16,7 @@ export default class TicketsSchema extends BaseSchema {
       table.string('name', 50).notNullable();
       table.string('description', 100).nullable();
       table.integer('total_quantity', 255).notNullable();
-      table.integer('remaining_quantity', 255).notNullable();
+      table.integer('total_sold', 255).notNullable().defaultTo(0);
       table.decimal('price', 10, 2).notNullable();
       table.uuid('status_id').notNullable().references('id').inTable('statuses').onDelete('RESTRICT');
       table.dateTime('start_date').notNullable();

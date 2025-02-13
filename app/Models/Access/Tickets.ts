@@ -27,7 +27,7 @@ export default class Tickets extends BaseModel {
   public total_quantity: number;
 
   @column()
-  public remaining_quantity: number;
+  public total_sold: number;
 
   @column()
   public price: number;
