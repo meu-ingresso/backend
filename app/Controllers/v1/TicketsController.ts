@@ -48,7 +48,7 @@ export default class TicketsController {
       return utils.getResponse(context, 403, utils.getHeaders(), utils.getBody('FORBIDDEN', null));
     }
 
-    if (payload.total_quantity === payload.remaining_quantity) {
+    if (payload.total_quantity === payload.total_sold) {
       const status = await this.statusService.searchStatusByName('Esgotado', 'ticket');
 
       if (status) {
