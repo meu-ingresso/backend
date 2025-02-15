@@ -22,14 +22,14 @@ export default class EventService {
     let total = {
       totalSales: 0,
       totalSalesToday: 0,
-      totalSalesAmout: 0,
+      totalSalesAmount: 0,
       totalSalesAmountToday: 0,
       totalViews: Number(totalViews[0].total),
     };
 
     for (const totalizer of totalizers) {
       total.totalSales += 1;
-      total.totalSalesAmout += Number(totalizer.net_value);
+      total.totalSalesAmount += Number(totalizer.net_value);
 
       const createdAt = DateTime.fromJSDate(totalizer.created_at).startOf('day');
 
