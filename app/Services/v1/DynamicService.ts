@@ -33,6 +33,7 @@ import EventGuest from 'App/Models/Access/EventGuests';
 import Notification from 'App/Models/Access/Notifications';
 import UserAttachment from 'App/Models/Access/UserAttachments';
 import Pdv from 'App/Models/Access/Pdvs';
+import PdvTicket from 'App/Models/Access/PdvTickets';
 
 import { DateTime } from 'luxon';
 
@@ -69,6 +70,7 @@ export default class DynamicService {
     Notification,
     UserAttachment,
     Pdv,
+    PdvTicket,
   };
 
   public async create(dynamicModel: string, record: Record<string, any>): Promise<any> {

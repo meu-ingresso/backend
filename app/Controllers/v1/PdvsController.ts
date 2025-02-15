@@ -1,11 +1,10 @@
 import { HttpContextContract } from '@ioc:Adonis/Core/HttpContext';
 import QueryModelValidator from 'App/Validators/v1/QueryModelValidator';
-import { CreatePdvValidator, UpdatePdvValidator } from 'App/Validators/v1/PdvValidator';
+import { CreatePdvValidator, UpdatePdvValidator } from 'App/Validators/v1/PdvsValidator';
 import DynamicService from 'App/Services/v1/DynamicService';
 import utils from 'Utils/utils';
-import { DateTime } from 'luxon';
 
-export default class PdvController {
+export default class PdvsController {
   private dynamicService: DynamicService = new DynamicService();
 
   public async create(context: HttpContextContract) {

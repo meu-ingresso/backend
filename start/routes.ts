@@ -106,10 +106,20 @@ Route.group(() => {
     Route.patch('/event-guest', 'v1/EventGuestsController.update');
     Route.delete('/event-guest/:id', 'v1/EventGuestsController.delete');
 
-    Route.get('/pdvs', 'v1/PdvController.search');
-    Route.post('/pdv', 'v1/PdvController.create');
-    Route.patch('/pdv', 'v1/PdvController.update');
-    Route.delete('/pdv/:id', 'v1/PdvController.delete');
+    Route.get('/pdvs', 'v1/PdvsController.search');
+    Route.post('/pdv', 'v1/PdvsController.create');
+    Route.patch('/pdv', 'v1/PdvsController.update');
+    Route.delete('/pdv/:id', 'v1/PdvsController.delete');
+
+    Route.get('/pdv-users', 'v1/PdvUsersController.search');
+    Route.post('/pdv-user', 'v1/PdvUsersController.create');
+    Route.patch('/pdv-user', 'v1/PdvUsersController.update');
+    Route.delete('/pdv-user/:id', 'v1/PdvUsersController.delete');
+
+    Route.get('/pdv-tickets', 'v1/PdvTicketsController.search');
+    Route.post('/pdv-ticket', 'v1/PdvTicketsController.create');
+    Route.patch('/pdv-ticket', 'v1/PdvTicketsController.update');
+    Route.delete('/pdv-ticket/:id', 'v1/PdvTicketsController.delete');
 
     Route.get('/event-checkout-fields', 'v1/EventCheckoutFieldsController.search');
     Route.post('/event-checkout-field', 'v1/EventCheckoutFieldsController.create');
