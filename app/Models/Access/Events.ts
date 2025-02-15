@@ -13,6 +13,7 @@ import EventViews from './EventViews';
 import EventCollaborators from './EventCollaborators';
 import Promoters from './Users';
 import Coupons from './Coupons';
+import Pdv from './Pdvs';
 
 export default class Events extends BaseModel {
   @column({ isPrimary: true })
@@ -128,6 +129,9 @@ export default class Events extends BaseModel {
 
   @hasMany(() => EventGuests, { foreignKey: 'event_id' })
   public guests: HasMany<typeof EventGuests>;
+
+  @hasMany(() => Pdv, { foreignKey: 'event_id' })
+  public pdvs: HasMany<typeof Pdv>;
 
   @beforeCreate()
   public static assignUuid(event: Events) {

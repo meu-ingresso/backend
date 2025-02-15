@@ -6,6 +6,7 @@ import Payments from './Payments';
 import Coupons from './Coupons';
 import Tickets from './Tickets';
 import Notifications from './Notifications';
+import Pdv from './Pdvs';
 
 export default class Statuses extends BaseModel {
   @column({ isPrimary: true })
@@ -53,6 +54,11 @@ export default class Statuses extends BaseModel {
     foreignKey: 'status_id',
   })
   public notifications: HasMany<typeof Notifications>;
+
+  @hasMany(() => Pdv, {
+    foreignKey: 'status_id',
+  })
+  public pdvs: HasMany<typeof Pdv>;
 
   @beforeCreate()
   public static assignUuid(status: Statuses) {

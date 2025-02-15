@@ -253,6 +253,8 @@ export default class DatabaseSeeder extends BaseSeeder {
       { id: uuidv4(), name: 'Reprovado', description: 'Evento reprovado pela equipe Meu Ingresso', module: 'event' },
       { id: uuidv4(), name: 'Enviada', description: 'Notificação enviada', module: 'notification' },
       { id: uuidv4(), name: 'Lida', description: 'Notificação lida', module: 'notification' },
+      { id: uuidv4(), name: 'Disponível', description: 'PDV Disponível para uso', module: 'pdv' },
+      { id: uuidv4(), name: 'Fechado', description: 'PDV Fechado', module: 'pdv' },
     ]);
 
     console.log('Statuses created');

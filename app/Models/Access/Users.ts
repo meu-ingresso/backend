@@ -6,6 +6,7 @@ import Tokens from './Tokens';
 import Events from './Events';
 import People from './People';
 import Notifications from './Notifications';
+import PdvUsers from './PdvUsers';
 
 export default class Users extends BaseModel {
   @column({ isPrimary: true })
@@ -57,6 +58,11 @@ export default class Users extends BaseModel {
     foreignKey: 'promoter_id',
   })
   public events: HasMany<typeof Events>;
+
+  @hasMany(() => PdvUsers, {
+    foreignKey: 'user_id',
+  })
+  public pdvUsers: HasMany<typeof PdvUsers>;
 
   @hasMany(() => Notifications, {
     foreignKey: 'sender_id',
