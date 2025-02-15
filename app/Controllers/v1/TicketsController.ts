@@ -40,6 +40,7 @@ export default class TicketsController {
     });
 
     const payload = await context.request.validate(UpdateTicketValidator);
+
     const oldData = await this.dynamicService.getById('Ticket', payload.id);
 
     const ableToUpdate = await utils.checkHasEventPermission(context.auth.user!.id, oldData.event_id);
@@ -48,7 +49,10 @@ export default class TicketsController {
       return utils.getResponse(context, 403, utils.getHeaders(), utils.getBody('FORBIDDEN', null));
     }
 
-    if (payload.total_quantity === payload.total_sold) {
+    const isTicketSoldOut =
+      payload.total_quantity && payload.total_sold && payload.total_quantity <= payload.total_sold;
+
+    if (isTicketSoldOut) {
       const status = await this.statusService.searchStatusByName('Esgotado', 'ticket');
 
       if (status) {
