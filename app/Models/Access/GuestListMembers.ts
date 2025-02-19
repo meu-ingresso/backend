@@ -1,15 +1,15 @@
 import { DateTime } from 'luxon';
 import { v4 as uuidv4 } from 'uuid';
 import { BaseModel, column, beforeCreate, belongsTo, BelongsTo } from '@ioc:Adonis/Lucid/Orm';
-import Events from './Events';
+import GuestLists from './GuestLists';
 import Users from './Users';
 
-export default class EventGuests extends BaseModel {
+export default class GuestListMembers extends BaseModel {
   @column({ isPrimary: true })
   public id: string;
 
   @column()
-  public event_id: string;
+  public guest_list_id: string;
 
   @column()
   public first_name: string;
@@ -21,7 +21,7 @@ export default class EventGuests extends BaseModel {
   public quantity: number;
 
   @column()
-  public guest_by: string;
+  public added_by: string;
 
   @column()
   public validated: boolean;
@@ -41,13 +41,13 @@ export default class EventGuests extends BaseModel {
   @column.dateTime()
   public deleted_at: DateTime | null;
 
-  @belongsTo(() => Events, {
-    foreignKey: 'event_id',
+  @belongsTo(() => GuestLists, {
+    foreignKey: 'guest_list_id',
   })
-  public event: BelongsTo<typeof Events>;
+  public guestList: BelongsTo<typeof GuestLists>;
 
   @belongsTo(() => Users, {
-    foreignKey: 'guest_by',
+    foreignKey: 'added_by',
   })
   public addedBy: BelongsTo<typeof Users>;
 
@@ -57,7 +57,7 @@ export default class EventGuests extends BaseModel {
   public validatedBy: BelongsTo<typeof Users>;
 
   @beforeCreate()
-  public static assignUuid(eventGuest: EventGuests) {
-    eventGuest.id = uuidv4();
+  public static assignUuid(guestListMember: GuestListMembers) {
+    guestListMember.id = uuidv4();
   }
 }

@@ -3,7 +3,6 @@ import { v4 as uuidv4 } from 'uuid';
 import { BaseModel, column, beforeCreate, hasMany, HasMany, belongsTo, BelongsTo } from '@ioc:Adonis/Lucid/Orm';
 import Tickets from './Tickets';
 import EventCheckoutFields from './EventCheckoutFields';
-import EventGuests from './EventGuests';
 import Categories from './Categories';
 import Ratings from './Ratings';
 import Statuses from './Statuses';
@@ -14,6 +13,7 @@ import EventCollaborators from './EventCollaborators';
 import Promoters from './Users';
 import Coupons from './Coupons';
 import Pdv from './Pdvs';
+import GuestLists from './GuestLists';
 
 export default class Events extends BaseModel {
   @column({ isPrimary: true })
@@ -127,11 +127,13 @@ export default class Events extends BaseModel {
   @hasMany(() => EventCheckoutFields, { foreignKey: 'event_id' })
   public checkoutFields: HasMany<typeof EventCheckoutFields>;
 
-  @hasMany(() => EventGuests, { foreignKey: 'event_id' })
-  public guests: HasMany<typeof EventGuests>;
-
   @hasMany(() => Pdv, { foreignKey: 'event_id' })
   public pdvs: HasMany<typeof Pdv>;
+
+  @hasMany(() => GuestLists, {
+    foreignKey: 'event_id',
+  })
+  public guestLists: HasMany<typeof GuestLists>;
 
   @beforeCreate()
   public static assignUuid(event: Events) {
