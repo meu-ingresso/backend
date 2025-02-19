@@ -101,10 +101,15 @@ Route.group(() => {
     Route.patch('/event-attachment', 'v1/EventAttachmentsController.update');
     Route.delete('/event-attachment/:id', 'v1/EventAttachmentsController.delete');
 
-    Route.get('/event-guests', 'v1/EventGuestsController.search');
-    Route.post('/event-guest', 'v1/EventGuestsController.create');
-    Route.patch('/event-guest', 'v1/EventGuestsController.update');
-    Route.delete('/event-guest/:id', 'v1/EventGuestsController.delete');
+    Route.get('/guest-lists', 'v1/GuestListsController.search');
+    Route.post('/guest-list', 'v1/GuestListsController.create');
+    Route.patch('/guest-list', 'v1/GuestListsController.update');
+    Route.delete('/guest-list/:id', 'v1/GuestListsController.delete');
+
+    Route.get('/guest-list-members', 'v1/GuestListMembersController.search');
+    Route.post('/guest-list-member', 'v1/GuestListMembersController.create');
+    Route.patch('/guest-list-member', 'v1/GuestListMembersController.update');
+    Route.delete('/guest-list-member/:id', 'v1/GuestListMembersController.delete');
 
     Route.get('/pdvs', 'v1/PdvsController.search');
     Route.post('/pdv', 'v1/PdvsController.create');
@@ -182,3 +187,19 @@ Route.group(() => {
     Route.post('/upload', 'v1/AwsController.create');
   }).middleware(['auth']);
 }).prefix('v1');
+
+// Guest Lists
+Route.group(() => {
+  Route.post('/', 'GuestListsController.create').middleware(['auth']);
+  Route.put('/:id', 'GuestListsController.update').middleware(['auth']);
+  Route.get('/', 'GuestListsController.search').middleware(['auth']);
+  Route.delete('/:id', 'GuestListsController.delete').middleware(['auth']);
+}).prefix('/api/v1/guest-lists');
+
+// Guest List Members
+Route.group(() => {
+  Route.post('/', 'GuestListMembersController.create').middleware(['auth']);
+  Route.put('/:id', 'GuestListMembersController.update').middleware(['auth']);
+  Route.get('/', 'GuestListMembersController.search').middleware(['auth']);
+  Route.delete('/:id', 'GuestListMembersController.delete').middleware(['auth']);
+}).prefix('/api/v1/guest-list-members');
