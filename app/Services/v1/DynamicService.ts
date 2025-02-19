@@ -29,12 +29,13 @@ import EventCheckoutFieldTicket from 'App/Models/Access/EventCheckoutFieldsTicke
 import CouponsTickets from 'App/Models/Access/CouponsTickets';
 import EventAttachment from 'App/Models/Access/EventAttachments';
 import EventCheckoutFieldOption from 'App/Models/Access/EventCheckoutFieldOptions';
-import EventGuest from 'App/Models/Access/EventGuests';
 import Notification from 'App/Models/Access/Notifications';
 import UserAttachment from 'App/Models/Access/UserAttachments';
 import Pdv from 'App/Models/Access/Pdvs';
 import PdvTicket from 'App/Models/Access/PdvTickets';
 import PdvUser from 'App/Models/Access/PdvUsers';
+import GuestList from 'App/Models/Access/GuestLists';
+import GuestListMember from 'App/Models/Access/GuestListMembers';
 
 import { DateTime } from 'luxon';
 
@@ -67,12 +68,13 @@ export default class DynamicService {
     CouponsTickets,
     EventAttachment,
     EventCheckoutFieldOption,
-    EventGuest,
     Notification,
     UserAttachment,
     Pdv,
     PdvTicket,
     PdvUser,
+    GuestList,
+    GuestListMember,
   };
 
   public async create(dynamicModel: string, record: Record<string, any>): Promise<any> {
