@@ -73,7 +73,7 @@ export default class EventService {
       .preload('collaborators')
       .preload('coupons')
       .preload('checkoutFields')
-      .preload('guests')
+      .preload('guestLists')
       .first();
   }
 }
