@@ -23,9 +23,6 @@ export default class GuestListMembers extends BaseModel {
   @column()
   public added_by: string;
 
-  @column.dateTime()
-  public validated_at: DateTime | null;
-
   @column.dateTime({ autoCreate: true })
   public created_at: DateTime;
 

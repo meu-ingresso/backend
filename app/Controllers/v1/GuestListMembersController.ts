@@ -30,12 +30,6 @@ export default class GuestListMembersController {
 
     const oldData = await this.dynamicService.getById('GuestListMember', payload.id);
 
-    if (payload.validated === true) {
-      payload.validated_by = context.auth.user!.id;
-      // @ts-ignore
-      payload.validated_at = DateTime.now().setZone('America/Sao_Paulo');
-    }
-
     const result = await this.dynamicService.update('GuestListMember', payload);
 
     await utils.createAudity(
