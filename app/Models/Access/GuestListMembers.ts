@@ -1,7 +1,8 @@
 import { DateTime } from 'luxon';
 import { v4 as uuidv4 } from 'uuid';
-import { BaseModel, column, beforeCreate, belongsTo, BelongsTo } from '@ioc:Adonis/Lucid/Orm';
+import { BaseModel, column, beforeCreate, belongsTo, BelongsTo, hasMany, HasMany } from '@ioc:Adonis/Lucid/Orm';
 import GuestLists from './GuestLists';
+import GuestListMemberValidated from './GuestListMembersValidated';
 import Users from './Users';
 
 export default class GuestListMembers extends BaseModel {
@@ -41,6 +42,11 @@ export default class GuestListMembers extends BaseModel {
     foreignKey: 'added_by',
   })
   public addedBy: BelongsTo<typeof Users>;
+
+  @hasMany(() => GuestListMemberValidated, {
+    foreignKey: 'guest_list_member_id',
+  })
+  public guestListMemberValidated: HasMany<typeof GuestListMemberValidated>;
 
   @beforeCreate()
   public static assignUuid(guestListMember: GuestListMembers) {

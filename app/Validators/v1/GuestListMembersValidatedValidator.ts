@@ -2,39 +2,32 @@ import { schema, rules } from '@ioc:Adonis/Core/Validator';
 import { HttpContextContract } from '@ioc:Adonis/Core/HttpContext';
 import ReportHandler from './Reporters/ReportHandler';
 
-class CreateGuestListMemberValidator {
+class CreateGuestListMemberValidatedValidator {
   constructor(protected context: HttpContextContract) {}
 
   public reporter = ReportHandler;
 
   public schema = schema.create({
-    guest_list_id: schema.string({}, [rules.exists({ table: 'guest_lists', column: 'id' })]),
-    first_name: schema.string({}, [rules.maxLength(255)]),
-    last_name: schema.string.optional({}, [rules.maxLength(255)]),
+    guest_list_member_id: schema.string({}, [rules.exists({ table: 'guest_list_members', column: 'id' })]),
     quantity: schema.number([rules.unsigned(), rules.range(1, 99999)]),
   });
 
   public messages = {
-    'guest_list_id.required': 'A lista de convidados é obrigatória',
-    'guest_list_id.exists': 'A lista informada não existe',
-    'first_name.required': 'O nome é obrigatório',
-    'first_name.maxLength': 'O nome não pode ter mais que 255 caracteres',
-    'last_name.maxLength': 'O sobrenome não pode ter mais que 255 caracteres',
+    'guest_list_member_id.required': 'O convidado é obrigatório',
+    'guest_list_member_id.exists': 'O convidado informado não existe',
     'quantity.required': 'A quantidade é obrigatória',
     'quantity.unsigned': 'A quantidade deve ser um número positivo',
   };
 }
 
-class UpdateGuestListMemberValidator {
+class UpdateGuestListMemberValidatedValidator {
   constructor(protected context: HttpContextContract) {}
 
   public reporter = ReportHandler;
 
   public schema = schema.create({
-    id: schema.string({}, [rules.exists({ table: 'guest_list_members', column: 'id' })]),
-    first_name: schema.string.optional({}, [rules.maxLength(255)]),
-    last_name: schema.string.optional({}, [rules.maxLength(255)]),
-    quantity: schema.number.optional([rules.unsigned(), rules.range(1, 99999)]),
+    id: schema.string({}, [rules.exists({ table: 'guest_list_members_validated', column: 'id' })]),
+    quantity: schema.number([rules.unsigned(), rules.range(1, 99999)]),
   });
 
   public messages = {
@@ -46,4 +39,4 @@ class UpdateGuestListMemberValidator {
   };
 }
 
-export { CreateGuestListMemberValidator, UpdateGuestListMemberValidator };
+export { CreateGuestListMemberValidatedValidator, UpdateGuestListMemberValidatedValidator };
