@@ -36,6 +36,7 @@ import PdvTicket from 'App/Models/Access/PdvTickets';
 import PdvUser from 'App/Models/Access/PdvUsers';
 import GuestList from 'App/Models/Access/GuestLists';
 import GuestListMember from 'App/Models/Access/GuestListMembers';
+import GuestListMemberValidated from 'App/Models/Access/GuestListMembersValidated';
 
 import { DateTime } from 'luxon';
 
@@ -75,6 +76,7 @@ export default class DynamicService {
     PdvUser,
     GuestList,
     GuestListMember,
+    GuestListMemberValidated,
   };
 
   public async create(dynamicModel: string, record: Record<string, any>): Promise<any> {
@@ -188,5 +190,20 @@ export default class DynamicService {
     });
 
     return model;
+  }
+
+  public async delete(dynamicModel: string, record: Record<string, any>): Promise<any> {
+    const ModelClass = this.modelMap[dynamicModel];
+
+    if (!ModelClass) {
+      throw new Error(`Model ${dynamicModel} not found`);
+    }
+
+    const model = await ModelClass.findOrFail(record.id);
+
+    await Database.transaction(async (trx) => {
+      model.useTransaction(trx);
+      await model.delete();
+    });
   }
 }
