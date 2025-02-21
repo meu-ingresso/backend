@@ -111,6 +111,11 @@ Route.group(() => {
     Route.patch('/guest-list-member', 'v1/GuestListMembersController.update');
     Route.delete('/guest-list-member/:id', 'v1/GuestListMembersController.delete');
 
+    Route.get('/guest-list-members-validated', 'v1/GuestListMembersValidatedController.search');
+    Route.post('/guest-list-member-validated', 'v1/GuestListMembersValidatedController.create');
+    Route.patch('/guest-list-member-validated', 'v1/GuestListMembersValidatedController.update');
+    Route.delete('/guest-list-member-validated/:id', 'v1/GuestListMembersValidatedController.delete');
+
     Route.get('/pdvs', 'v1/PdvsController.search');
     Route.post('/pdv', 'v1/PdvsController.create');
     Route.patch('/pdv', 'v1/PdvsController.update');
@@ -187,19 +192,3 @@ Route.group(() => {
     Route.post('/upload', 'v1/AwsController.create');
   }).middleware(['auth']);
 }).prefix('v1');
-
-// Guest Lists
-Route.group(() => {
-  Route.post('/', 'GuestListsController.create').middleware(['auth']);
-  Route.put('/:id', 'GuestListsController.update').middleware(['auth']);
-  Route.get('/', 'GuestListsController.search').middleware(['auth']);
-  Route.delete('/:id', 'GuestListsController.delete').middleware(['auth']);
-}).prefix('/api/v1/guest-lists');
-
-// Guest List Members
-Route.group(() => {
-  Route.post('/', 'GuestListMembersController.create').middleware(['auth']);
-  Route.put('/:id', 'GuestListMembersController.update').middleware(['auth']);
-  Route.get('/', 'GuestListMembersController.search').middleware(['auth']);
-  Route.delete('/:id', 'GuestListMembersController.delete').middleware(['auth']);
-}).prefix('/api/v1/guest-list-members');

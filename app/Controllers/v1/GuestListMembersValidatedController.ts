@@ -1,40 +1,49 @@
 import { HttpContextContract } from '@ioc:Adonis/Core/HttpContext';
 import QueryModelValidator from 'App/Validators/v1/QueryModelValidator';
 import {
-  CreateGuestListMemberValidator,
-  UpdateGuestListMemberValidator,
-} from 'App/Validators/v1/GuestListMembersValidator';
+  CreateGuestListMemberValidatedValidator,
+  UpdateGuestListMemberValidatedValidator,
+} from 'App/Validators/v1/GuestListMembersValidatedValidator';
 import DynamicService from 'App/Services/v1/DynamicService';
 import utils from 'Utils/utils';
-import { DateTime } from 'luxon';
 
 export default class GuestListMembersController {
   private dynamicService: DynamicService = new DynamicService();
 
   public async create(context: HttpContextContract) {
-    const payload = await context.request.validate(CreateGuestListMemberValidator);
+    const payload = await context.request.validate(CreateGuestListMemberValidatedValidator);
 
-    payload.added_by = context.auth.user!.id;
+    // @ts-ignore
+    payload.validated_by = context.auth.user!.id;
 
-    const result = await this.dynamicService.create('GuestListMember', payload);
+    const result = await this.dynamicService.create('GuestListMemberValidated', payload);
 
-    await utils.createAudity('CREATE', 'GUEST_LIST_MEMBER', result.id, context.auth.user?.$attributes.id, null, result);
+    await utils.createAudity(
+      'CREATE',
+      'GUEST_LIST_MEMBER_VALIDATED',
+      result.id,
+      context.auth.user?.$attributes.id,
+      null,
+      result
+    );
 
     const headers = utils.getHeaders();
+
     const body = utils.getBody('CREATE_SUCCESS', result);
+
     utils.getResponse(context, 201, headers, body);
   }
 
   public async update(context: HttpContextContract) {
-    const payload = await context.request.validate(UpdateGuestListMemberValidator);
+    const payload = await context.request.validate(UpdateGuestListMemberValidatedValidator);
 
-    const oldData = await this.dynamicService.getById('GuestListMember', payload.id);
+    const oldData = await this.dynamicService.getById('GuestListMemberValidated', payload.id);
 
-    const result = await this.dynamicService.update('GuestListMember', payload);
+    const result = await this.dynamicService.update('GuestListMemberValidated', payload);
 
     await utils.createAudity(
       'UPDATE',
-      'GUEST_LIST_MEMBER',
+      'GUEST_LIST_MEMBER_VALIDATED',
       result.id,
       context.auth.user?.$attributes.id,
       oldData.$attributes,
@@ -51,7 +60,7 @@ export default class GuestListMembersController {
   public async search(context: HttpContextContract) {
     const payload = await context.request.validate(QueryModelValidator);
 
-    const result = await this.dynamicService.searchActives('GuestListMember', payload);
+    const result = await this.dynamicService.searchActives('GuestListMemberValidated', payload);
 
     const headers = utils.getHeaders();
 
@@ -63,13 +72,13 @@ export default class GuestListMembersController {
   public async delete(context: HttpContextContract) {
     const id = context.request.params().id;
 
-    const oldData = await this.dynamicService.getById('GuestListMember', id);
+    const oldData = await this.dynamicService.getById('GuestListMemberValidated', id);
 
-    const result = await this.dynamicService.softDelete('GuestListMember', { id });
+    const result = await this.dynamicService.delete('GuestListMemberValidated', { id });
 
     await utils.createAudity(
       'DELETE',
-      'GUEST_LIST_MEMBER',
+      'GUEST_LIST_MEMBER_VALIDATED',
       id,
       context.auth.user?.$attributes.id,
       oldData.$attributes,
