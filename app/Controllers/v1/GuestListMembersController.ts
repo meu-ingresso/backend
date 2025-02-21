@@ -6,7 +6,6 @@ import {
 } from 'App/Validators/v1/GuestListMembersValidator';
 import DynamicService from 'App/Services/v1/DynamicService';
 import utils from 'Utils/utils';
-import { DateTime } from 'luxon';
 
 export default class GuestListMembersController {
   private dynamicService: DynamicService = new DynamicService();
@@ -14,6 +13,7 @@ export default class GuestListMembersController {
   public async create(context: HttpContextContract) {
     const payload = await context.request.validate(CreateGuestListMemberValidator);
 
+    // @ts-ignore
     payload.added_by = context.auth.user!.id;
 
     const result = await this.dynamicService.create('GuestListMember', payload);
