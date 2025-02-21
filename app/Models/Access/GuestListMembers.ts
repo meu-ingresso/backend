@@ -23,12 +23,6 @@ export default class GuestListMembers extends BaseModel {
   @column()
   public added_by: string;
 
-  @column()
-  public validated: boolean;
-
-  @column()
-  public validated_by: string | null;
-
   @column.dateTime()
   public validated_at: DateTime | null;
 
@@ -50,11 +44,6 @@ export default class GuestListMembers extends BaseModel {
     foreignKey: 'added_by',
   })
   public addedBy: BelongsTo<typeof Users>;
-
-  @belongsTo(() => Users, {
-    foreignKey: 'validated_by',
-  })
-  public validatedBy: BelongsTo<typeof Users>;
 
   @beforeCreate()
   public static assignUuid(guestListMember: GuestListMembers) {
