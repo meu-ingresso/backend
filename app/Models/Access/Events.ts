@@ -1,6 +1,16 @@
 import { DateTime } from 'luxon';
 import { v4 as uuidv4 } from 'uuid';
-import { BaseModel, column, beforeCreate, hasMany, HasMany, belongsTo, BelongsTo } from '@ioc:Adonis/Lucid/Orm';
+import {
+  BaseModel,
+  column,
+  beforeCreate,
+  hasMany,
+  HasMany,
+  belongsTo,
+  BelongsTo,
+  hasOne,
+  HasOne,
+} from '@ioc:Adonis/Lucid/Orm';
 import Tickets from './Tickets';
 import EventCheckoutFields from './EventCheckoutFields';
 import Categories from './Categories';
@@ -9,6 +19,7 @@ import Statuses from './Statuses';
 import Addresses from './Addresses';
 import EventAttachments from './EventAttachments';
 import EventViews from './EventViews';
+import EventFees from './EventFees';
 import EventCollaborators from './EventCollaborators';
 import Promoters from './Users';
 import Coupons from './Coupons';
@@ -117,6 +128,9 @@ export default class Events extends BaseModel {
 
   @hasMany(() => EventViews, { foreignKey: 'event_id' })
   public views: HasMany<typeof EventViews>;
+
+  @hasOne(() => EventFees, { foreignKey: 'event_id' })
+  public fees: HasOne<typeof EventFees>;
 
   @hasMany(() => EventCollaborators, { foreignKey: 'event_id' })
   public collaborators: HasMany<typeof EventCollaborators>;
