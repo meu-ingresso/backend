@@ -12,7 +12,7 @@ export default class RolesController {
 
     const result = await this.dynamicService.create('Role', payload);
 
-    await utils.createAudity('CREATE', 'ROLE', result.id, context.auth.user?.$attributes.id, null, result);
+    utils.createAudity('CREATE', 'ROLE', result.id, context.auth.user?.$attributes.id, null, result);
 
     const headers = utils.getHeaders();
 
@@ -34,14 +34,7 @@ export default class RolesController {
 
     const result = await this.dynamicService.update('Role', payload);
 
-    await utils.createAudity(
-      'UPDATE',
-      'ROLE',
-      result.id,
-      context.auth.user?.$attributes.id,
-      oldData.$attributes,
-      result
-    );
+    utils.createAudity('UPDATE', 'ROLE', result.id, context.auth.user?.$attributes.id, oldData.$attributes, result);
 
     const headers = utils.getHeaders();
 
@@ -75,7 +68,7 @@ export default class RolesController {
 
     const result = await this.dynamicService.softDelete('Role', { id });
 
-    await utils.createAudity('DELETE', 'ROLE', id, context.auth.user?.$attributes.id, oldData.$attributes, result);
+    utils.createAudity('DELETE', 'ROLE', id, context.auth.user?.$attributes.id, oldData.$attributes, result);
 
     const headers = utils.getHeaders();
 

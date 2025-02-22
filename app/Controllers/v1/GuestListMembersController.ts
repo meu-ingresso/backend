@@ -18,7 +18,7 @@ export default class GuestListMembersController {
 
     const result = await this.dynamicService.create('GuestListMember', payload);
 
-    await utils.createAudity('CREATE', 'GUEST_LIST_MEMBER', result.id, context.auth.user?.$attributes.id, null, result);
+    utils.createAudity('CREATE', 'GUEST_LIST_MEMBER', result.id, context.auth.user?.$attributes.id, null, result);
 
     const headers = utils.getHeaders();
     const body = utils.getBody('CREATE_SUCCESS', result);
@@ -32,7 +32,7 @@ export default class GuestListMembersController {
 
     const result = await this.dynamicService.update('GuestListMember', payload);
 
-    await utils.createAudity(
+    utils.createAudity(
       'UPDATE',
       'GUEST_LIST_MEMBER',
       result.id,
@@ -67,7 +67,7 @@ export default class GuestListMembersController {
 
     const result = await this.dynamicService.softDelete('GuestListMember', { id });
 
-    await utils.createAudity(
+    utils.createAudity(
       'DELETE',
       'GUEST_LIST_MEMBER',
       id,

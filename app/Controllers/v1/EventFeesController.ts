@@ -18,7 +18,7 @@ export default class EventFeesController {
 
     const result = await this.dynamicService.create('EventFee', payload);
 
-    await utils.createAudity('CREATE', 'EVENT_FEE', result.id, context.auth.user?.$attributes.id, null, result);
+    utils.createAudity('CREATE', 'EVENT_FEE', result.id, context.auth.user?.$attributes.id, null, result);
 
     const headers = utils.getHeaders();
 
@@ -40,7 +40,7 @@ export default class EventFeesController {
 
     const result = await this.dynamicService.update('EventFee', payload);
 
-    await utils.createAudity(
+    utils.createAudity(
       'UPDATE',
       'EVENT_FEE',
       result.id,
@@ -81,7 +81,7 @@ export default class EventFeesController {
 
     const result = await this.dynamicService.softDelete('EventFee', { id });
 
-    await utils.createAudity('DELETE', 'EVENT_FEE', id, context.auth.user?.$attributes.id, oldData.$attributes, result);
+    utils.createAudity('DELETE', 'EVENT_FEE', id, context.auth.user?.$attributes.id, oldData.$attributes, result);
 
     const headers = utils.getHeaders();
 

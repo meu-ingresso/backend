@@ -13,7 +13,7 @@ export default class AddressesController {
 
     const result = await this.dynamicService.create('Address', payload);
 
-    await utils.createAudity('CREATE', 'ADDRESS', result.id, context.auth.user?.$attributes.id, null, result);
+    utils.createAudity('CREATE', 'ADDRESS', result.id, context.auth.user?.$attributes.id, null, result);
 
     const headers = utils.getHeaders();
 
@@ -29,14 +29,7 @@ export default class AddressesController {
 
     const result = await this.dynamicService.update('Address', payload);
 
-    await utils.createAudity(
-      'UPDATE',
-      'ADDRESS',
-      result.id,
-      context.auth.user?.$attributes.id,
-      oldData.$attributes,
-      result
-    );
+    utils.createAudity('UPDATE', 'ADDRESS', result.id, context.auth.user?.$attributes.id, oldData.$attributes, result);
 
     const headers = utils.getHeaders();
 
@@ -64,7 +57,7 @@ export default class AddressesController {
 
     const result = await this.dynamicService.softDelete('Address', { id });
 
-    await utils.createAudity('DELETE', 'ADDRESS', id, context.auth.user?.$attributes.id, oldData.$attributes, result);
+    utils.createAudity('DELETE', 'ADDRESS', id, context.auth.user?.$attributes.id, oldData.$attributes, result);
 
     const headers = utils.getHeaders();
 

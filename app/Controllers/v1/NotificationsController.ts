@@ -14,7 +14,7 @@ export default class NotificationsController {
 
     const result = await this.dynamicService.create('Notification', payload);
 
-    await utils.createAudity('CREATE', 'NOTIFICATION', result.id, context.auth.user?.$attributes.id, null, result);
+    utils.createAudity('CREATE', 'NOTIFICATION', result.id, context.auth.user?.$attributes.id, null, result);
 
     const headers = utils.getHeaders();
 
@@ -30,7 +30,7 @@ export default class NotificationsController {
 
     const result = await this.dynamicService.update('Notification', payload);
 
-    await utils.createAudity(
+    utils.createAudity(
       'UPDATE',
       'NOTIFICATION',
       result.id,
@@ -65,14 +65,7 @@ export default class NotificationsController {
 
     const result = await this.dynamicService.softDelete('Notification', { id });
 
-    await utils.createAudity(
-      'DELETE',
-      'NOTIFICATION',
-      id,
-      context.auth.user?.$attributes.id,
-      oldData.$attributes,
-      result
-    );
+    utils.createAudity('DELETE', 'NOTIFICATION', id, context.auth.user?.$attributes.id, oldData.$attributes, result);
 
     const headers = utils.getHeaders();
 

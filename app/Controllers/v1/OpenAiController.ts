@@ -15,7 +15,7 @@ export default class TicketsController {
 
     const request = baseRequest + payload.event_description + finalRequest;
 
-    await utils.createAudity('CREATE', 'OPEN_AI', null, context.auth.user?.$attributes.id, null, { request });
+    utils.createAudity('CREATE', 'OPEN_AI', null, context.auth.user?.$attributes.id, null, { request });
 
     const result = await this.openAiService.create({
       messages: [
@@ -26,7 +26,7 @@ export default class TicketsController {
       ],
     });
 
-    await utils.createAudity('RESPONSE', 'OPEN_AI', null, context.auth.user?.$attributes.id, null, result);
+    utils.createAudity('RESPONSE', 'OPEN_AI', null, context.auth.user?.$attributes.id, null, result);
 
     const headers = utils.getHeaders();
 

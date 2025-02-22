@@ -21,14 +21,7 @@ export default class EventCollaboratorsController {
 
     const result = await this.dynamicService.create('EventCollaborator', payload);
 
-    await utils.createAudity(
-      'CREATE',
-      'EVENT_COLLABORATOR',
-      result.id,
-      context.auth.user?.$attributes.id,
-      null,
-      result
-    );
+    utils.createAudity('CREATE', 'EVENT_COLLABORATOR', result.id, context.auth.user?.$attributes.id, null, result);
 
     const headers = utils.getHeaders();
 
@@ -50,7 +43,7 @@ export default class EventCollaboratorsController {
 
     const result = await this.dynamicService.update('EventCollaborator', payload);
 
-    await utils.createAudity(
+    utils.createAudity(
       'UPDATE',
       'EVENT_COLLABORATOR',
       result.id,
@@ -91,7 +84,7 @@ export default class EventCollaboratorsController {
 
     const result = await this.dynamicService.softDelete('EventCollaborator', { id });
 
-    await utils.createAudity(
+    utils.createAudity(
       'DELETE',
       'EVENT_COLLABORATOR',
       id,

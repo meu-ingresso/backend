@@ -20,7 +20,7 @@ export default class TicketsController {
 
     const result = await this.dynamicService.create('Ticket', payload);
 
-    await utils.createAudity('CREATE', 'TICKET', result.id, context.auth.user?.$attributes.id, null, result);
+    utils.createAudity('CREATE', 'TICKET', result.id, context.auth.user?.$attributes.id, null, result);
 
     const headers = utils.getHeaders();
 
@@ -30,15 +30,6 @@ export default class TicketsController {
   }
 
   public async update(context: HttpContextContract) {
-    const ticketId = context.request.input('id');
-
-    const ticket = await this.dynamicService.getById('Ticket', ticketId);
-
-    context.request.updateBody({
-      ...context.request.body(),
-      event_id: ticket.event_id,
-    });
-
     const payload = await context.request.validate(UpdateTicketValidator);
 
     const oldData = await this.dynamicService.getById('Ticket', payload.id);
@@ -62,14 +53,7 @@ export default class TicketsController {
 
     const result = await this.dynamicService.update('Ticket', payload);
 
-    await utils.createAudity(
-      'UPDATE',
-      'TICKET',
-      result.id,
-      context.auth.user?.$attributes.id,
-      oldData.$attributes,
-      result
-    );
+    utils.createAudity('UPDATE', 'TICKET', result.id, context.auth.user?.$attributes.id, oldData.$attributes, result);
 
     const headers = utils.getHeaders();
 
@@ -105,7 +89,7 @@ export default class TicketsController {
 
     const result = await this.dynamicService.softDelete('Ticket', { id });
 
-    await utils.createAudity('DELETE', 'TICKET', id, context.auth.user?.$attributes.id, oldData.$attributes, result);
+    utils.createAudity('DELETE', 'TICKET', id, context.auth.user?.$attributes.id, oldData.$attributes, result);
 
     const headers = utils.getHeaders();
 

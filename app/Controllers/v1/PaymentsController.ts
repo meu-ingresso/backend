@@ -12,7 +12,7 @@ export default class PaymentsController {
 
     const result = await this.dynamicService.create('Payment', payload);
 
-    await utils.createAudity('CREATE', 'PAYMENT', result.id, context.auth.user?.$attributes.id, null, result);
+    utils.createAudity('CREATE', 'PAYMENT', result.id, context.auth.user?.$attributes.id, null, result);
 
     const headers = utils.getHeaders();
 
@@ -28,14 +28,7 @@ export default class PaymentsController {
 
     const result = await this.dynamicService.update('Payment', payload);
 
-    await utils.createAudity(
-      'UPDATE',
-      'PAYMENT',
-      result.id,
-      context.auth.user?.$attributes.id,
-      oldData.$attributes,
-      result
-    );
+    utils.createAudity('UPDATE', 'PAYMENT', result.id, context.auth.user?.$attributes.id, oldData.$attributes, result);
 
     const headers = utils.getHeaders();
 
@@ -63,7 +56,7 @@ export default class PaymentsController {
 
     const result = await this.dynamicService.softDelete('Payment', { id });
 
-    await utils.createAudity('DELETE', 'PAYMENT', id, context.auth.user?.$attributes.id, oldData.$attributes, result);
+    utils.createAudity('DELETE', 'PAYMENT', id, context.auth.user?.$attributes.id, oldData.$attributes, result);
 
     const headers = utils.getHeaders();
 

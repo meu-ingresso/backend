@@ -21,7 +21,7 @@ export default class EventAttachmentsController {
 
     const result = await this.dynamicService.create('EventAttachment', payload);
 
-    await utils.createAudity('CREATE', 'EVENT_ATTACHMENT', result.id, context.auth.user?.$attributes.id, null, result);
+    utils.createAudity('CREATE', 'EVENT_ATTACHMENT', result.id, context.auth.user?.$attributes.id, null, result);
 
     const headers = utils.getHeaders();
 
@@ -43,7 +43,7 @@ export default class EventAttachmentsController {
 
     const result = await this.dynamicService.update('EventAttachment', payload);
 
-    await utils.createAudity(
+    utils.createAudity(
       'UPDATE',
       'EVENT_ATTACHMENT',
       result.id,
@@ -84,7 +84,7 @@ export default class EventAttachmentsController {
 
     const result = await this.dynamicService.softDelete('EventAttachment', { id });
 
-    await utils.createAudity(
+    utils.createAudity(
       'DELETE',
       'EVENT_ATTACHMENT',
       id,
