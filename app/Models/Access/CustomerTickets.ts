@@ -1,11 +1,21 @@
 import { DateTime } from 'luxon';
 import { v4 as uuidv4 } from 'uuid';
-import { BaseModel, column, beforeCreate, afterCreate, belongsTo, BelongsTo } from '@ioc:Adonis/Lucid/Orm';
+import {
+  BaseModel,
+  column,
+  beforeCreate,
+  afterCreate,
+  belongsTo,
+  BelongsTo,
+  hasMany,
+  HasMany,
+} from '@ioc:Adonis/Lucid/Orm';
 import Tickets from './Tickets';
 import People from './People';
 import Users from './Users';
 import Statuses from './Statuses';
 import Payments from './Payments';
+import TicketFields from './TicketFields';
 
 export default class CustomerTickets extends BaseModel {
   @column({ isPrimary: true })
@@ -76,6 +86,11 @@ export default class CustomerTickets extends BaseModel {
     foreignKey: 'payment_id',
   })
   public payment: BelongsTo<typeof Payments>;
+
+  @hasMany(() => TicketFields, {
+    foreignKey: 'customer_ticket_id',
+  })
+  public ticketFields: HasMany<typeof TicketFields>;
 
   @beforeCreate()
   public static assignUuid(customerTicket: CustomerTickets) {
