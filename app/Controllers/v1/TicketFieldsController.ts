@@ -12,7 +12,7 @@ export default class TicketFieldsController {
 
     const result = await this.dynamicService.create('TicketField', payload);
 
-    await utils.createAudity('CREATE', 'TICKET_FIELD', result.id, context.auth.user?.$attributes.id, null, result);
+    utils.createAudity('CREATE', 'TICKET_FIELD', result.id, context.auth.user?.$attributes.id, null, result);
 
     const headers = utils.getHeaders();
 
@@ -28,7 +28,7 @@ export default class TicketFieldsController {
 
     const result = await this.dynamicService.update('TicketField', payload);
 
-    await utils.createAudity(
+    utils.createAudity(
       'UPDATE',
       'TICKET_FIELD',
       result.id,
@@ -65,14 +65,7 @@ export default class TicketFieldsController {
 
     const result = await this.dynamicService.softDelete('TicketField', { id });
 
-    await utils.createAudity(
-      'DELETE',
-      'TICKET_FIELD',
-      id,
-      context.auth.user?.$attributes.id,
-      oldData.$attributes,
-      result
-    );
+    utils.createAudity('DELETE', 'TICKET_FIELD', id, context.auth.user?.$attributes.id, oldData.$attributes, result);
 
     const headers = utils.getHeaders();
 

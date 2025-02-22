@@ -15,14 +15,7 @@ export default class TicketEventCategoriesController {
 
     const result = await this.dynamicService.create('TicketEventCategory', payload);
 
-    await utils.createAudity(
-      'CREATE',
-      'TICKET_EVENT_CATEGORY',
-      result.id,
-      context.auth.user?.$attributes.id,
-      null,
-      result
-    );
+    utils.createAudity('CREATE', 'TICKET_EVENT_CATEGORY', result.id, context.auth.user?.$attributes.id, null, result);
 
     const headers = utils.getHeaders();
 
@@ -38,7 +31,7 @@ export default class TicketEventCategoriesController {
 
     const result = await this.dynamicService.update('TicketEventCategory', payload);
 
-    await utils.createAudity(
+    utils.createAudity(
       'UPDATE',
       'TICKET_EVENT_CATEGORY',
       result.id,
@@ -75,7 +68,7 @@ export default class TicketEventCategoriesController {
 
     const result = await this.dynamicService.softDelete('TicketEventCategory', { id });
 
-    await utils.createAudity(
+    utils.createAudity(
       'DELETE',
       'TICKET_EVENT_CATEGORY',
       id,

@@ -15,7 +15,7 @@ export default class EventCheckoutFieldOptionsController {
 
     const result = await this.dynamicService.create('EventCheckoutFieldOption', payload);
 
-    await utils.createAudity(
+    utils.createAudity(
       'CREATE',
       'EVENT_CHECKOUT_FIELD_OPTIONS',
       result.id,
@@ -38,7 +38,7 @@ export default class EventCheckoutFieldOptionsController {
 
     const result = await this.dynamicService.update('EventCheckoutFieldOption', payload);
 
-    await utils.createAudity(
+    utils.createAudity(
       'UPDATE',
       'EVENT_CHECKOUT_FIELD_OPTIONS',
       result.id,
@@ -73,7 +73,7 @@ export default class EventCheckoutFieldOptionsController {
 
     const result = await this.dynamicService.softDelete('EventCheckoutFieldOption', { id });
 
-    await utils.createAudity(
+    utils.createAudity(
       'DELETE',
       'EVENT_CHECKOUT_FIELD_OPTIONS',
       id,

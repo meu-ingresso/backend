@@ -12,7 +12,7 @@ export default class RatingsController {
 
     const result = await this.dynamicService.create('Rating', payload);
 
-    await utils.createAudity('CREATE', 'RATING', result.id, context.auth.user?.$attributes.id, null, result);
+    utils.createAudity('CREATE', 'RATING', result.id, context.auth.user?.$attributes.id, null, result);
 
     const headers = utils.getHeaders();
 
@@ -28,14 +28,7 @@ export default class RatingsController {
 
     const result = await this.dynamicService.update('Rating', payload);
 
-    await utils.createAudity(
-      'UPDATE',
-      'RATING',
-      result.id,
-      context.auth.user?.$attributes.id,
-      oldData.$attributes,
-      result
-    );
+    utils.createAudity('UPDATE', 'RATING', result.id, context.auth.user?.$attributes.id, oldData.$attributes, result);
 
     const headers = utils.getHeaders();
 
@@ -63,7 +56,7 @@ export default class RatingsController {
 
     const result = await this.dynamicService.softDelete('Rating', { id });
 
-    await utils.createAudity('DELETE', 'RATING', id, context.auth.user?.$attributes.id, oldData.$attributes, result);
+    utils.createAudity('DELETE', 'RATING', id, context.auth.user?.$attributes.id, oldData.$attributes, result);
 
     const headers = utils.getHeaders();
 

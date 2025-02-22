@@ -40,14 +40,7 @@ export default class EventViewsController {
       result = await this.eventViewService.create(payload);
     }
 
-    await utils.createAudity(
-      'CREATE',
-      'EVENT_VIEW',
-      result?.id || null,
-      context.auth.user?.$attributes.id,
-      null,
-      result
-    );
+    utils.createAudity('CREATE', 'EVENT_VIEW', result?.id || null, context.auth.user?.$attributes.id, null, result);
 
     const headers = utils.getHeaders();
 

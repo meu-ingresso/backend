@@ -12,7 +12,7 @@ export default class PeopleController {
 
     const result = await this.dynamicService.create('People', payload);
 
-    await utils.createAudity('CREATE', 'PEOPLE', result.id, context.auth.user?.$attributes.id, null, result);
+    utils.createAudity('CREATE', 'PEOPLE', result.id, context.auth.user?.$attributes.id, null, result);
 
     const headers = utils.getHeaders();
 
@@ -36,14 +36,7 @@ export default class PeopleController {
 
     const result = await this.dynamicService.update('People', payload);
 
-    await utils.createAudity(
-      'UPDATE',
-      'PEOPLE',
-      result.id,
-      context.auth.user?.$attributes.id,
-      oldData.$attributes,
-      result
-    );
+    utils.createAudity('UPDATE', 'PEOPLE', result.id, context.auth.user?.$attributes.id, oldData.$attributes, result);
 
     const headers = utils.getHeaders();
 
@@ -79,7 +72,7 @@ export default class PeopleController {
 
     const result = await this.dynamicService.softDelete('People', { id });
 
-    await utils.createAudity('DELETE', 'PEOPLE', id, context.auth.user?.$attributes.id, oldData.$attributes, result);
+    utils.createAudity('DELETE', 'PEOPLE', id, context.auth.user?.$attributes.id, oldData.$attributes, result);
 
     const headers = utils.getHeaders();
 

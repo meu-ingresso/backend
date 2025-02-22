@@ -18,7 +18,7 @@ export default class GuestListMembersController {
 
     const result = await this.dynamicService.create('GuestListMemberValidated', payload);
 
-    await utils.createAudity(
+    utils.createAudity(
       'CREATE',
       'GUEST_LIST_MEMBER_VALIDATED',
       result.id,
@@ -41,7 +41,7 @@ export default class GuestListMembersController {
 
     const result = await this.dynamicService.update('GuestListMemberValidated', payload);
 
-    await utils.createAudity(
+    utils.createAudity(
       'UPDATE',
       'GUEST_LIST_MEMBER_VALIDATED',
       result.id,
@@ -76,7 +76,7 @@ export default class GuestListMembersController {
 
     const result = await this.dynamicService.delete('GuestListMemberValidated', { id });
 
-    await utils.createAudity(
+    utils.createAudity(
       'DELETE',
       'GUEST_LIST_MEMBER_VALIDATED',
       id,

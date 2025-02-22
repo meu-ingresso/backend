@@ -12,7 +12,7 @@ export default class PdvUsersController {
 
     const result = await this.dynamicService.create('PdvUser', payload);
 
-    await utils.createAudity('CREATE', 'PDV_USER', result.id, context.auth.user?.$attributes.id, null, result);
+    utils.createAudity('CREATE', 'PDV_USER', result.id, context.auth.user?.$attributes.id, null, result);
 
     const headers = utils.getHeaders();
 
@@ -28,14 +28,7 @@ export default class PdvUsersController {
 
     const result = await this.dynamicService.update('PdvUser', payload);
 
-    await utils.createAudity(
-      'UPDATE',
-      'PDV_USER',
-      result.id,
-      context.auth.user?.$attributes.id,
-      oldData.$attributes,
-      result
-    );
+    utils.createAudity('UPDATE', 'PDV_USER', result.id, context.auth.user?.$attributes.id, oldData.$attributes, result);
 
     const headers = utils.getHeaders();
 
@@ -63,7 +56,7 @@ export default class PdvUsersController {
 
     const result = await this.dynamicService.softDelete('PdvUser', { id });
 
-    await utils.createAudity('DELETE', 'PDV_USER', id, context.auth.user?.$attributes.id, oldData.$attributes, result);
+    utils.createAudity('DELETE', 'PDV_USER', id, context.auth.user?.$attributes.id, oldData.$attributes, result);
 
     const headers = utils.getHeaders();
 

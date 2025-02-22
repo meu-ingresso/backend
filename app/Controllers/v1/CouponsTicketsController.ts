@@ -12,7 +12,7 @@ export default class CouponsTicketsController {
 
     const result = await this.dynamicService.create('CouponsTickets', payload);
 
-    await utils.createAudity('CREATE', 'COUPONS_TICKETS', result.id, context.auth.user?.$attributes.id, null, result);
+    utils.createAudity('CREATE', 'COUPONS_TICKETS', result.id, context.auth.user?.$attributes.id, null, result);
 
     const headers = utils.getHeaders();
 
@@ -42,14 +42,7 @@ export default class CouponsTicketsController {
 
     const result = await this.dynamicService.softDelete('CouponsTickets', { id });
 
-    await utils.createAudity(
-      'DELETE',
-      'COUPONS_TICKETS',
-      id,
-      context.auth.user?.$attributes.id,
-      oldData.$attributes,
-      result
-    );
+    utils.createAudity('DELETE', 'COUPONS_TICKETS', id, context.auth.user?.$attributes.id, oldData.$attributes, result);
 
     const headers = utils.getHeaders();
 
