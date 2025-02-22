@@ -105,7 +105,7 @@ export default class CustomerTickets extends BaseModel {
     await customerTicket.save();
   }
 
-  private static generateUniqueIdentifier(length = 8): string {
+  private static generateUniqueIdentifier(length = 9): string {
     const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
 
     return Array.from({ length }, () => chars.charAt(Math.floor(Math.random() * chars.length))).join('');
