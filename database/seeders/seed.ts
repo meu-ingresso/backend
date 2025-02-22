@@ -345,15 +345,11 @@ export default class DatabaseSeeder extends BaseSeeder {
         id: uuidv4(),
         event_id: events[0].id,
         platform_fee: 5.0,
-        promoter_fee: 10.0,
-        fixed_fee: 2.0,
       },
       {
         id: uuidv4(),
         event_id: events[1].id,
         platform_fee: 3.0,
-        promoter_fee: 7.0,
-        fixed_fee: 1.5,
       },
     ]);
 
