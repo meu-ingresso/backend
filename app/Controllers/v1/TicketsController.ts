@@ -32,28 +32,21 @@ export default class TicketsController {
   public async update(context: HttpContextContract) {
     const payload = await context.request.validate(UpdateTicketValidator);
 
-    const oldData = await this.dynamicService.getById('Ticket', payload.id);
+    payload.data.forEach(async (ticket) => {
+      const isTicketSoldOut = ticket.total_quantity && ticket.total_sold && ticket.total_quantity <= ticket.total_sold;
 
-    const ableToUpdate = await utils.checkHasEventPermission(context.auth.user!.id, oldData.event_id);
+      if (isTicketSoldOut) {
+        const status = await this.statusService.searchStatusByName('Esgotado', 'ticket');
 
-    if (!ableToUpdate) {
-      return utils.getResponse(context, 403, utils.getHeaders(), utils.getBody('FORBIDDEN', null));
-    }
-
-    const isTicketSoldOut =
-      payload.total_quantity && payload.total_sold && payload.total_quantity <= payload.total_sold;
-
-    if (isTicketSoldOut) {
-      const status = await this.statusService.searchStatusByName('Esgotado', 'ticket');
-
-      if (status) {
-        payload.status_id = status.id;
+        if (status) {
+          ticket.status_id = status.id;
+        }
       }
-    }
+    });
 
-    const result = await this.dynamicService.update('Ticket', payload);
+    const result = await this.dynamicService.bulkUpdate('Ticket', payload.data);
 
-    utils.createAudity('UPDATE', 'TICKET', result.id, context.auth.user?.$attributes.id, oldData.$attributes, result);
+    utils.createAudity('UPDATE', 'TICKET', result.id, context.auth.user?.$attributes.id, null, result);
 
     const headers = utils.getHeaders();
 

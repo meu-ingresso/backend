@@ -116,6 +116,32 @@ export default class DynamicService {
     return model;
   }
 
+  public async bulkUpdate(dynamicModel: string, records: Record<string, any>[]): Promise<any> {
+    const ModelClass = this.modelMap[dynamicModel];
+
+    if (!ModelClass) {
+      throw new Error(`Model ${dynamicModel} not found`);
+    }
+
+    const results = await Database.transaction(async (trx) => {
+      const updatedRecords: ModelObject[] = [];
+
+      for (const record of records) {
+        const model = await ModelClass.findOrFail(record.id);
+        model.useTransaction(trx);
+
+        model.merge({ ...record });
+        await model.save();
+
+        updatedRecords.push(model);
+      }
+
+      return updatedRecords;
+    });
+
+    return results;
+  }
+
   public async getById(dynamicModel: string, id: string): Promise<ModelObject> {
     const ModelClass = this.modelMap[dynamicModel];
 

@@ -51,37 +51,43 @@ class UpdateEventCheckoutFieldValidator {
   public reporter = ReportHandler;
 
   public schema = schema.create({
-    id: schema.string({ trim: true }, [rules.exists({ table: 'event_checkout_fields', column: 'id' })]),
-    event_id: schema.string.optional({ trim: true }, [rules.exists({ table: 'events', column: 'id' })]),
-    name: schema.string.optional({ trim: true }, [rules.maxLength(50)]),
-    type: schema.enum.optional([
-      'CPF',
-      'CNPJ',
-      'EMAIL',
-      'TELEFONE',
-      'DATA',
-      'TEXTO',
-      'MENU_DROPDOWN',
-      'MULTI_CHECKBOX',
-      'TERMO',
-      'MESA',
-      'ASSENTO',
-      'PARAGRAFO',
-    ] as const),
-    required: schema.boolean.optional(),
-    is_unique: schema.boolean.optional(),
-    visible_on_ticket: schema.boolean.optional(),
-    help_text: schema.string.optional({ trim: true }, [rules.maxLength(255)]),
-    display_order: schema.number.optional(),
+    data: schema.array().members(
+      schema.object().members({
+        id: schema.string({ trim: true }, [rules.exists({ table: 'event_checkout_fields', column: 'id' })]),
+        event_id: schema.string.optional({ trim: true }, [rules.exists({ table: 'events', column: 'id' })]),
+        name: schema.string.optional({ trim: true }, [rules.maxLength(50)]),
+        type: schema.enum.optional([
+          'CPF',
+          'CNPJ',
+          'EMAIL',
+          'TELEFONE',
+          'DATA',
+          'TEXTO',
+          'MENU_DROPDOWN',
+          'MULTI_CHECKBOX',
+          'TERMO',
+          'MESA',
+          'ASSENTO',
+          'PARAGRAFO',
+        ] as const),
+        required: schema.boolean.optional(),
+        is_unique: schema.boolean.optional(),
+        visible_on_ticket: schema.boolean.optional(),
+        help_text: schema.string.optional({ trim: true }, [rules.maxLength(255)]),
+        display_order: schema.number.optional(),
+      })
+    ),
   });
 
   public messages = {
-    'id.required': 'O campo "id" é obrigatório.',
-    'id.exists': 'O "id" fornecido não existe na tabela de campos de checkout.',
-    'name.maxLength': 'O campo "name" deve ter no máximo 50 caracteres.',
-    'type.enum': 'O campo "type" deve ser um dos valores válidos.',
-    'help_text.maxLength': 'O campo "help_text" deve ter no máximo 255 caracteres.',
-    'display_order.number': 'O campo "display_order" precisa ser um número válido.',
+    'event_checkout_fields.required': 'O campo "event_checkout_fields" é obrigatório.',
+    'event_checkout_fields.array': 'O campo "event_checkout_fields" deve ser um array.',
+    'event_checkout_fields.*.id.required': 'O campo "id" é obrigatório.',
+    'event_checkout_fields.*.id.exists': 'O "id" fornecido não existe na tabela de campos de checkout.',
+    'event_checkout_fields.*.name.maxLength': 'O campo "name" deve ter no máximo 50 caracteres.',
+    'event_checkout_fields.*.type.enum': 'O campo "type" deve ser um dos valores válidos.',
+    'event_checkout_fields.*.help_text.maxLength': 'O campo "help_text" deve ter no máximo 255 caracteres.',
+    'event_checkout_fields.*.display_order.number': 'O campo "display_order" precisa ser um número válido.',
   };
 }
 
