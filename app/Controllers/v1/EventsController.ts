@@ -20,6 +20,11 @@ export default class EventsController {
 
     const result = await this.dynamicService.create('Event', payload);
 
+    this.dynamicService.create('EventFees', {
+      event_id: result.id,
+      platform_fee: 10,
+    });
+
     await utils.createAudity('CREATE', 'EVENT', result.id, context.auth.user?.$attributes.id, null, result);
 
     const headers = utils.getHeaders();
