@@ -47,7 +47,7 @@ class UpdateCustomerTicketValidator {
     payment_id: schema.string.optional({}, [rules.exists({ table: 'payments', column: 'id' })]),
     validated: schema.boolean.optional(),
     validated_by: schema.string.optional({}, [rules.exists({ table: 'users', column: 'id' })]),
-    validated_at: schema.date.optional(),
+    validated_at: schema.string.optional(),
   });
 
   public messages = {

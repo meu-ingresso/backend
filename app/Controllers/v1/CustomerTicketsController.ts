@@ -6,7 +6,7 @@ import {
 } from 'App/Validators/v1/CustomerTicketsValidator';
 import DynamicService from 'App/Services/v1/DynamicService';
 import utils from 'Utils/utils';
-
+import { DateTime } from 'luxon';
 export default class CustomerTicketsController {
   private dynamicService: DynamicService = new DynamicService();
 
@@ -26,6 +26,16 @@ export default class CustomerTicketsController {
 
   public async update(context: HttpContextContract) {
     const payload = await context.request.validate(UpdateCustomerTicketValidator);
+
+    if (payload.validated) {
+      payload.validated_by = context.auth.user!.id;
+      payload.validated_at = DateTime.now().toISO();
+    } else {
+      // @ts-ignore
+      payload.validated_by = null;
+      // @ts-ignore
+      payload.validated_at = null;
+    }
 
     const oldData = await this.dynamicService.getById('CustomerTicket', payload.id);
 
