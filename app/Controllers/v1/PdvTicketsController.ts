@@ -12,7 +12,7 @@ export default class PdvTicketsController {
 
     const result = await this.dynamicService.create('PdvTicket', payload);
 
-    await utils.createAudity('CREATE', 'PDV_TICKET', result.id, context.auth.user?.$attributes.id, null, result);
+    utils.createAudity('CREATE', 'PDV_TICKET', result.id, context.auth.user?.$attributes.id, null, result);
 
     const headers = utils.getHeaders();
 
@@ -28,7 +28,7 @@ export default class PdvTicketsController {
 
     const result = await this.dynamicService.update('PdvTicket', payload);
 
-    await utils.createAudity(
+    utils.createAudity(
       'UPDATE',
       'PDV_TICKET',
       result.id,
@@ -63,14 +63,7 @@ export default class PdvTicketsController {
 
     const result = await this.dynamicService.softDelete('PdvTicket', { id });
 
-    await utils.createAudity(
-      'DELETE',
-      'PDV_TICKET',
-      id,
-      context.auth.user?.$attributes.id,
-      oldData.$attributes,
-      result
-    );
+    utils.createAudity('DELETE', 'PDV_TICKET', id, context.auth.user?.$attributes.id, oldData.$attributes, result);
 
     const headers = utils.getHeaders();
 

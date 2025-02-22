@@ -12,7 +12,7 @@ export default class ParametersController {
 
     const result = await this.dynamicService.create('Parameter', payload);
 
-    await utils.createAudity('CREATE', 'PARAMETER', result.id, context.auth.user?.$attributes.id, null, result);
+    utils.createAudity('CREATE', 'PARAMETER', result.id, context.auth.user?.$attributes.id, null, result);
 
     const headers = utils.getHeaders();
 
@@ -28,7 +28,7 @@ export default class ParametersController {
 
     const result = await this.dynamicService.update('Parameter', payload);
 
-    await utils.createAudity(
+    utils.createAudity(
       'UPDATE',
       'PARAMETER',
       result.id,
@@ -63,7 +63,7 @@ export default class ParametersController {
 
     const result = await this.dynamicService.softDelete('Parameter', { id });
 
-    await utils.createAudity('DELETE', 'PARAMETER', id, context.auth.user?.$attributes.id, oldData.$attributes, result);
+    utils.createAudity('DELETE', 'PARAMETER', id, context.auth.user?.$attributes.id, oldData.$attributes, result);
 
     const headers = utils.getHeaders();
 

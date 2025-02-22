@@ -12,7 +12,7 @@ export default class EventCheckoutFieldsTicketsController {
 
     const result = await this.dynamicService.create('EventCheckoutFieldTicket', payload);
 
-    await utils.createAudity(
+    utils.createAudity(
       'CREATE',
       'EVENT_CHECKOUT_FIELD_TICKET',
       result.id,
@@ -47,7 +47,7 @@ export default class EventCheckoutFieldsTicketsController {
 
     const result = await this.dynamicService.softDelete('EventCheckoutFieldTicket', { id });
 
-    await utils.createAudity(
+    utils.createAudity(
       'DELETE',
       'EVENT_CHECKOUT_FIELD_TICKET',
       id,

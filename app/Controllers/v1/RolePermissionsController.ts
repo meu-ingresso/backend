@@ -15,7 +15,7 @@ export default class RolePermissionsController {
 
     const result = await this.dynamicService.create('RolePermission', payload);
 
-    await utils.createAudity('CREATE', 'ROLE_PERMISSION', result.id, context.auth.user?.$attributes.id, null, result);
+    utils.createAudity('CREATE', 'ROLE_PERMISSION', result.id, context.auth.user?.$attributes.id, null, result);
 
     const headers = utils.getHeaders();
 
@@ -31,7 +31,7 @@ export default class RolePermissionsController {
 
     const result = await this.dynamicService.update('RolePermission', payload);
 
-    await utils.createAudity(
+    utils.createAudity(
       'UPDATE',
       'ROLE_PERMISSION',
       result.id,

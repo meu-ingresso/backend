@@ -18,7 +18,7 @@ export default class PermissionsController {
 
     const result = await this.dynamicService.create('Permission', payload);
 
-    await utils.createAudity('CREATE', 'PERMISSION', result.id, context.auth.user?.$attributes.id, null, result);
+    utils.createAudity('CREATE', 'PERMISSION', result.id, context.auth.user?.$attributes.id, null, result);
 
     const headers = utils.getHeaders();
 
@@ -40,7 +40,7 @@ export default class PermissionsController {
 
     const result = await this.dynamicService.update('Permission', payload);
 
-    await utils.createAudity(
+    utils.createAudity(
       'UPDATE',
       'PERMISSION',
       result.id,
@@ -81,14 +81,7 @@ export default class PermissionsController {
 
     const result = await this.dynamicService.softDelete('Permission', { id });
 
-    await utils.createAudity(
-      'DELETE',
-      'PERMISSION',
-      id,
-      context.auth.user?.$attributes.id,
-      oldData.$attributes,
-      result
-    );
+    utils.createAudity('DELETE', 'PERMISSION', id, context.auth.user?.$attributes.id, oldData.$attributes, result);
 
     const headers = utils.getHeaders();
 

@@ -21,14 +21,7 @@ export default class EventCheckoutFieldsController {
 
     const result = await this.dynamicService.create('EventCheckoutField', payload);
 
-    await utils.createAudity(
-      'CREATE',
-      'EVENT_CHECKOUT_FIELD',
-      result.id,
-      context.auth.user?.$attributes.id,
-      null,
-      result
-    );
+    utils.createAudity('CREATE', 'EVENT_CHECKOUT_FIELD', result.id, context.auth.user?.$attributes.id, null, result);
 
     const headers = utils.getHeaders();
 
@@ -50,7 +43,7 @@ export default class EventCheckoutFieldsController {
 
     const result = await this.dynamicService.update('EventCheckoutField', payload);
 
-    await utils.createAudity(
+    utils.createAudity(
       'UPDATE',
       'EVENT_CHECKOUT_FIELD',
       result.id,
@@ -91,7 +84,7 @@ export default class EventCheckoutFieldsController {
 
     const result = await this.dynamicService.softDelete('EventCheckoutField', { id });
 
-    await utils.createAudity(
+    utils.createAudity(
       'DELETE',
       'EVENT_CHECKOUT_FIELD',
       id,
