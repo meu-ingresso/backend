@@ -33,24 +33,9 @@ export default class EventCheckoutFieldsController {
   public async update(context: HttpContextContract) {
     const payload = await context.request.validate(UpdateEventCheckoutFieldValidator);
 
-    const oldData = await this.dynamicService.getById('EventCheckoutField', payload.id);
+    const result = await this.dynamicService.bulkUpdate('EventCheckoutField', payload.data);
 
-    const ableToUpdate = await utils.checkHasEventPermission(context.auth.user!.id, oldData.event_id);
-
-    if (!ableToUpdate) {
-      return utils.getResponse(context, 403, utils.getHeaders(), utils.getBody('FORBIDDEN', null));
-    }
-
-    const result = await this.dynamicService.update('EventCheckoutField', payload);
-
-    utils.createAudity(
-      'UPDATE',
-      'EVENT_CHECKOUT_FIELD',
-      result.id,
-      context.auth.user?.$attributes.id,
-      oldData.$attributes,
-      result
-    );
+    utils.createAudity('UPDATE', 'EVENT_CHECKOUT_FIELD', result.id, context.auth.user?.$attributes.id, null, result);
 
     const headers = utils.getHeaders();
 
