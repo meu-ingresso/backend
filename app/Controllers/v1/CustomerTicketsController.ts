@@ -27,17 +27,6 @@ export default class CustomerTicketsController {
   public async update(context: HttpContextContract) {
     const payload = await context.request.validate(UpdateCustomerTicketValidator);
 
-    const ticket_identifier = Array(11)
-      .fill(0)
-      .map(() => {
-        const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-        return chars.charAt(Math.floor(Math.random() * chars.length));
-      })
-      .join('');
-
-    // @ts-ignore
-    payload.ticket_identifier = ticket_identifier;
-
     const oldData = await this.dynamicService.getById('CustomerTicket', payload.id);
 
     const result = await this.dynamicService.update('CustomerTicket', payload);
