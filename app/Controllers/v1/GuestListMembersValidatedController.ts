@@ -14,7 +14,7 @@ export default class GuestListMembersController {
     const payload = await context.request.validate(CreateGuestListMemberValidatedValidator);
 
     // @ts-ignore
-    payload.validated_by = context.auth.user!.id;
+    payload.added_by = context.auth.user!.id;
 
     const result = await this.dynamicService.create('GuestListMemberValidated', payload);
 
