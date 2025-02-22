@@ -21,16 +21,7 @@ class CreateTicketValidator {
     start_date: schema.date(),
     end_date: schema.date(),
     availability: schema.enum(['Privado', 'Publico', 'PDV']),
-    display_order: schema.number([
-      rules.unique({
-        table: 'tickets',
-        column: 'display_order',
-        where: {
-          event_id: this.context.request.input('event_id'),
-          deleted_at: null,
-        },
-      }),
-    ]),
+    display_order: schema.number(),
     min_quantity_per_user: schema.number.optional(),
     max_quantity_per_user: schema.number.optional(),
   });
@@ -53,7 +44,6 @@ class CreateTicketValidator {
     'availability.enum': 'O campo "availability" deve ser Privado, Público ou PDV.',
     'display_order.required': 'O campo "display_order" é obrigatório.',
     'display_order.number': 'O campo "display_order" precisa ser um número válido.',
-    'display_order.unique': 'O campo "display_order" deve ser único para o evento.',
     'min_quantity_per_user.number': 'O min_quantity_per_user precisa ser um número válido.',
     'max_quantity_per_user.number': 'O min_quantity_per_user precisa ser um número válido.',
   };
@@ -80,17 +70,7 @@ class UpdateTicketValidator {
     start_date: schema.date.optional(),
     end_date: schema.date.optional(),
     availability: schema.enum.optional(['Privado', 'Publico', 'PDV']),
-    display_order: schema.number.optional([
-      rules.unique({
-        table: 'tickets',
-        column: 'display_order',
-        whereNot: { id: this.context.request.input('id') },
-        where: {
-          event_id: this.context.request.input('event_id'),
-          deleted_at: null,
-        },
-      }),
-    ]),
+    display_order: schema.number.optional(),
     min_quantity_per_user: schema.number.optional(),
     max_quantity_per_user: schema.number.optional(),
   });
@@ -108,7 +88,6 @@ class UpdateTicketValidator {
     'total_sold.number': 'A quantidade vendida deve ser um número.',
     'price.number': 'O preço deve ser um número.',
     'display_order.number': 'O campo "display_order" precisa ser um número válido.',
-    'display_order.unique': 'O campo "display_order" deve ser único para o evento.',
   };
 }
 

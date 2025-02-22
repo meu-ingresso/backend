@@ -13,23 +13,11 @@ export default class EventFees extends BaseModel {
   @column()
   public platform_fee: number;
 
-  @column()
-  public promoter_fee: number;
-
-  @column()
-  public fixed_fee: number | null;
-
-  @column()
-  public variable_fee: number | null;
-
   @column.dateTime({ autoCreate: true })
   public created_at: DateTime;
 
   @column.dateTime({ autoCreate: true, autoUpdate: true })
   public updated_at: DateTime;
-
-  @column.dateTime()
-  public deleted_at: DateTime | null;
 
   @belongsTo(() => Event, {
     foreignKey: 'event_id',
