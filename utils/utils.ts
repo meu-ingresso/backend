@@ -21,7 +21,9 @@ function getBody(code: string, result: any) {
   return body;
 }
 
-function getResponse(context: HttpContextContract, code: number, headers: any, body: any) {
+function getResponse(context: HttpContextContract, code: number, body: any) {
+  const headers = getHeaders();
+
   const response: any = context.response.status(code).send({ headers, body });
 
   return response;
