@@ -17,11 +17,12 @@ class CreateCouponTicketValidator {
   });
 
   public messages = {
-    'coupon_id.required': 'O campo "coupon_id" é obrigatório.',
-    'coupon_id.exists': 'O "coupon_id" fornecido não existe.',
-    'coupon_id.unique': 'Essa combinação de "coupon_id" e "ticket_id" já existe.',
-    'ticket_id.required': 'O campo "ticket_id" é obrigatório.',
-    'ticket_id.exists': 'O "ticket_id" fornecido não existe.',
+    'data.required': 'O campo "data" é obrigatório.',
+    'data.array': 'O campo "data" deve ser um array.',
+    'data.*.coupon_id.required': 'O campo "coupon_id" é obrigatório.',
+    'data.*.coupon_id.exists': 'O "coupon_id" fornecido não existe.',
+    'data.*.ticket_id.required': 'O campo "ticket_id" é obrigatório.',
+    'data.*.ticket_id.exists': 'O "ticket_id" fornecido não existe.',
   };
 }
 
