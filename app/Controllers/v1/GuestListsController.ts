@@ -10,61 +10,72 @@ export default class GuestListsController {
   public async create(context: HttpContextContract) {
     const payload = await context.request.validate(CreateGuestListValidator);
 
-    payload.created_by = context.auth.user!.id;
+    const ableToCreate = await utils.checkHasEventPermission(context.auth.user!.id, payload.data[0].event_id);
 
-    const result = await this.dynamicService.create('GuestList', payload);
+    if (!ableToCreate) {
+      return utils.handleError(context, 403, 'FORBIDDEN', 'ACCESS_DENIED');
+    }
 
-    utils.createAudity('CREATE', 'GUEST_LIST', result.id, context.auth.user?.$attributes.id, null, result);
+    payload.data.forEach((item) => {
+      item.created_by = context.auth.user!.id;
+    });
 
-    const headers = utils.getHeaders();
-    const body = utils.getBody('CREATE_SUCCESS', result);
-    utils.getResponse(context, 201, headers, body);
+    const result = await this.dynamicService.bulkCreate({
+      modelName: 'GuestList',
+      records: payload.data,
+      userId: context.auth.user?.$attributes.id,
+    });
+
+    if (result[0].error) {
+      return utils.handleError(context, 400, 'CREATE_ERROR', `${result[0].error}`);
+    }
+
+    return utils.handleSuccess(context, result, 'CREATE_SUCCESS', 201);
   }
 
   public async update(context: HttpContextContract) {
     const payload = await context.request.validate(UpdateGuestListValidator);
 
-    const oldData = await this.dynamicService.getById('GuestList', payload.id);
+    const oldData = await this.dynamicService.getById('GuestList', payload.data[0].id);
+    const ableToUpdate = await utils.checkHasEventPermission(context.auth.user!.id, oldData.event_id);
 
-    const result = await this.dynamicService.update('GuestList', payload);
+    if (!ableToUpdate) {
+      return utils.handleError(context, 403, 'FORBIDDEN', 'ACCESS_DENIED');
+    }
 
-    utils.createAudity(
-      'UPDATE',
-      'GUEST_LIST',
-      result.id,
-      context.auth.user?.$attributes.id,
-      oldData.$attributes,
-      result
-    );
+    const result = await this.dynamicService.bulkUpdate({
+      modelName: 'GuestList',
+      records: payload.data,
+      userId: context.auth.user?.$attributes.id,
+    });
 
-    const headers = utils.getHeaders();
-    const body = utils.getBody('UPDATE_SUCCESS', result);
-    utils.getResponse(context, 200, headers, body);
+    return utils.handleSuccess(context, result, 'UPDATE_SUCCESS', 200);
   }
 
   public async search(context: HttpContextContract) {
-    const payload = await context.request.validate(QueryModelValidator);
+    const query = await context.request.validate(QueryModelValidator);
 
-    const result = await this.dynamicService.searchActives('GuestList', payload);
+    const result = await this.dynamicService.searchActives('GuestList', query);
 
-    const headers = utils.getHeaders();
-
-    const body = utils.getBody('SEARCH_SUCCESS', result);
-
-    utils.getResponse(context, 200, headers, body);
+    return utils.handleSuccess(context, result, 'SEARCH_SUCCESS', 200);
   }
 
   public async delete(context: HttpContextContract) {
     const id = context.request.params().id;
 
     const oldData = await this.dynamicService.getById('GuestList', id);
+    const ableToDelete = await utils.checkHasEventPermission(context.auth.user!.id, oldData.event_id);
 
-    const result = await this.dynamicService.softDelete('GuestList', { id });
+    if (!ableToDelete) {
+      return utils.handleError(context, 403, 'FORBIDDEN', 'ACCESS_DENIED');
+    }
 
-    utils.createAudity('DELETE', 'GUEST_LIST', id, context.auth.user?.$attributes.id, oldData.$attributes, result);
+    const result = await this.dynamicService.softDelete({
+      modelName: 'GuestList',
+      record: { id },
+      userId: context.auth.user?.$attributes.id,
+    });
 
-    const headers = utils.getHeaders();
-    const body = utils.getBody('DELETE_SUCCESS', result);
-    utils.getResponse(context, 200, headers, body);
+    return utils.handleSuccess(context, result, 'DELETE_SUCCESS', 200);
   }
 }
