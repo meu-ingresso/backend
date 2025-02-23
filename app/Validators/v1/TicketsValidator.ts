@@ -86,21 +86,21 @@ class UpdateTicketValidator {
   });
 
   public messages = {
-    'tickets.required': 'O array de tickets é obrigatório.',
-    'tickets.array': 'O campo tickets deve ser um array.',
-    'tickets.*.id.required': 'O campo "id" é obrigatório para todos os tickets.',
-    'tickets.*.name.string': 'O campo "name" deve ser uma string válida.',
-    'tickets.*.event_id.exists': 'O campo "event_id" especificado não existe.',
-    'tickets.*.ticket_event_category_id.exists': 'A categoria de ticket especificado não existe.',
-    'tickets.*.start_date.date': 'O campo "start_date" deve ser uma data válida.',
-    'tickets.*.end_date.date': 'O campo "end_date" deve ser uma data válida.',
-    'tickets.*.availability.enum': 'O campo "availability" deve ser Privado, Público ou PDV.',
-    'tickets.*.min_quantity_per_user.number': 'O campo "min_quantity_per_user" precisa ser um número válido.',
-    'tickets.*.max_quantity_per_user.number': 'O campo "max_quantity_per_user" precisa ser um número válido.',
-    'tickets.*.total_quantity.number': 'O campo "total_quantity" deve ser um número.',
-    'tickets.*.total_sold.number': 'O campo "total_sold" deve ser um número.',
-    'tickets.*.price.number': 'O campo "price" deve ser um número.',
-    'tickets.*.display_order.number': 'O campo "display_order" precisa ser um número válido.',
+    'data.required': 'O array de tickets é obrigatório.',
+    'data.array': 'O campo data deve ser um array.',
+    'data.*.id.required': 'O campo "id" é obrigatório para todos os tickets.',
+    'data.*.name.string': 'O campo "name" deve ser uma string válida.',
+    'data.*.event_id.exists': 'O campo "event_id" especificado não existe.',
+    'data.*.ticket_event_category_id.exists': 'A categoria de ticket especificado não existe.',
+    'data.*.start_date.date': 'O campo "start_date" deve ser uma data válida.',
+    'data.*.end_date.date': 'O campo "end_date" deve ser uma data válida.',
+    'data.*.availability.enum': 'O campo "availability" deve ser Privado, Público ou PDV.',
+    'data.*.min_quantity_per_user.number': 'O campo "min_quantity_per_user" precisa ser um número válido.',
+    'data.*.max_quantity_per_user.number': 'O campo "max_quantity_per_user" precisa ser um número válido.',
+    'data.*.total_quantity.number': 'O campo "total_quantity" deve ser um número.',
+    'data.*.total_sold.number': 'O campo "total_sold" deve ser um número.',
+    'data.*.price.number': 'O campo "price" deve ser um número.',
+    'data.*.display_order.number': 'O campo "display_order" precisa ser um número válido.',
   };
 }
 
