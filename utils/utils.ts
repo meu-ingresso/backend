@@ -4,10 +4,12 @@ import { HttpContextContract } from '@ioc:Adonis/Core/HttpContext';
 import DynamicService from 'App/Services/v1/DynamicService';
 import UserService from 'App/Services/v1/UserService';
 import EventService from 'App/Services/v1/EventService';
+import AuditService from 'App/Services/v1/AuditService';
 
 const dynamicService = new DynamicService();
 const userService = new UserService();
 const eventService = new EventService();
+const auditService = new AuditService();
 
 function getHeaders() {
   const headers: HttpHeader[] = [{ key: 'Content-type', value: 'application/json' }];
@@ -37,20 +39,7 @@ async function createAudity(
   old_data: Record<string, any> | null = null,
   new_data: Record<string, any> | null = null
 ): Promise<void> {
-  try {
-    const payload = {
-      action,
-      entity,
-      entity_id,
-      user_id,
-      old_data: old_data ? JSON.stringify(old_data) : null,
-      new_data: new_data ? JSON.stringify(new_data) : null,
-    };
-
-    await dynamicService.create('AuditLog', payload);
-  } catch (error) {
-    console.error('Error creating audit log:', error);
-  }
+  await auditService.create(action, entity, entity_id, user_id, old_data, new_data);
 }
 
 async function getInfosByRole(userId: string, data: any, module: string): Promise<typeof data> {
@@ -100,17 +89,15 @@ async function getInfosByRole(userId: string, data: any, module: string): Promis
 }
 
 async function handleError(context: HttpContextContract, status: number, type: string, message: string) {
-  const headers = getHeaders();
   const body = getBody(type, message);
 
-  return getResponse(context, status, headers, body);
+  return getResponse(context, status, body);
 }
 
 async function handleSuccess(context: HttpContextContract, result: any, code: string, statusCode: number) {
-  const headers = getHeaders();
   const body = getBody(code, result);
 
-  return getResponse(context, statusCode, headers, body);
+  return getResponse(context, statusCode, body);
 }
 
 async function getUserWithRole(userId: string): Promise<any | null> {
