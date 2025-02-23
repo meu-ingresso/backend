@@ -12,9 +12,7 @@ export default class AuthController {
     const auth = await this.loginService.login(payload);
 
     if (!auth) {
-      const body = utils.getBody('LOGIN_FAILURE', null);
-
-      return utils.getResponse(context, 401, body);
+      return utils.handleError(context, 401, 'LOGIN_FAILURE', 'Credenciais inválidas');
     }
 
     const expiresIn = 302400000;
@@ -23,18 +21,14 @@ export default class AuthController {
 
     utils.createAudity('LOGIN', 'AUTH', auth.id, auth.id, {}, auth);
 
-    const body = utils.getBody('LOGIN_SUCCESS', { auth, token });
-
-    utils.getResponse(context, 200, body);
+    return utils.handleSuccess(context, { auth, token }, 'LOGIN_SUCCESS', 200);
   }
 
   public async logout(context: HttpContextContract) {
     const userId = context.auth.user?.$attributes.id;
 
     if (!userId) {
-      const body = utils.getBody('LOGOUT_FAILURE', { message: 'Invalid credentials', revoked: false });
-
-      return utils.getResponse(context, 401, body);
+      return utils.handleError(context, 401, 'LOGOUT_FAILURE', 'Credenciais inválidas');
     }
 
     utils.createAudity('LOGOUT', 'AUTH', userId, userId, { revoked: false }, { revoked: true });
@@ -43,8 +37,6 @@ export default class AuthController {
 
     await context.auth.use('api').revoke();
 
-    const body = utils.getBody('LOGOUT_SUCCESS', null);
-
-    utils.getResponse(context, 200, body);
+    return utils.handleSuccess(context, null, 'LOGOUT_SUCCESS', 200);
   }
 }
