@@ -28,10 +28,6 @@ export default class TicketsController {
 
     utils.createAudity('RESPONSE', 'OPEN_AI', null, context.auth.user?.$attributes.id, null, result);
 
-    const headers = utils.getHeaders();
-
-    const body = utils.getBody('IMPROVE_SUCCESS', result);
-
-    utils.getResponse(context, 200, headers, body);
+    return utils.handleSuccess(context, result, 'IMPROVE_SUCCESS', 200);
   }
 }
