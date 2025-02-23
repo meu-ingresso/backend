@@ -8,20 +8,26 @@ class CreateEventAttachmentValidator {
   public reporter = ReportHandler;
 
   public schema = schema.create({
-    event_id: schema.string({ trim: true }, [rules.exists({ table: 'events', column: 'id' })]),
-    name: schema.string({ trim: true }, [rules.maxLength(255)]),
-    type: schema.string.optional({ trim: true }, [rules.maxLength(50)]),
-    url: schema.string.optional({ trim: true }, [rules.url(), rules.maxLength(255)]),
+    data: schema.array().members(
+      schema.object().members({
+        event_id: schema.string({ trim: true }, [rules.exists({ table: 'events', column: 'id' })]),
+        name: schema.string({ trim: true }, [rules.maxLength(255)]),
+        type: schema.string.optional({ trim: true }, [rules.maxLength(50)]),
+        url: schema.string.optional({ trim: true }, [rules.url(), rules.maxLength(255)]),
+      })
+    ),
   });
 
   public messages = {
-    'event_id.required': 'O campo "event_id" é obrigatório.',
-    'event_id.exists': 'O "event_id" fornecido não existe na tabela de eventos.',
-    'name.required': 'O campo "name" é obrigatório.',
-    'name.maxLength': 'O campo "name" deve ter no máximo 255 caracteres.',
-    'type.maxLength': 'O campo "type" deve ter no máximo 50 caracteres.',
-    'url.url': 'O campo "url" deve ser uma URL válida.',
-    'url.maxLength': 'O campo "url" deve ter no máximo 255 caracteres.',
+    'data.required': 'O campo "data" é obrigatório.',
+    'data.array': 'O campo data deve ser um array.',
+    'data.*.event_id.required': 'O campo "event_id" é obrigatório.',
+    'data.*.event_id.exists': 'O "event_id" fornecido não existe na tabela de eventos.',
+    'data.*.name.required': 'O campo "name" é obrigatório.',
+    'data.*.name.maxLength': 'O campo "name" deve ter no máximo 255 caracteres.',
+    'data.*.type.maxLength': 'O campo "type" deve ter no máximo 50 caracteres.',
+    'data.*.url.url': 'O campo "url" deve ser uma URL válida.',
+    'data.*.url.maxLength': 'O campo "url" deve ter no máximo 255 caracteres.',
   };
 }
 
@@ -31,21 +37,27 @@ class UpdateEventAttachmentValidator {
   public reporter = ReportHandler;
 
   public schema = schema.create({
-    id: schema.string({ trim: true }, [rules.exists({ table: 'event_attachments', column: 'id' })]),
-    event_id: schema.string.optional({ trim: true }, [rules.exists({ table: 'events', column: 'id' })]),
-    name: schema.string.optional({ trim: true }, [rules.maxLength(255)]),
-    type: schema.string.optional({ trim: true }, [rules.maxLength(50)]),
-    url: schema.string.optional({ trim: true }, [rules.url(), rules.maxLength(255)]),
+    data: schema.array().members(
+      schema.object().members({
+        id: schema.string({ trim: true }, [rules.exists({ table: 'event_attachments', column: 'id' })]),
+        event_id: schema.string.optional({ trim: true }, [rules.exists({ table: 'events', column: 'id' })]),
+        name: schema.string.optional({ trim: true }, [rules.maxLength(255)]),
+        type: schema.string.optional({ trim: true }, [rules.maxLength(50)]),
+        url: schema.string.optional({ trim: true }, [rules.url(), rules.maxLength(255)]),
+      })
+    ),
   });
 
   public messages = {
-    'id.required': 'O campo "id" é obrigatório.',
-    'id.exists': 'O "id" fornecido não existe na tabela de anexos.',
-    'event_id.exists': 'O "event_id" fornecido não existe na tabela de eventos.',
-    'name.maxLength': 'O campo "name" deve ter no máximo 255 caracteres.',
-    'type.maxLength': 'O campo "type" deve ter no máximo 50 caracteres.',
-    'url.url': 'O campo "url" deve ser uma URL válida.',
-    'url.maxLength': 'O campo "url" deve ter no máximo 255 caracteres.',
+    'data.required': 'O campo "data" é obrigatório.',
+    'data.array': 'O campo data deve ser um array.',
+    'data.*.id.required': 'O campo "id" é obrigatório.',
+    'data.*.id.exists': 'O "id" fornecido não existe na tabela de anexos.',
+    'data.*.event_id.exists': 'O "event_id" fornecido não existe na tabela de eventos.',
+    'data.*.name.maxLength': 'O campo "name" deve ter no máximo 255 caracteres.',
+    'data.*.type.maxLength': 'O campo "type" deve ter no máximo 50 caracteres.',
+    'data.*.url.url': 'O campo "url" deve ser uma URL válida.',
+    'data.*.url.maxLength': 'O campo "url" deve ter no máximo 255 caracteres.',
   };
 }
 
