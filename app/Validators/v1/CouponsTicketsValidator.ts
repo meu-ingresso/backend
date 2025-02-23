@@ -8,18 +8,12 @@ class CreateCouponTicketValidator {
   public reporter = ReportHandler;
 
   public schema = schema.create({
-    coupon_id: schema.string({ trim: true }, [
-      rules.exists({ table: 'coupons', column: 'id' }),
-      rules.unique({
-        table: 'coupons_tickets',
-        column: 'coupon_id',
-        where: {
-          ticket_id: this.context.request.input('ticket_id'),
-          deleted_at: null,
-        },
-      }),
-    ]),
-    ticket_id: schema.string({ trim: true }, [rules.exists({ table: 'tickets', column: 'id' })]),
+    data: schema.array().members(
+      schema.object().members({
+        coupon_id: schema.string({ trim: true }, [rules.exists({ table: 'coupons', column: 'id' })]),
+        ticket_id: schema.string({ trim: true }, [rules.exists({ table: 'tickets', column: 'id' })]),
+      })
+    ),
   });
 
   public messages = {
