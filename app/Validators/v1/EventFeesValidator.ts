@@ -8,15 +8,21 @@ class CreateEventFeeValidator {
   public reporter = ReportHandler;
 
   public schema = schema.create({
-    event_id: schema.string({ trim: true }, [rules.exists({ table: 'events', column: 'id' })]),
-    platform_fee: schema.number(),
+    data: schema.array().members(
+      schema.object().members({
+        event_id: schema.string({ trim: true }, [rules.exists({ table: 'events', column: 'id' })]),
+        platform_fee: schema.number(),
+      })
+    ),
   });
 
   public messages = {
-    'event_id.required': 'O campo "event_id" é obrigatório.',
-    'event_id.exists': 'O evento especificado não foi encontrado.',
-    'platform_fee.required': 'O campo "platform_fee" é obrigatório.',
-    'platform_fee.number': 'O campo "platform_fee" deve ser um número.',
+    'data.required': 'O campo "data" é obrigatório.',
+    'data.array': 'O campo "data" deve ser um array.',
+    'data.*.event_id.required': 'O campo "event_id" é obrigatório.',
+    'data.*.event_id.exists': 'O evento especificado não foi encontrado.',
+    'data.*.platform_fee.required': 'O campo "platform_fee" é obrigatório.',
+    'data.*.platform_fee.number': 'O campo "platform_fee" deve ser um número.',
   };
 }
 
@@ -26,16 +32,22 @@ class UpdateEventFeeValidator {
   public reporter = ReportHandler;
 
   public schema = schema.create({
-    id: schema.string({ trim: true }),
-    event_id: schema.string.optional({ trim: true }, [rules.exists({ table: 'events', column: 'id' })]),
-    platform_fee: schema.number.optional(),
+    data: schema.array().members(
+      schema.object().members({
+        id: schema.string({ trim: true }, [rules.exists({ table: 'event_fees', column: 'id' })]),
+        event_id: schema.string.optional({ trim: true }, [rules.exists({ table: 'events', column: 'id' })]),
+        platform_fee: schema.number.optional(),
+      })
+    ),
   });
 
   public messages = {
-    'id.required': 'O campo "id" é obrigatório.',
-    'id.string': 'O campo "id" deve ser uma string válida.',
-    'event_id.exists': 'O evento especificado não foi encontrado.',
-    'platform_fee.number': 'O campo "platform_fee" deve ser um número.',
+    'data.required': 'O campo "data" é obrigatório.',
+    'data.array': 'O campo "data" deve ser um array.',
+    'data.*.id.required': 'O campo "id" é obrigatório.',
+    'data.*.id.exists': 'O "id" fornecido não existe na tabela de taxas.',
+    'data.*.event_id.exists': 'O evento especificado não foi encontrado.',
+    'data.*.platform_fee.number': 'O campo "platform_fee" deve ser um número.',
   };
 }
 

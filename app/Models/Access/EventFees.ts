@@ -19,6 +19,9 @@ export default class EventFees extends BaseModel {
   @column.dateTime({ autoCreate: true, autoUpdate: true })
   public updated_at: DateTime;
 
+  @column()
+  public deleted_at: DateTime | null;
+
   @belongsTo(() => Event, {
     foreignKey: 'event_id',
   })
