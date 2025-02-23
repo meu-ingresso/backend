@@ -17,9 +17,12 @@ class CreateCouponValidator {
           rules.unique({
             table: 'coupons',
             column: 'code',
-            where: {
-              event_id: this.context.request.input('data.0.event_id'),
-              deleted_at: null,
+            where: async (db, _, field) => {
+              const index = parseInt(field.split('.')[1]);
+              const id = this.context.request.input(`data.${index}.id`);
+              const eventId = this.context.request.input(`data.${index}.event_id`) || (await this.getCouponEventId(id));
+
+              db.where('event_id', eventId).whereNull('deleted_at');
             },
           }),
         ]),
@@ -79,8 +82,7 @@ class UpdateCouponValidator {
             },
             where: async (db, _, field) => {
               const index = parseInt(field.split('.')[1]);
-              const id = this.context.request.input(`data.${index}.id`);
-              const eventId = this.context.request.input(`data.${index}.event_id`) || (await this.getCouponEventId(id));
+              const eventId = this.context.request.input(`data.${index}.event_id`);
 
               db.where('event_id', eventId).whereNull('deleted_at');
             },
