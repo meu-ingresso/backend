@@ -8,27 +8,33 @@ class CreateAddressValidator {
   public reporter = ReportHandler;
 
   public schema = schema.create({
-    street: schema.string(),
-    zipcode: schema.string(),
-    number: schema.string.optional(),
-    complement: schema.string.optional(),
-    neighborhood: schema.string(),
-    latitude: schema.number.optional(),
-    longitude: schema.number.optional(),
-    city: schema.string(),
-    state: schema.string(),
+    data: schema.array().members(
+      schema.object().members({
+        street: schema.string({ trim: true }),
+        zipcode: schema.string({ trim: true }),
+        number: schema.string.optional({ trim: true }),
+        complement: schema.string.optional({ trim: true }),
+        neighborhood: schema.string({ trim: true }),
+        latitude: schema.number.optional(),
+        longitude: schema.number.optional(),
+        city: schema.string({ trim: true }),
+        state: schema.string({ trim: true }),
+      })
+    ),
   });
 
   public messages = {
-    'street.required': 'O campo "street" é obrigatório.',
-    'zipcode.required': 'O campo "zipcode" é obrigatório.',
-    'neighborhood.required': 'O campo "neighborhood" é obrigatório.',
-    'city.required': 'O campo "city" é obrigatório.',
-    'city.string': 'O campo "city" deve ser uma string.',
-    'state.required': 'O campo "state" é obrigatório.',
-    'state.string': 'O campo "state" deve ser uma string.',
-    'latitude.number': 'O campo "latitude" deve ser um número válido.',
-    'longitude.number': 'O campo "longitude" deve ser um número válido.',
+    'data.required': 'O array de endereços é obrigatório.',
+    'data.array': 'O campo data deve ser um array.',
+    'data.*.street.required': 'O campo "street" é obrigatório.',
+    'data.*.zipcode.required': 'O campo "zipcode" é obrigatório.',
+    'data.*.neighborhood.required': 'O campo "neighborhood" é obrigatório.',
+    'data.*.city.required': 'O campo "city" é obrigatório.',
+    'data.*.city.string': 'O campo "city" deve ser uma string.',
+    'data.*.state.required': 'O campo "state" é obrigatório.',
+    'data.*.state.string': 'O campo "state" deve ser uma string.',
+    'data.*.latitude.number': 'O campo "latitude" deve ser um número válido.',
+    'data.*.longitude.number': 'O campo "longitude" deve ser um número válido.',
   };
 }
 
@@ -38,24 +44,30 @@ class UpdateAddressValidator {
   public reporter = ReportHandler;
 
   public schema = schema.create({
-    id: schema.string(),
-    street: schema.string.optional(),
-    zipcode: schema.string.optional(),
-    number: schema.string.optional(),
-    complement: schema.string.optional(),
-    neighborhood: schema.string.optional(),
-    latitude: schema.number.optional(),
-    longitude: schema.number.optional(),
-    city: schema.string.optional(),
-    state: schema.string.optional(),
+    data: schema.array().members(
+      schema.object().members({
+        id: schema.string({ trim: true }),
+        street: schema.string.optional({ trim: true }),
+        zipcode: schema.string.optional({ trim: true }),
+        number: schema.string.optional({ trim: true }),
+        complement: schema.string.optional({ trim: true }),
+        neighborhood: schema.string.optional({ trim: true }),
+        latitude: schema.number.optional(),
+        longitude: schema.number.optional(),
+        city: schema.string.optional({ trim: true }),
+        state: schema.string.optional({ trim: true }),
+      })
+    ),
   });
 
   public messages = {
-    'id.required': 'O campo "id" é obrigatório.',
-    'city.string': 'O campo "city" deve ser uma string.',
-    'state.string': 'O campo "state" deve ser uma string.',
-    'latitude.number': 'O campo "latitude" deve ser um número válido.',
-    'longitude.number': 'O campo "longitude" deve ser um número válido.',
+    'data.required': 'O array de endereços é obrigatório.',
+    'data.array': 'O campo data deve ser um array.',
+    'data.*.id.required': 'O campo "id" é obrigatório.',
+    'data.*.city.string': 'O campo "city" deve ser uma string.',
+    'data.*.state.string': 'O campo "state" deve ser uma string.',
+    'data.*.latitude.number': 'O campo "latitude" deve ser um número válido.',
+    'data.*.longitude.number': 'O campo "longitude" deve ser um número válido.',
   };
 }
 
