@@ -1,6 +1,7 @@
 import { schema, rules } from '@ioc:Adonis/Core/Validator';
 import { HttpContextContract } from '@ioc:Adonis/Core/HttpContext';
 import ReportHandler from './Reporters/ReportHandler';
+import Database from '@ioc:Adonis/Lucid/Database';
 
 class CreateCouponValidator {
   constructor(protected context: HttpContextContract) {}
@@ -8,40 +9,46 @@ class CreateCouponValidator {
   public reporter = ReportHandler;
 
   public schema = schema.create({
-    event_id: schema.string({}, [rules.exists({ table: 'events', column: 'id' })]),
-    status_id: schema.string({}, [rules.exists({ table: 'statuses', column: 'id' })]),
-    code: schema.string({}, [
-      rules.unique({
-        table: 'coupons',
-        column: 'code',
-        where: {
-          event_id: this.context.request.input('event_id'),
-          deleted_at: null,
-        },
-      }),
-    ]),
-    discount_type: schema.enum(['PERCENTAGE', 'FIXED']),
-    discount_value: schema.number(),
-    start_date: schema.date.optional(),
-    end_date: schema.date.optional(),
-    max_uses: schema.number(),
+    data: schema.array().members(
+      schema.object().members({
+        event_id: schema.string({}, [rules.exists({ table: 'events', column: 'id' })]),
+        status_id: schema.string({}, [rules.exists({ table: 'statuses', column: 'id' })]),
+        code: schema.string({}, [
+          rules.unique({
+            table: 'coupons',
+            column: 'code',
+            where: {
+              event_id: this.context.request.input('data.0.event_id'),
+              deleted_at: null,
+            },
+          }),
+        ]),
+        discount_type: schema.enum(['PERCENTAGE', 'FIXED']),
+        discount_value: schema.number(),
+        start_date: schema.date.optional(),
+        end_date: schema.date.optional(),
+        max_uses: schema.number(),
+      })
+    ),
   });
 
   public messages = {
-    'event_id.required': 'O campo "event_id" é obrigatório.',
-    'event_id.exists': 'O evento especificado não existe.',
-    'status_id.required': 'O campo "status_id" é obrigatório.',
-    'status_id.exists': 'O status especificado não existe.',
-    'code.required': 'O campo "code" é obrigatório.',
-    'code.unique': 'Já existe um cupom com este código para o mesmo evento.',
-    'discount_type.required': 'O campo "discount_type" é obrigatório.',
-    'discount_type.enum': 'O campo "discount_type" deve ser "PERCENTAGE" ou "FIXED".',
-    'discount_value.required': 'O campo "discount_value" é obrigatório.',
-    'discount_value.number': 'O campo "discount_value" deve ser um número válido.',
-    'start_date.date': 'A data de início deve ser uma data válida.',
-    'end_date.date': 'A data de fim deve ser uma data válida.',
-    'max_uses.required': 'O campo "max_uses" é obrigatório.',
-    'max_uses.number': 'O campo "max_uses" deve ser um número válido.',
+    'data.required': 'O campo "data" é obrigatório.',
+    'data.array': 'O campo data deve ser um array.',
+    'data.*.event_id.required': 'O campo "event_id" é obrigatório.',
+    'data.*.event_id.exists': 'O evento especificado não existe.',
+    'data.*.status_id.required': 'O campo "status_id" é obrigatório.',
+    'data.*.status_id.exists': 'O status especificado não existe.',
+    'data.*.code.required': 'O campo "code" é obrigatório.',
+    'data.*.code.unique': 'Já existe um cupom com este código para o mesmo evento.',
+    'data.*.discount_type.required': 'O campo "discount_type" é obrigatório.',
+    'data.*.discount_type.enum': 'O campo "discount_type" deve ser "PERCENTAGE" ou "FIXED".',
+    'data.*.discount_value.required': 'O campo "discount_value" é obrigatório.',
+    'data.*.discount_value.number': 'O campo "discount_value" deve ser um número válido.',
+    'data.*.start_date.date': 'A data de início deve ser uma data válida.',
+    'data.*.end_date.date': 'A data de fim deve ser uma data válida.',
+    'data.*.max_uses.required': 'O campo "max_uses" é obrigatório.',
+    'data.*.max_uses.number': 'O campo "max_uses" deve ser um número válido.',
   };
 }
 
@@ -50,40 +57,58 @@ class UpdateCouponValidator {
 
   public reporter = ReportHandler;
 
+  private async getCouponEventId(couponId: string): Promise<string | null> {
+    const coupon = await Database.from('coupons').where('id', couponId).first();
+    return coupon?.event_id || null;
+  }
+
   public schema = schema.create({
-    id: schema.string({}, [rules.exists({ table: 'coupons', column: 'id' })]),
-    event_id: schema.string.optional({}, [rules.exists({ table: 'events', column: 'id' })]),
-    status_id: schema.string.optional({}, [rules.exists({ table: 'statuses', column: 'id' })]),
-    code: schema.string.optional({}, [
-      rules.unique({
-        table: 'coupons',
-        column: 'code',
-        whereNot: { id: this.context.request.input('id') },
-        where: {
-          event_id: this.context.request.input('event_id'),
-          deleted_at: null,
-        },
-      }),
-    ]),
-    discount_type: schema.enum.optional(['PERCENTAGE', 'FIXED']),
-    discount_value: schema.number.optional(),
-    start_date: schema.date.optional(),
-    end_date: schema.date.optional(),
-    max_uses: schema.number.optional(),
-    uses: schema.number.optional(),
+    data: schema.array().members(
+      schema.object().members({
+        id: schema.string({}, [rules.exists({ table: 'coupons', column: 'id' })]),
+        event_id: schema.string.optional({}, [rules.exists({ table: 'events', column: 'id' })]),
+        status_id: schema.string.optional({}, [rules.exists({ table: 'statuses', column: 'id' })]),
+        code: schema.string.optional({}, [
+          rules.unique({
+            table: 'coupons',
+            column: 'code',
+            whereNot: (db, _, field) => {
+              const index = parseInt(field.split('.')[1]);
+              const id = this.context.request.input(`data.${index}.id`);
+              db.whereNot('id', id);
+            },
+            where: async (db, _, field) => {
+              const index = parseInt(field.split('.')[1]);
+              const id = this.context.request.input(`data.${index}.id`);
+              const eventId = this.context.request.input(`data.${index}.event_id`) || (await this.getCouponEventId(id));
+
+              db.where('event_id', eventId).whereNull('deleted_at');
+            },
+          }),
+        ]),
+        discount_type: schema.enum.optional(['PERCENTAGE', 'FIXED']),
+        discount_value: schema.number.optional(),
+        start_date: schema.date.optional(),
+        end_date: schema.date.optional(),
+        max_uses: schema.number.optional(),
+        uses: schema.number.optional(),
+      })
+    ),
   });
 
   public messages = {
-    'id.required': 'O campo "id" é obrigatório.',
-    'id.exists': 'O cupom especificado não existe.',
-    'event_id.exists': 'O evento especificado não existe.',
-    'status_id.exists': 'O status especificado não existe.',
-    'code.unique': 'Já existe um cupom com este código para o mesmo evento.',
-    'discount_type.enum': 'O campo "discount_type" deve ser "PERCENTAGE" ou "FIXED".',
-    'start_date.date': 'A data de início deve ser uma data válida.',
-    'end_date.date': 'A data de fim deve ser uma data válida.',
-    'max_uses.number': 'O campo "max_uses" deve ser um número válido.',
-    'uses.number': 'O campo "uses" deve ser um número válido.',
+    'data.required': 'O campo "data" é obrigatório.',
+    'data.array': 'O campo data deve ser um array.',
+    'data.*.id.required': 'O campo "id" é obrigatório.',
+    'data.*.id.exists': 'O cupom especificado não existe.',
+    'data.*.event_id.exists': 'O evento especificado não existe.',
+    'data.*.status_id.exists': 'O status especificado não existe.',
+    'data.*.code.unique': 'Já existe um cupom com este código para o mesmo evento.',
+    'data.*.discount_type.enum': 'O campo "discount_type" deve ser "PERCENTAGE" ou "FIXED".',
+    'data.*.start_date.date': 'A data de início deve ser uma data válida.',
+    'data.*.end_date.date': 'A data de fim deve ser uma data válida.',
+    'data.*.max_uses.number': 'O campo "max_uses" deve ser um número válido.',
+    'data.*.uses.number': 'O campo "uses" deve ser um número válido.',
   };
 }
 

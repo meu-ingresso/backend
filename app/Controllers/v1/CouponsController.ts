@@ -12,95 +12,82 @@ export default class CouponsController {
   public async create(context: HttpContextContract) {
     const payload = await context.request.validate(CreateCouponValidator);
 
-    const ableToCreate = await utils.checkHasEventPermission(context.auth.user!.id, payload.event_id);
+    const ableToCreate = await utils.checkHasEventPermission(context.auth.user!.id, payload.data[0].event_id);
 
     if (!ableToCreate) {
-      return utils.getResponse(context, 403, utils.getHeaders(), utils.getBody('FORBIDDEN', null));
+      return utils.handleError(context, 403, 'FORBIDDEN', 'Acesso negado');
     }
 
-    const result = await this.dynamicService.create('Coupon', payload);
+    const result = await this.dynamicService.bulkCreate({
+      modelName: 'Coupon',
+      records: payload.data,
+      userId: context.auth.user?.$attributes.id,
+    });
 
-    utils.createAudity('CREATE', 'COUPON', result.id, context.auth.user?.$attributes.id, null, result);
-
-    const headers = utils.getHeaders();
-
-    const body = utils.getBody('CREATE_SUCCESS', result);
-
-    utils.getResponse(context, 201, headers, body);
+    return utils.handleSuccess(context, result, 'CREATE_SUCCESS', 201);
   }
 
   public async update(context: HttpContextContract) {
-    const couponId = context.request.input('id');
-
-    const coupon = await this.dynamicService.getById('Coupon', couponId);
-
-    context.request.updateBody({
-      ...context.request.body(),
-      event_id: coupon.event_id,
-    });
-
     const payload = await context.request.validate(UpdateCouponValidator);
 
-    const oldData = await this.dynamicService.getById('Coupon', payload.id);
+    const coupon = await this.dynamicService.getById('Coupon', payload.data[0].id);
 
-    const ableToUpdate = await utils.checkHasEventPermission(context.auth.user!.id, oldData.event_id);
+    const ableToUpdate = await utils.checkHasEventPermission(context.auth.user!.id, coupon.event_id);
 
     if (!ableToUpdate) {
-      return utils.getResponse(context, 403, utils.getHeaders(), utils.getBody('FORBIDDEN', null));
+      return utils.handleError(context, 403, 'FORBIDDEN', 'Acesso negado');
     }
 
-    if (payload.uses === payload.max_uses) {
-      const status = await this.statusService.searchStatusByName('Esgotado', 'coupon');
+    const updatedRecords = await Promise.all(
+      payload.data.map(async (item) => {
+        if (item.uses === item.max_uses) {
+          const status = await this.statusService.searchStatusByName('Esgotado', 'coupon');
 
-      if (status) {
-        payload.status_id = status.id;
-      }
-    }
+          if (status) {
+            item.status_id = status.id;
+          }
+        }
 
-    const result = await this.dynamicService.update('Coupon', payload);
+        return item;
+      })
+    );
 
-    utils.createAudity('UPDATE', 'COUPON', result.id, context.auth.user?.$attributes.id, oldData.$attributes, result);
+    const result = await this.dynamicService.bulkUpdate({
+      modelName: 'Coupon',
+      records: updatedRecords,
+      userId: context.auth.user?.$attributes.id,
+    });
 
-    const headers = utils.getHeaders();
-
-    const body = utils.getBody('UPDATE_SUCCESS', result);
-
-    utils.getResponse(context, 200, headers, body);
+    return utils.handleSuccess(context, result, 'UPDATE_SUCCESS', 200);
   }
 
   public async search(context: HttpContextContract) {
-    const payload = await context.request.validate(QueryModelValidator);
+    const query = await context.request.validate(QueryModelValidator);
 
-    const result = await this.dynamicService.searchActives('Coupon', payload);
+    const result = await this.dynamicService.searchActives('Coupon', query);
 
     const resultByRole = await utils.getInfosByRole(context.auth.user!.id, result, 'Coupon');
 
-    const headers = utils.getHeaders();
-
-    const body = utils.getBody('SEARCH_SUCCESS', resultByRole);
-
-    utils.getResponse(context, 200, headers, body);
+    return utils.handleSuccess(context, resultByRole, 'SEARCH_SUCCESS', 200);
   }
 
   public async delete(context: HttpContextContract) {
     const id = context.request.params().id;
 
-    const oldData = await this.dynamicService.getById('Coupon', id);
+    const coupon = await this.dynamicService.getById('Coupon', id);
 
-    const ableToDelete = await utils.checkHasEventPermission(context.auth.user!.id, oldData.event_id);
+    const ableToDelete = await utils.checkHasEventPermission(context.auth.user!.id, coupon.event_id);
 
     if (!ableToDelete) {
-      return utils.getResponse(context, 403, utils.getHeaders(), utils.getBody('FORBIDDEN', null));
+      return utils.handleError(context, 403, 'FORBIDDEN', 'Acesso negado');
     }
 
-    const result = await this.dynamicService.softDelete('Coupon', { id });
+    const result = await this.dynamicService.softDelete({
+      modelName: 'Coupon',
+      record: { id },
+      userId: context.auth.user?.$attributes.id,
+    });
 
-    utils.createAudity('DELETE', 'COUPON', id, context.auth.user?.$attributes.id, oldData.$attributes, result);
-
-    const headers = utils.getHeaders();
-
-    const body = utils.getBody('DELETE_SUCCESS', result);
-
-    utils.getResponse(context, 200, headers, body);
+    return utils.handleSuccess(context, result, 'DELETE_SUCCESS', 200);
   }
 }
