@@ -41,9 +41,9 @@ export default class EventCheckoutFieldsController {
   }
 
   public async search(context: HttpContextContract) {
-    const payload = await context.request.validate(QueryModelValidator);
+    const query = await context.request.validate(QueryModelValidator);
 
-    const result = await this.dynamicService.searchActives('EventCheckoutField', payload);
+    const result = await this.dynamicService.searchActives('EventCheckoutField', query);
 
     return utils.handleSuccess(context, result, 'SEARCH_SUCCESS', 200);
   }
@@ -52,23 +52,17 @@ export default class EventCheckoutFieldsController {
     const id = context.request.params().id;
 
     const oldData = await this.dynamicService.getById('EventCheckoutField', id);
-
     const ableToDelete = await utils.checkHasEventPermission(context.auth.user!.id, oldData.event_id);
 
     if (!ableToDelete) {
       return utils.handleError(context, 403, 'FORBIDDEN', 'ACCESS_DENIED');
     }
 
-    const result = await this.dynamicService.softDelete('EventCheckoutField', { id });
-
-    utils.createAudity(
-      'DELETE',
-      'EVENT_CHECKOUT_FIELD',
-      id,
-      context.auth.user?.$attributes.id,
-      oldData.$attributes,
-      result
-    );
+    const result = await this.dynamicService.softDelete({
+      modelName: 'EventCheckoutField',
+      record: { id },
+      userId: context.auth.user?.$attributes.id,
+    });
 
     return utils.handleSuccess(context, result, 'DELETE_SUCCESS', 200);
   }
