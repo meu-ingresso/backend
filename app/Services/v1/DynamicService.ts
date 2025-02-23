@@ -1,7 +1,10 @@
 import Database from '@ioc:Adonis/Lucid/Database';
 import { BaseModel } from '@ioc:Adonis/Lucid/Orm';
 import { ModelObject } from '@ioc:Adonis/Lucid/Orm';
+import { DateTime } from 'luxon';
+
 import DataAccessService from './DataAccessService';
+import AuditService from './AuditService';
 import State from 'App/Models/Access/States';
 import City from 'App/Models/Access/Cities';
 import Address from 'App/Models/Access/Addresses';
@@ -38,7 +41,11 @@ import GuestList from 'App/Models/Access/GuestLists';
 import GuestListMember from 'App/Models/Access/GuestListMembers';
 import GuestListMemberValidated from 'App/Models/Access/GuestListMembersValidated';
 
-import { DateTime } from 'luxon';
+interface BulkParams {
+  modelName: string;
+  records: Record<string, any>[];
+  userId?: string;
+}
 
 export default class DynamicService {
   private modelMap: Record<string, typeof BaseModel> = {
@@ -79,6 +86,8 @@ export default class DynamicService {
     GuestListMemberValidated,
   };
 
+  private auditService: AuditService = new AuditService();
+
   public async create(dynamicModel: string, record: Record<string, any>): Promise<any> {
     const ModelClass = this.modelMap[dynamicModel];
 
@@ -116,11 +125,46 @@ export default class DynamicService {
     return model;
   }
 
-  public async bulkUpdate(dynamicModel: string, records: Record<string, any>[]): Promise<any> {
-    const ModelClass = this.modelMap[dynamicModel];
+  public async bulkCreate({ modelName, records, userId }: BulkParams): Promise<any> {
+    const ModelClass = this.modelMap[modelName];
 
     if (!ModelClass) {
-      throw new Error(`Model ${dynamicModel} not found`);
+      throw new Error(`Model ${modelName} not found`);
+    }
+
+    const results = await Database.transaction(async (trx) => {
+      const createdRecords: ModelObject[] = [];
+
+      for (const record of records) {
+        const model = new ModelClass().fill(record);
+
+        model.useTransaction(trx);
+
+        await model.save();
+
+        await this.auditService.create(
+          'CREATE',
+          modelName.toUpperCase(),
+          model.$attributes.id,
+          userId,
+          null,
+          model.$attributes
+        );
+
+        createdRecords.push(model);
+      }
+
+      return createdRecords;
+    });
+
+    return results;
+  }
+
+  public async bulkUpdate({ modelName, records, userId }: BulkParams): Promise<any> {
+    const ModelClass = this.modelMap[modelName];
+
+    if (!ModelClass) {
+      throw new Error(`Model ${modelName} not found`);
     }
 
     const results = await Database.transaction(async (trx) => {
@@ -128,10 +172,22 @@ export default class DynamicService {
 
       for (const record of records) {
         const model = await ModelClass.findOrFail(record.id);
+        const oldData = { ...model.$attributes };
+
         model.useTransaction(trx);
 
         model.merge({ ...record });
+
         await model.save();
+
+        await this.auditService.create(
+          'UPDATE',
+          modelName.toUpperCase(),
+          model.$attributes.id,
+          userId,
+          oldData,
+          model.$attributes
+        );
 
         updatedRecords.push(model);
       }
