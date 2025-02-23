@@ -13,73 +13,48 @@ export default class GuestListMembersController {
   public async create(context: HttpContextContract) {
     const payload = await context.request.validate(CreateGuestListMemberValidator);
 
-    // @ts-ignore
-    payload.added_by = context.auth.user!.id;
+    payload.data.forEach((item) => {
+      item.added_by = context.auth.user!.id;
+    });
 
-    const result = await this.dynamicService.create('GuestListMember', payload);
+    const result = await this.dynamicService.bulkCreate({
+      modelName: 'GuestListMember',
+      records: payload.data,
+      userId: context.auth.user?.$attributes.id,
+    });
 
-    utils.createAudity('CREATE', 'GUEST_LIST_MEMBER', result.id, context.auth.user?.$attributes.id, null, result);
-
-    const headers = utils.getHeaders();
-    const body = utils.getBody('CREATE_SUCCESS', result);
-    utils.getResponse(context, 201, headers, body);
+    return utils.handleSuccess(context, result, 'CREATE_SUCCESS', 201);
   }
 
   public async update(context: HttpContextContract) {
     const payload = await context.request.validate(UpdateGuestListMemberValidator);
 
-    const oldData = await this.dynamicService.getById('GuestListMember', payload.id);
+    const result = await this.dynamicService.bulkUpdate({
+      modelName: 'GuestListMember',
+      records: payload.data,
+      userId: context.auth.user?.$attributes.id,
+    });
 
-    const result = await this.dynamicService.update('GuestListMember', payload);
-
-    utils.createAudity(
-      'UPDATE',
-      'GUEST_LIST_MEMBER',
-      result.id,
-      context.auth.user?.$attributes.id,
-      oldData.$attributes,
-      result
-    );
-
-    const headers = utils.getHeaders();
-
-    const body = utils.getBody('UPDATE_SUCCESS', result);
-
-    utils.getResponse(context, 200, headers, body);
+    return utils.handleSuccess(context, result, 'UPDATE_SUCCESS', 200);
   }
 
   public async search(context: HttpContextContract) {
-    const payload = await context.request.validate(QueryModelValidator);
+    const query = await context.request.validate(QueryModelValidator);
 
-    const result = await this.dynamicService.searchActives('GuestListMember', payload);
+    const result = await this.dynamicService.searchActives('GuestListMember', query);
 
-    const headers = utils.getHeaders();
-
-    const body = utils.getBody('SEARCH_SUCCESS', result);
-
-    utils.getResponse(context, 200, headers, body);
+    return utils.handleSuccess(context, result, 'SEARCH_SUCCESS', 200);
   }
 
   public async delete(context: HttpContextContract) {
     const id = context.request.params().id;
 
-    const oldData = await this.dynamicService.getById('GuestListMember', id);
+    const result = await this.dynamicService.softDelete({
+      modelName: 'GuestListMember',
+      record: { id },
+      userId: context.auth.user?.$attributes.id,
+    });
 
-    const result = await this.dynamicService.softDelete('GuestListMember', { id });
-
-    utils.createAudity(
-      'DELETE',
-      'GUEST_LIST_MEMBER',
-      id,
-      context.auth.user?.$attributes.id,
-      oldData.$attributes,
-      result
-    );
-
-    const headers = utils.getHeaders();
-
-    const body = utils.getBody('DELETE_SUCCESS', result);
-
-    utils.getResponse(context, 200, headers, body);
+    return utils.handleSuccess(context, result, 'DELETE_SUCCESS', 200);
   }
 }
