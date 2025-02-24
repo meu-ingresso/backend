@@ -1,9 +1,6 @@
 import { HttpContextContract } from '@ioc:Adonis/Core/HttpContext';
 import QueryModelValidator from 'App/Validators/v1/QueryModelValidator';
-import {
-  CreateRolePermissionValidator,
-  UpdateRolePermissionValidator,
-} from 'App/Validators/v1/RolePermissionsValidator';
+import { CreateRolePermissionValidator } from 'App/Validators/v1/RolePermissionsValidator';
 import DynamicService from 'App/Services/v1/DynamicService';
 import utils from 'Utils/utils';
 
@@ -13,49 +10,58 @@ export default class RolePermissionsController {
   public async create(context: HttpContextContract) {
     const payload = await context.request.validate(CreateRolePermissionValidator);
 
-    const result = await this.dynamicService.create('RolePermission', payload);
+    const ableToCreate = await utils.checkHasAdminPermission(context.auth.user!.id);
 
-    utils.createAudity('CREATE', 'ROLE_PERMISSION', result.id, context.auth.user?.$attributes.id, null, result);
+    if (!ableToCreate) {
+      return utils.handleError(
+        context,
+        403,
+        'FORBIDDEN',
+        'Você não tem permissão para criar relacionamentos entre papéis e permissões.'
+      );
+    }
 
-    const headers = utils.getHeaders();
+    const result = await this.dynamicService.bulkCreate({
+      modelName: 'RolePermission',
+      records: payload.data,
+      userId: context.auth.user?.$attributes.id,
+    });
 
-    const body = utils.getBody('CREATE_SUCCESS', result);
+    if (result[0].error) {
+      return utils.handleError(context, 400, 'CREATE_ERROR', `${result[0].error}`);
+    }
 
-    utils.getResponse(context, 201, headers, body);
-  }
-
-  public async update(context: HttpContextContract) {
-    const payload = await context.request.validate(UpdateRolePermissionValidator);
-
-    const oldData = await this.dynamicService.getById('RolePermission', payload.id);
-
-    const result = await this.dynamicService.update('RolePermission', payload);
-
-    utils.createAudity(
-      'UPDATE',
-      'ROLE_PERMISSION',
-      result.id,
-      context.auth.user?.$attributes.id,
-      oldData.$attributes,
-      result
-    );
-
-    const headers = utils.getHeaders();
-
-    const body = utils.getBody('UPDATE_SUCCESS', result);
-
-    utils.getResponse(context, 200, headers, body);
+    return utils.handleSuccess(context, result, 'CREATE_SUCCESS', 201);
   }
 
   public async search(context: HttpContextContract) {
-    const payload = await context.request.validate(QueryModelValidator);
+    const query = await context.request.validate(QueryModelValidator);
 
-    const result = await this.dynamicService.searchActives('RolePermission', payload);
+    const result = await this.dynamicService.searchActives('RolePermission', query);
 
-    const headers = utils.getHeaders();
+    return utils.handleSuccess(context, result, 'SEARCH_SUCCESS', 200);
+  }
 
-    const body = utils.getBody('SEARCH_SUCCESS', result);
+  public async delete(context: HttpContextContract) {
+    const id = context.request.params().id;
 
-    utils.getResponse(context, 200, headers, body);
+    const ableToDelete = await utils.checkHasAdminPermission(context.auth.user!.id);
+
+    if (!ableToDelete) {
+      return utils.handleError(
+        context,
+        403,
+        'FORBIDDEN',
+        'Você não tem permissão para excluir relacionamentos entre papéis e permissões.'
+      );
+    }
+
+    const result = await this.dynamicService.delete({
+      modelName: 'RolePermission',
+      record: { id },
+      userId: context.auth.user?.$attributes.id,
+    });
+
+    return utils.handleSuccess(context, result, 'DELETE_SUCCESS', 200);
   }
 }
