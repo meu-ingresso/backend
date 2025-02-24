@@ -14,6 +14,7 @@ import CustomerTicket from 'App/Models/Access/CustomerTickets';
 import EventCollaborator from 'App/Models/Access/EventCollaborators';
 import Event from 'App/Models/Access/Events';
 import EventFee from 'App/Models/Access/EventFees';
+import EventView from 'App/Models/Access/EventViews';
 import Parameter from 'App/Models/Access/Parameters';
 import Payment from 'App/Models/Access/Payments';
 import People from 'App/Models/Access/People';
@@ -41,10 +42,16 @@ import GuestList from 'App/Models/Access/GuestLists';
 import GuestListMember from 'App/Models/Access/GuestListMembers';
 import GuestListMemberValidated from 'App/Models/Access/GuestListMembersValidated';
 
-interface BulkParams {
+interface DynamicParams {
   modelName: string;
   records: Record<string, any>[];
   userId?: string;
+}
+
+interface DeleteParams {
+  modelName: string;
+  record: Record<string, any>;
+  userId: string;
 }
 
 export default class DynamicService {
@@ -58,6 +65,7 @@ export default class DynamicService {
     EventCollaborator,
     Event,
     EventFee,
+    EventView,
     Parameter,
     Payment,
     People,
@@ -125,7 +133,7 @@ export default class DynamicService {
     return model;
   }
 
-  public async bulkCreate({ modelName, records, userId }: BulkParams): Promise<any> {
+  public async bulkCreate({ modelName, records, userId }: DynamicParams): Promise<any> {
     const ModelClass = this.modelMap[modelName];
 
     if (!ModelClass) {
@@ -135,23 +143,27 @@ export default class DynamicService {
     const results = await Database.transaction(async (trx) => {
       const createdRecords: ModelObject[] = [];
 
-      for (const record of records) {
-        const model = new ModelClass().fill(record);
+      try {
+        for (const item of records) {
+          const model = new ModelClass().fill(item);
 
-        model.useTransaction(trx);
+          model.useTransaction(trx);
 
-        await model.save();
+          await model.save();
 
-        await this.auditService.create(
-          'CREATE',
-          modelName.toUpperCase(),
-          model.$attributes.id,
-          userId,
-          null,
-          model.$attributes
-        );
+          this.auditService.create(
+            'CREATE',
+            modelName.toUpperCase(),
+            model.$attributes.id,
+            userId,
+            null,
+            model.$attributes
+          );
 
-        createdRecords.push(model);
+          createdRecords.push(model);
+        }
+      } catch (error) {
+        return [{ error: error.detail || error.message || 'Erro ao criar os registros.' }];
       }
 
       return createdRecords;
@@ -160,7 +172,7 @@ export default class DynamicService {
     return results;
   }
 
-  public async bulkUpdate({ modelName, records, userId }: BulkParams): Promise<any> {
+  public async bulkUpdate({ modelName, records, userId }: DynamicParams): Promise<any> {
     const ModelClass = this.modelMap[modelName];
 
     if (!ModelClass) {
@@ -170,17 +182,17 @@ export default class DynamicService {
     const results = await Database.transaction(async (trx) => {
       const updatedRecords: ModelObject[] = [];
 
-      for (const record of records) {
-        const model = await ModelClass.findOrFail(record.id);
+      for (const item of records) {
+        const model = await ModelClass.findOrFail(item.id);
         const oldData = { ...model.$attributes };
 
         model.useTransaction(trx);
 
-        model.merge({ ...record });
+        model.merge({ ...item });
 
         await model.save();
 
-        await this.auditService.create(
+        this.auditService.create(
           'UPDATE',
           modelName.toUpperCase(),
           model.$attributes.id,
@@ -252,14 +264,16 @@ export default class DynamicService {
     return await dataAccessService.search(query);
   }
 
-  public async softDelete(dynamicModel: string, record: Record<string, any>): Promise<any> {
-    const ModelClass = this.modelMap[dynamicModel];
+  public async softDelete({ modelName, record, userId }: DeleteParams): Promise<any> {
+    const ModelClass = this.modelMap[modelName];
 
     if (!ModelClass) {
-      throw new Error(`Model ${dynamicModel} not found`);
+      throw new Error(`Model ${modelName} not found`);
     }
 
     const model = await ModelClass.findOrFail(record.id);
+
+    const oldData = { ...model.$attributes };
 
     record.deleted_at = DateTime.now().setZone('America/Sao_Paulo');
 
@@ -269,23 +283,37 @@ export default class DynamicService {
       model.merge({ ...record });
 
       await model.save();
+
+      this.auditService.create(
+        'DELETE',
+        modelName.toUpperCase(),
+        model.$attributes.id,
+        userId,
+        oldData,
+        model.$attributes
+      );
     });
 
     return model;
   }
 
-  public async delete(dynamicModel: string, record: Record<string, any>): Promise<any> {
-    const ModelClass = this.modelMap[dynamicModel];
+  public async delete({ modelName, record, userId }: DeleteParams): Promise<any> {
+    const ModelClass = this.modelMap[modelName];
 
     if (!ModelClass) {
-      throw new Error(`Model ${dynamicModel} not found`);
+      throw new Error(`Model ${modelName} not found`);
     }
 
     const model = await ModelClass.findOrFail(record.id);
+    const oldData = { ...model.$attributes };
 
     await Database.transaction(async (trx) => {
       model.useTransaction(trx);
       await model.delete();
+
+      this.auditService.create('DELETE', modelName.toUpperCase(), model.$attributes.id, userId, oldData, null);
     });
+
+    return model;
   }
 }
