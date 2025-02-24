@@ -42,7 +42,7 @@ export default class TicketFieldsController {
   public async search(context: HttpContextContract) {
     const query = await context.request.validate(QueryModelValidator);
 
-    const result = await this.dynamicService.searchActives('TicketField', query);
+    const result = await this.dynamicService.search('TicketField', query);
 
     const resultByRole = await utils.getInfosByRole(context.auth.user!.id, result, 'TicketField');
 

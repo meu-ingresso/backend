@@ -45,7 +45,7 @@ export default class TicketEventCategoriesController {
   public async search(context: HttpContextContract) {
     const query = await context.request.validate(QueryModelValidator);
 
-    const result = await this.dynamicService.searchActives('TicketEventCategory', query);
+    const result = await this.dynamicService.search('TicketEventCategory', query);
 
     const resultByRole = await utils.getInfosByRole(context.auth.user!.id, result, 'TicketEventCategory');
 

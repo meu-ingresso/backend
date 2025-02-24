@@ -42,7 +42,7 @@ export default class CitiesController {
   public async search(context: HttpContextContract) {
     const query = await context.request.validate(QueryModelValidator);
 
-    const result = await this.dynamicService.searchActives('City', query);
+    const result = await this.dynamicService.search('City', query);
 
     return utils.handleSuccess(context, result, 'SEARCH_SUCCESS', 200);
   }

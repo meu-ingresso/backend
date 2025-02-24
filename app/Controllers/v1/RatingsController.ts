@@ -42,7 +42,7 @@ export default class RatingsController {
   public async search(context: HttpContextContract) {
     const query = await context.request.validate(QueryModelValidator);
 
-    const result = await this.dynamicService.searchActives('Rating', query);
+    const result = await this.dynamicService.search('Rating', query);
 
     return utils.handleSuccess(context, result, 'SEARCH_SUCCESS', 200);
   }

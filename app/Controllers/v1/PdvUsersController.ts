@@ -42,7 +42,7 @@ export default class PdvUsersController {
   public async search(context: HttpContextContract) {
     const query = await context.request.validate(QueryModelValidator);
 
-    const result = await this.dynamicService.searchActives('PdvUser', query);
+    const result = await this.dynamicService.search('PdvUser', query);
 
     return utils.handleSuccess(context, result, 'SEARCH_SUCCESS', 200);
   }

@@ -42,7 +42,7 @@ export default class PaymentsController {
   public async search(context: HttpContextContract) {
     const query = await context.request.validate(QueryModelValidator);
 
-    const result = await this.dynamicService.searchActives('Payment', query);
+    const result = await this.dynamicService.search('Payment', query);
 
     return utils.handleSuccess(context, result, 'SEARCH_SUCCESS', 200);
   }

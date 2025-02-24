@@ -42,7 +42,7 @@ export default class CategoriesController {
   public async search(context: HttpContextContract) {
     const query = await context.request.validate(QueryModelValidator);
 
-    const result = await this.dynamicService.searchActives('Category', query);
+    const result = await this.dynamicService.search('Category', query);
 
     return utils.handleSuccess(context, result, 'SEARCH_SUCCESS', 200);
   }

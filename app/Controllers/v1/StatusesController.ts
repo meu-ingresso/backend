@@ -54,7 +54,7 @@ export default class StatusesController {
   public async search(context: HttpContextContract) {
     const query = await context.request.validate(QueryModelValidator);
 
-    const result = await this.dynamicService.searchActives('Status', query);
+    const result = await this.dynamicService.search('Status', query);
 
     return utils.handleSuccess(context, result, 'SEARCH_SUCCESS', 200);
   }

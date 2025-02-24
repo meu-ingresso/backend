@@ -224,39 +224,7 @@ export default class DynamicService {
     return await ModelClass.findOrFail(id);
   }
 
-  public async searchActives(dynamicModel: string, query?: any): Promise<{ meta?: any; data: ModelObject[] }> {
-    const ModelClass = this.modelMap[dynamicModel];
-
-    if (!ModelClass) {
-      throw new Error(`Model ${dynamicModel} not found`);
-    }
-
-    const dataAccessService = new DataAccessService<typeof ModelClass>(ModelClass);
-
-    return await dataAccessService.search(query);
-  }
-
-  public async searchInactives(dynamicModel: string, query?: any): Promise<{ meta?: any; data: ModelObject[] }> {
-    const ModelClass = this.modelMap[dynamicModel];
-
-    if (!ModelClass) {
-      throw new Error(`Model ${dynamicModel} not found`);
-    }
-
-    const dataAccessService = new DataAccessService<typeof ModelClass>(ModelClass);
-
-    const result = await dataAccessService.search(query);
-
-    result.data = result.data.filter((item) => item.deleted_at);
-
-    if (result.meta) {
-      result.meta.total = result.data.length;
-    }
-
-    return result;
-  }
-
-  public async searchAll(dynamicModel: string, query?: any): Promise<{ meta?: any; data: ModelObject[] }> {
+  public async search(dynamicModel: string, query?: any): Promise<{ meta?: any; data: ModelObject[] }> {
     const ModelClass = this.modelMap[dynamicModel];
 
     if (!ModelClass) {
