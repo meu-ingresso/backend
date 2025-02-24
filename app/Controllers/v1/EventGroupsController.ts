@@ -1,17 +1,17 @@
 import { HttpContextContract } from '@ioc:Adonis/Core/HttpContext';
 import QueryModelValidator from 'App/Validators/v1/QueryModelValidator';
-import { CreateCouponTicketValidator } from 'App/Validators/v1/CouponsTicketsValidator';
+import { CreateEventGroupValidator } from 'App/Validators/v1/EventGroupsValidator';
 import DynamicService from 'App/Services/v1/DynamicService';
 import utils from 'Utils/utils';
 
-export default class CouponsTicketsController {
+export default class EventGroupsController {
   private dynamicService: DynamicService = new DynamicService();
 
   public async create(context: HttpContextContract) {
-    const payload = await context.request.validate(CreateCouponTicketValidator);
+    const payload = await context.request.validate(CreateEventGroupValidator);
 
     const result = await this.dynamicService.bulkCreate({
-      modelName: 'CouponsTickets',
+      modelName: 'EventGroup',
       records: payload.data,
       userId: context.auth.user?.$attributes.id,
     });
@@ -26,18 +26,16 @@ export default class CouponsTicketsController {
   public async search(context: HttpContextContract) {
     const query = await context.request.validate(QueryModelValidator);
 
-    const result = await this.dynamicService.search('CouponsTickets', query);
+    const result = await this.dynamicService.search('EventGroup', query);
 
-    const resultByRole = await utils.getInfosByRole(context.auth.user!.id, result, 'CouponsTickets');
-
-    return utils.handleSuccess(context, resultByRole, 'SEARCH_SUCCESS', 200);
+    return utils.handleSuccess(context, result, 'SEARCH_SUCCESS', 200);
   }
 
   public async delete(context: HttpContextContract) {
     const id = context.request.params().id;
 
     const result = await this.dynamicService.delete({
-      modelName: 'CouponsTickets',
+      modelName: 'EventGroup',
       record: { id },
       userId: context.auth.user?.$attributes.id,
     });

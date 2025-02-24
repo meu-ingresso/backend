@@ -198,9 +198,18 @@ export default class Query<T> {
           }
         }
       } else {
-        builder.whereHas(whereHas[0], (subQuery: any) =>
-          this.queryWhereHasRecursive(subQuery, Object.entries(whereHas[1]))
-        );
+        builder.whereHas(whereHas[0], (subQuery: any) => {
+          const subWhereHas = Object.entries(whereHas[1]);
+          const tableName = subQuery.model.table;
+
+          // Verifica se é um campo direto da tabela
+          if (subWhereHas.length === 1 && typeof subWhereHas[0][1] === 'string') {
+            const [field, value] = subWhereHas[0];
+            subQuery.where(`${tableName}.${field}`, value);
+          } else {
+            this.queryWhereHasRecursive(subQuery, subWhereHas);
+          }
+        });
       }
     }
 

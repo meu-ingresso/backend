@@ -34,7 +34,7 @@ export default class EventCheckoutFieldsTicketsController {
   public async delete(context: HttpContextContract) {
     const id = context.request.params().id;
 
-    const result = await this.dynamicService.softDelete({
+    const result = await this.dynamicService.delete({
       modelName: 'EventCheckoutFieldTicket',
       record: { id },
       userId: context.auth.user?.$attributes.id,
