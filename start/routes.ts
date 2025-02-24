@@ -96,6 +96,14 @@ Route.group(() => {
     Route.patch('/event-fee', 'v1/EventFeesController.update');
     Route.delete('/event-fee/:id', 'v1/EventFeesController.delete');
 
+    Route.get('/event-groups', 'v1/EventGroupsController.search');
+    Route.post('/event-group', 'v1/EventGroupsController.create');
+    Route.delete('/event-group/:id', 'v1/EventGroupsController.delete');
+
+    Route.get('/event-group-relations', 'v1/EventGroupRelationsController.search');
+    Route.post('/event-group-relation', 'v1/EventGroupRelationsController.create');
+    Route.delete('/event-group-relation/:id', 'v1/EventGroupRelationsController.delete');
+
     Route.get('/event-attachments', 'v1/EventAttachmentsController.search');
     Route.post('/event-attachment', 'v1/EventAttachmentsController.create');
     Route.patch('/event-attachment', 'v1/EventAttachmentsController.update');
