@@ -1,7 +1,6 @@
 import { schema, rules } from '@ioc:Adonis/Core/Validator';
 import { HttpContextContract } from '@ioc:Adonis/Core/HttpContext';
 import ReportHandler from './Reporters/ReportHandler';
-import Database from '@ioc:Adonis/Lucid/Database';
 
 class CreateCouponValidator {
   constructor(protected context: HttpContextContract) {}
@@ -13,19 +12,7 @@ class CreateCouponValidator {
       schema.object().members({
         event_id: schema.string({}, [rules.exists({ table: 'events', column: 'id' })]),
         status_id: schema.string({}, [rules.exists({ table: 'statuses', column: 'id' })]),
-        code: schema.string({}, [
-          rules.unique({
-            table: 'coupons',
-            column: 'code',
-            where: async (db, _, field) => {
-              const index = parseInt(field.split('.')[1]);
-              const id = this.context.request.input(`data.${index}.id`);
-              const eventId = this.context.request.input(`data.${index}.event_id`) || (await this.getCouponEventId(id));
-
-              db.where('event_id', eventId).whereNull('deleted_at');
-            },
-          }),
-        ]),
+        code: schema.string(),
         discount_type: schema.enum(['PERCENTAGE', 'FIXED']),
         discount_value: schema.number(),
         start_date: schema.date.optional(),
@@ -60,34 +47,13 @@ class UpdateCouponValidator {
 
   public reporter = ReportHandler;
 
-  private async getCouponEventId(couponId: string): Promise<string | null> {
-    const coupon = await Database.from('coupons').where('id', couponId).first();
-    return coupon?.event_id || null;
-  }
-
   public schema = schema.create({
     data: schema.array().members(
       schema.object().members({
         id: schema.string({}, [rules.exists({ table: 'coupons', column: 'id' })]),
         event_id: schema.string.optional({}, [rules.exists({ table: 'events', column: 'id' })]),
         status_id: schema.string.optional({}, [rules.exists({ table: 'statuses', column: 'id' })]),
-        code: schema.string.optional({}, [
-          rules.unique({
-            table: 'coupons',
-            column: 'code',
-            whereNot: (db, _, field) => {
-              const index = parseInt(field.split('.')[1]);
-              const id = this.context.request.input(`data.${index}.id`);
-              db.whereNot('id', id);
-            },
-            where: async (db, _, field) => {
-              const index = parseInt(field.split('.')[1]);
-              const eventId = this.context.request.input(`data.${index}.event_id`);
-
-              db.where('event_id', eventId).whereNull('deleted_at');
-            },
-          }),
-        ]),
+        code: schema.string.optional(),
         discount_type: schema.enum.optional(['PERCENTAGE', 'FIXED']),
         discount_value: schema.number.optional(),
         start_date: schema.date.optional(),
