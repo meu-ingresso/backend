@@ -10,6 +10,8 @@ import {
   BelongsTo,
   hasOne,
   HasOne,
+  manyToMany,
+  ManyToMany,
 } from '@ioc:Adonis/Lucid/Orm';
 import Tickets from './Tickets';
 import EventCheckoutFields from './EventCheckoutFields';
@@ -25,6 +27,7 @@ import Promoters from './Users';
 import Coupons from './Coupons';
 import Pdv from './Pdvs';
 import GuestLists from './GuestLists';
+import EventGroups from './EventGroups';
 
 export default class Events extends BaseModel {
   @column({ isPrimary: true })
@@ -131,6 +134,13 @@ export default class Events extends BaseModel {
 
   @hasOne(() => EventFees, { foreignKey: 'event_id' })
   public fees: HasOne<typeof EventFees>;
+
+  @manyToMany(() => EventGroups, {
+    pivotTable: 'event_group_relations',
+    pivotForeignKey: 'event_id',
+    pivotRelatedForeignKey: 'group_id',
+  })
+  public groups: ManyToMany<typeof EventGroups>;
 
   @hasMany(() => EventCollaborators, { foreignKey: 'event_id' })
   public collaborators: HasMany<typeof EventCollaborators>;

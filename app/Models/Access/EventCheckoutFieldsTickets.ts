@@ -20,9 +20,6 @@ export default class EventCheckoutFieldsTickets extends BaseModel {
   @column.dateTime({ autoCreate: true, autoUpdate: true })
   public updated_at: DateTime;
 
-  @column.dateTime()
-  public deleted_at: DateTime | null;
-
   @belongsTo(() => EventCheckoutFields, {
     foreignKey: 'event_checkout_field_id',
   })

@@ -41,6 +41,8 @@ import PdvUser from 'App/Models/Access/PdvUsers';
 import GuestList from 'App/Models/Access/GuestLists';
 import GuestListMember from 'App/Models/Access/GuestListMembers';
 import GuestListMemberValidated from 'App/Models/Access/GuestListMembersValidated';
+import EventGroup from 'App/Models/Access/EventGroups';
+import EventGroupRelation from 'App/Models/Access/EventGroupRelations';
 
 interface DynamicParams {
   modelName: string;
@@ -92,6 +94,8 @@ export default class DynamicService {
     GuestList,
     GuestListMember,
     GuestListMemberValidated,
+    EventGroup,
+    EventGroupRelation,
   };
 
   private auditService: AuditService = new AuditService();
