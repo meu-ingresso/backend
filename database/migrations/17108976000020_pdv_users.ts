@@ -9,8 +9,6 @@ export default class PdvUsersSchema extends BaseSchema {
       table.uuid('pdv_id').notNullable().references('id').inTable('pdvs').onDelete('CASCADE');
       table.uuid('user_id').notNullable().references('id').inTable('users').onDelete('CASCADE');
       table.timestamp('created_at', { useTz: true }).notNullable().defaultTo(this.now());
-      table.timestamp('updated_at', { useTz: true }).notNullable().defaultTo(this.now());
-      table.timestamp('deleted_at', { useTz: true }).nullable();
     });
   }
 

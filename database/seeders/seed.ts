@@ -241,12 +241,12 @@ export default class DatabaseSeeder extends BaseSeeder {
         module: 'event',
       },
       { id: uuidv4(), name: 'Aprovado', description: 'Pagamento Aprovado', module: 'payment' },
-      { id: uuidv4(), name: 'Disponível', description: 'Disponível para check-in', module: 'ticket' },
+      { id: uuidv4(), name: 'Disponível', description: 'Disponível para check-in', module: 'customer_ticket' },
       {
         id: uuidv4(),
         name: 'Validado',
         description: 'Indisponível para uso; Ingresso já validado na portaria',
-        module: 'ticket',
+        module: 'customer_ticket',
       },
       { id: uuidv4(), name: 'Disponível', description: 'Cupom Disponível para uso', module: 'coupon' },
       { id: uuidv4(), name: 'Esgotado', description: 'Cupom Indisponível para uso', module: 'coupon' },
@@ -255,6 +255,9 @@ export default class DatabaseSeeder extends BaseSeeder {
       { id: uuidv4(), name: 'Lida', description: 'Notificação lida', module: 'notification' },
       { id: uuidv4(), name: 'Disponível', description: 'PDV Disponível para uso', module: 'pdv' },
       { id: uuidv4(), name: 'Fechado', description: 'PDV Fechado', module: 'pdv' },
+      { id: uuidv4(), name: 'Pendente', description: 'Pagamento Pendente', module: 'payment' },
+      { id: uuidv4(), name: 'Cancelado', description: 'Pagamento Cancelado', module: 'payment' },
+      { id: uuidv4(), name: 'Estornado', description: 'Pagamento Estornado', module: 'payment' },
     ]);
 
     console.log('Statuses created');

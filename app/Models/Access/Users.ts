@@ -1,12 +1,22 @@
 import { DateTime } from 'luxon';
 import { v4 as uuidv4 } from 'uuid';
-import { BaseModel, column, beforeCreate, belongsTo, BelongsTo, hasMany, HasMany } from '@ioc:Adonis/Lucid/Orm';
+import {
+  BaseModel,
+  column,
+  beforeCreate,
+  belongsTo,
+  BelongsTo,
+  hasMany,
+  HasMany,
+  beforeSave,
+} from '@ioc:Adonis/Lucid/Orm';
 import Roles from './Roles';
 import Tokens from './Tokens';
 import Events from './Events';
 import People from './People';
 import Notifications from './Notifications';
 import PdvUsers from './PdvUsers';
+import Hash from '@ioc:Adonis/Core/Hash';
 
 export default class Users extends BaseModel {
   @column({ isPrimary: true })
@@ -19,7 +29,7 @@ export default class Users extends BaseModel {
   public alias: string | null;
 
   @column({ serializeAs: null })
-  public password: string | null;
+  public password: string;
 
   @column()
   public role_id: string | null;
@@ -72,5 +82,12 @@ export default class Users extends BaseModel {
   @beforeCreate()
   public static assignUuid(user: Users) {
     user.id = uuidv4();
+  }
+
+  @beforeSave()
+  public static async hashPassword(user: Users) {
+    if (user.$dirty.password) {
+      user.password = await Hash.make(user.password);
+    }
   }
 }

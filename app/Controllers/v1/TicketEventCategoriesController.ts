@@ -13,74 +13,50 @@ export default class TicketEventCategoriesController {
   public async create(context: HttpContextContract) {
     const payload = await context.request.validate(CreateTicketEventCategoryValidator);
 
-    const result = await this.dynamicService.create('TicketEventCategory', payload);
+    const result = await this.dynamicService.bulkCreate({
+      modelName: 'TicketEventCategory',
+      records: payload.data,
+      userId: context.auth.user?.$attributes.id,
+    });
 
-    utils.createAudity('CREATE', 'TICKET_EVENT_CATEGORY', result.id, context.auth.user?.$attributes.id, null, result);
+    if (result[0].error) {
+      return utils.handleError(context, 400, 'CREATE_ERROR', `${result[0].error}`);
+    }
 
-    const headers = utils.getHeaders();
-
-    const body = utils.getBody('CREATE_SUCCESS', result);
-
-    utils.getResponse(context, 201, headers, body);
+    return utils.handleSuccess(context, result, 'CREATE_SUCCESS', 201);
   }
 
   public async update(context: HttpContextContract) {
     const payload = await context.request.validate(UpdateTicketEventCategoryValidator);
 
-    const oldData = await this.dynamicService.getById('TicketEventCategory', payload.id);
+    const result = await this.dynamicService.bulkUpdate({
+      modelName: 'TicketEventCategory',
+      records: payload.data,
+      userId: context.auth.user?.$attributes.id,
+    });
 
-    const result = await this.dynamicService.update('TicketEventCategory', payload);
-
-    utils.createAudity(
-      'UPDATE',
-      'TICKET_EVENT_CATEGORY',
-      result.id,
-      context.auth.user?.$attributes.id,
-      oldData.$attributes,
-      result
-    );
-
-    const headers = utils.getHeaders();
-
-    const body = utils.getBody('UPDATE_SUCCESS', result);
-
-    utils.getResponse(context, 200, headers, body);
+    return utils.handleSuccess(context, result, 'UPDATE_SUCCESS', 200);
   }
 
   public async search(context: HttpContextContract) {
-    const payload = await context.request.validate(QueryModelValidator);
+    const query = await context.request.validate(QueryModelValidator);
 
-    const result = await this.dynamicService.searchActives('TicketEventCategory', payload);
+    const result = await this.dynamicService.searchActives('TicketEventCategory', query);
 
     const resultByRole = await utils.getInfosByRole(context.auth.user!.id, result, 'TicketEventCategory');
 
-    const headers = utils.getHeaders();
-
-    const body = utils.getBody('SEARCH_SUCCESS', resultByRole);
-
-    utils.getResponse(context, 200, headers, body);
+    return utils.handleSuccess(context, resultByRole, 'SEARCH_SUCCESS', 200);
   }
 
   public async delete(context: HttpContextContract) {
     const id = context.request.params().id;
 
-    const oldData = await this.dynamicService.getById('TicketEventCategory', id);
+    const result = await this.dynamicService.softDelete({
+      modelName: 'TicketEventCategory',
+      record: { id },
+      userId: context.auth.user?.$attributes.id,
+    });
 
-    const result = await this.dynamicService.softDelete('TicketEventCategory', { id });
-
-    utils.createAudity(
-      'DELETE',
-      'TICKET_EVENT_CATEGORY',
-      id,
-      context.auth.user?.$attributes.id,
-      oldData.$attributes,
-      result
-    );
-
-    const headers = utils.getHeaders();
-
-    const body = utils.getBody('DELETE_SUCCESS', result);
-
-    utils.getResponse(context, 200, headers, body);
+    return utils.handleSuccess(context, result, 'DELETE_SUCCESS', 200);
   }
 }

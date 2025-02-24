@@ -10,58 +10,48 @@ export default class RatingsController {
   public async create(context: HttpContextContract) {
     const payload = await context.request.validate(CreateRatingValidator);
 
-    const result = await this.dynamicService.create('Rating', payload);
+    const result = await this.dynamicService.bulkCreate({
+      modelName: 'Rating',
+      records: payload.data,
+      userId: context.auth.user?.$attributes.id,
+    });
 
-    utils.createAudity('CREATE', 'RATING', result.id, context.auth.user?.$attributes.id, null, result);
+    if (result[0].error) {
+      return utils.handleError(context, 400, 'CREATE_ERROR', `${result[0].error}`);
+    }
 
-    const headers = utils.getHeaders();
-
-    const body = utils.getBody('CREATE_SUCCESS', result);
-
-    utils.getResponse(context, 201, headers, body);
+    return utils.handleSuccess(context, result, 'CREATE_SUCCESS', 201);
   }
 
   public async update(context: HttpContextContract) {
     const payload = await context.request.validate(UpdateRatingValidator);
 
-    const oldData = await this.dynamicService.getById('Rating', payload.id);
+    const result = await this.dynamicService.bulkUpdate({
+      modelName: 'Rating',
+      records: payload.data,
+      userId: context.auth.user?.$attributes.id,
+    });
 
-    const result = await this.dynamicService.update('Rating', payload);
-
-    utils.createAudity('UPDATE', 'RATING', result.id, context.auth.user?.$attributes.id, oldData.$attributes, result);
-
-    const headers = utils.getHeaders();
-
-    const body = utils.getBody('UPDATE_SUCCESS', result);
-
-    utils.getResponse(context, 200, headers, body);
+    return utils.handleSuccess(context, result, 'UPDATE_SUCCESS', 200);
   }
 
   public async search(context: HttpContextContract) {
-    const payload = await context.request.validate(QueryModelValidator);
+    const query = await context.request.validate(QueryModelValidator);
 
-    const result = await this.dynamicService.searchActives('Rating', payload);
+    const result = await this.dynamicService.searchActives('Rating', query);
 
-    const headers = utils.getHeaders();
-
-    const body = utils.getBody('SEARCH_SUCCESS', result);
-
-    utils.getResponse(context, 200, headers, body);
+    return utils.handleSuccess(context, result, 'SEARCH_SUCCESS', 200);
   }
 
   public async delete(context: HttpContextContract) {
     const id = context.request.params().id;
 
-    const oldData = await this.dynamicService.getById('Rating', id);
+    const result = await this.dynamicService.softDelete({
+      modelName: 'Rating',
+      record: { id },
+      userId: context.auth.user?.$attributes.id,
+    });
 
-    const result = await this.dynamicService.softDelete('Rating', { id });
-
-    utils.createAudity('DELETE', 'RATING', id, context.auth.user?.$attributes.id, oldData.$attributes, result);
-
-    const headers = utils.getHeaders();
-
-    const body = utils.getBody('DELETE_SUCCESS', result);
-
-    utils.getResponse(context, 200, headers, body);
+    return utils.handleSuccess(context, result, 'DELETE_SUCCESS', 200);
   }
 }

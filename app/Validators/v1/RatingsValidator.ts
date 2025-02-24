@@ -1,4 +1,4 @@
-import { schema } from '@ioc:Adonis/Core/Validator';
+import { schema, rules } from '@ioc:Adonis/Core/Validator';
 import { HttpContextContract } from '@ioc:Adonis/Core/HttpContext';
 import ReportHandler from './Reporters/ReportHandler';
 
@@ -8,16 +8,31 @@ class CreateRatingValidator {
   public reporter = ReportHandler;
 
   public schema = schema.create({
-    name: schema.string(),
-    description: schema.string.optional(),
-    image: schema.string.optional(),
+    data: schema.array().members(
+      schema.object().members({
+        name: schema.string({ trim: true }, [
+          rules.unique({
+            table: 'ratings',
+            column: 'name',
+            where: {
+              deleted_at: null,
+            },
+          }),
+        ]),
+        description: schema.string.optional({ trim: true }),
+        image: schema.string.optional({ trim: true }),
+      })
+    ),
   });
 
   public messages = {
-    'name.required': 'O campo "name" é obrigatório.',
-    'name.string': 'O campo "name" deve ser uma string válida.',
-    'description.string': 'O campo "description" deve ser uma string válida.',
-    'image.string': 'O campo "image" deve ser uma string válida.',
+    'data.required': 'O campo "data" é obrigatório.',
+    'data.array': 'O campo data deve ser um array.',
+    'data.*.name.required': 'O campo "name" é obrigatório.',
+    'data.*.name.string': 'O campo "name" deve ser uma string válida.',
+    'data.*.name.unique': 'Já existe uma classificação com este nome.',
+    'data.*.description.string': 'O campo "description" deve ser uma string válida.',
+    'data.*.image.string': 'O campo "image" deve ser uma string válida.',
   };
 }
 
@@ -27,18 +42,38 @@ class UpdateRatingValidator {
   public reporter = ReportHandler;
 
   public schema = schema.create({
-    id: schema.string(),
-    name: schema.string.optional(),
-    description: schema.string.optional(),
-    image: schema.string.optional(),
+    data: schema.array().members(
+      schema.object().members({
+        id: schema.string({ trim: true }, [rules.exists({ table: 'ratings', column: 'id' })]),
+        name: schema.string.optional({ trim: true }, [
+          rules.unique({
+            table: 'ratings',
+            column: 'name',
+            where: {
+              deleted_at: null,
+            },
+            whereNot: (db, _, field) => {
+              const index = parseInt(field.split('.')[1]);
+              const id = this.context.request.input(`data.${index}.id`);
+              db.whereNot('id', id);
+            },
+          }),
+        ]),
+        description: schema.string.optional({ trim: true }),
+        image: schema.string.optional({ trim: true }),
+      })
+    ),
   });
 
   public messages = {
-    'id.required': 'O campo "id" é obrigatório.',
-    'id.string': 'O campo "id" deve ser uma string válida.',
-    'name.string': 'O campo "name" deve ser uma string válida.',
-    'description.string': 'O campo "description" deve ser uma string válida.',
-    'image.string': 'O campo "image" deve ser uma string válida.',
+    'data.required': 'O campo "data" é obrigatório.',
+    'data.array': 'O campo data deve ser um array.',
+    'data.*.id.required': 'O campo "id" é obrigatório.',
+    'data.*.id.exists': 'A classificação especificada não existe.',
+    'data.*.name.string': 'O campo "name" deve ser uma string válida.',
+    'data.*.name.unique': 'Já existe uma classificação com este nome.',
+    'data.*.description.string': 'O campo "description" deve ser uma string válida.',
+    'data.*.image.string': 'O campo "image" deve ser uma string válida.',
   };
 }
 

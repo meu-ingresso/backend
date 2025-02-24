@@ -9,7 +9,6 @@ export default class RolePermissionsSchema extends BaseSchema {
       table.uuid('role_id').notNullable().references('id').inTable('roles').onDelete('CASCADE');
       table.uuid('permission_id').notNullable().references('id').inTable('permissions').onDelete('CASCADE');
       table.timestamp('created_at', { useTz: true }).defaultTo(this.now());
-      table.timestamp('updated_at', { useTz: true }).defaultTo(this.now());
     });
   }
 

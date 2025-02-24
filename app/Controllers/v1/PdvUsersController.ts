@@ -10,58 +10,48 @@ export default class PdvUsersController {
   public async create(context: HttpContextContract) {
     const payload = await context.request.validate(CreatePdvUsersValidator);
 
-    const result = await this.dynamicService.create('PdvUser', payload);
+    const result = await this.dynamicService.bulkCreate({
+      modelName: 'PdvUser',
+      records: payload.data,
+      userId: context.auth.user?.$attributes.id,
+    });
 
-    utils.createAudity('CREATE', 'PDV_USER', result.id, context.auth.user?.$attributes.id, null, result);
+    if (result[0].error) {
+      return utils.handleError(context, 400, 'CREATE_ERROR', `${result[0].error}`);
+    }
 
-    const headers = utils.getHeaders();
-
-    const body = utils.getBody('CREATE_SUCCESS', result);
-
-    utils.getResponse(context, 201, headers, body);
+    return utils.handleSuccess(context, result, 'CREATE_SUCCESS', 201);
   }
 
   public async update(context: HttpContextContract) {
     const payload = await context.request.validate(UpdatePdvUsersValidator);
 
-    const oldData = await this.dynamicService.getById('PdvUser', payload.id);
+    const result = await this.dynamicService.bulkUpdate({
+      modelName: 'PdvUser',
+      records: payload.data,
+      userId: context.auth.user?.$attributes.id,
+    });
 
-    const result = await this.dynamicService.update('PdvUser', payload);
-
-    utils.createAudity('UPDATE', 'PDV_USER', result.id, context.auth.user?.$attributes.id, oldData.$attributes, result);
-
-    const headers = utils.getHeaders();
-
-    const body = utils.getBody('UPDATE_SUCCESS', result);
-
-    utils.getResponse(context, 200, headers, body);
+    return utils.handleSuccess(context, result, 'UPDATE_SUCCESS', 200);
   }
 
   public async search(context: HttpContextContract) {
-    const payload = await context.request.validate(QueryModelValidator);
+    const query = await context.request.validate(QueryModelValidator);
 
-    const result = await this.dynamicService.searchActives('PdvUser', payload);
+    const result = await this.dynamicService.searchActives('PdvUser', query);
 
-    const headers = utils.getHeaders();
-
-    const body = utils.getBody('SEARCH_SUCCESS', result);
-
-    utils.getResponse(context, 200, headers, body);
+    return utils.handleSuccess(context, result, 'SEARCH_SUCCESS', 200);
   }
 
   public async delete(context: HttpContextContract) {
     const id = context.request.params().id;
 
-    const oldData = await this.dynamicService.getById('PdvUser', id);
+    const result = await this.dynamicService.delete({
+      modelName: 'PdvUser',
+      record: { id },
+      userId: context.auth.user?.$attributes.id,
+    });
 
-    const result = await this.dynamicService.softDelete('PdvUser', { id });
-
-    utils.createAudity('DELETE', 'PDV_USER', id, context.auth.user?.$attributes.id, oldData.$attributes, result);
-
-    const headers = utils.getHeaders();
-
-    const body = utils.getBody('DELETE_SUCCESS', result);
-
-    utils.getResponse(context, 200, headers, body);
+    return utils.handleSuccess(context, result, 'DELETE_SUCCESS', 200);
   }
 }

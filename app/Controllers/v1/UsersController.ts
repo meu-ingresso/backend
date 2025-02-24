@@ -10,51 +10,50 @@ export default class UsersController {
   public async create(context: HttpContextContract) {
     const payload = await context.request.validate(CreateUserValidator);
 
-    const result = await this.dynamicService.create('User', payload);
+    const result = await this.dynamicService.bulkCreate({
+      modelName: 'User',
+      records: payload.data,
+      userId: context.auth.user?.$attributes.id,
+    });
 
-    utils.createAudity('CREATE', 'USER', result.id, context.auth.user?.$attributes.id, null, result);
+    if (result[0].error) {
+      return utils.handleError(context, 400, 'CREATE_ERROR', `${result[0].error}`);
+    }
 
-    const headers = utils.getHeaders();
+    utils.createAudity('CREATE', 'USER', result[0].id, context.auth.user?.$attributes.id, null, result);
 
-    const body = utils.getBody('CREATE_SUCCESS', result);
-
-    utils.getResponse(context, 201, headers, body);
+    return utils.handleSuccess(context, result, 'CREATE_SUCCESS', 201);
   }
 
   public async update(context: HttpContextContract) {
     const payload = await context.request.validate(UpdateUserValidator);
 
-    const oldData = await this.dynamicService.getById('User', payload.id);
+    const oldData = await this.dynamicService.getById('User', payload.data[0].id);
 
     const ableToUpdate = await utils.checkHasAdminPermission(context.auth.user!.id);
-
     const isOwnUser = oldData.id === context.auth.user!.id;
 
     if (!ableToUpdate && !isOwnUser) {
-      return utils.getResponse(context, 403, utils.getHeaders(), utils.getBody('FORBIDDEN', null));
+      return utils.handleError(context, 403, 'FORBIDDEN', 'ACCESS_DENIED');
     }
 
-    const result = await this.dynamicService.update('User', payload);
+    const result = await this.dynamicService.bulkUpdate({
+      modelName: 'User',
+      records: payload.data,
+      userId: context.auth.user?.$attributes.id,
+    });
 
-    utils.createAudity('UPDATE', 'USER', result.id, context.auth.user?.$attributes.id, oldData.$attributes, result);
+    utils.createAudity('UPDATE', 'USER', result[0].id, context.auth.user?.$attributes.id, oldData.$attributes, result);
 
-    const headers = utils.getHeaders();
-
-    const body = utils.getBody('UPDATE_SUCCESS', result);
-
-    utils.getResponse(context, 200, headers, body);
+    return utils.handleSuccess(context, result, 'UPDATE_SUCCESS', 200);
   }
 
   public async search(context: HttpContextContract) {
-    const payload = await context.request.validate(QueryModelValidator);
+    const query = await context.request.validate(QueryModelValidator);
 
-    const result = await this.dynamicService.searchActives('User', payload);
+    const result = await this.dynamicService.searchActives('User', query);
 
-    const headers = utils.getHeaders();
-
-    const body = utils.getBody('SEARCH_SUCCESS', result);
-
-    utils.getResponse(context, 200, headers, body);
+    return utils.handleSuccess(context, result, 'SEARCH_SUCCESS', 200);
   }
 
   public async delete(context: HttpContextContract) {
@@ -63,21 +62,20 @@ export default class UsersController {
     const oldData = await this.dynamicService.getById('User', id);
 
     const ableToDelete = await utils.checkHasAdminPermission(context.auth.user!.id);
-
     const isOwnUser = oldData.id === context.auth.user!.id;
 
     if (!ableToDelete && !isOwnUser) {
-      return utils.getResponse(context, 403, utils.getHeaders(), utils.getBody('FORBIDDEN', null));
+      return utils.handleError(context, 403, 'FORBIDDEN', 'ACCESS_DENIED');
     }
 
-    const result = await this.dynamicService.softDelete('User', { id });
+    const result = await this.dynamicService.softDelete({
+      modelName: 'User',
+      record: { id },
+      userId: context.auth.user?.$attributes.id,
+    });
 
     utils.createAudity('DELETE', 'USER', id, context.auth.user?.$attributes.id, oldData.$attributes, result);
 
-    const headers = utils.getHeaders();
-
-    const body = utils.getBody('DELETE_SUCCESS', result);
-
-    utils.getResponse(context, 200, headers, body);
+    return utils.handleSuccess(context, result, 'DELETE_SUCCESS', 200);
   }
 }

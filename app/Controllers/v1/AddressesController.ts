@@ -1,4 +1,5 @@
 import { HttpContextContract } from '@ioc:Adonis/Core/HttpContext';
+import QueryModelValidator from 'App/Validators/v1/QueryModelValidator';
 import { CreateAddressValidator, UpdateAddressValidator } from 'App/Validators/v1/AddressesValidator';
 import DynamicService from 'App/Services/v1/DynamicService';
 import utils from 'Utils/utils';
@@ -9,60 +10,44 @@ export default class AddressesController {
   public async create(context: HttpContextContract) {
     const payload = await context.request.validate(CreateAddressValidator);
 
-    payload.zipcode = payload.zipcode.replace(/\D/g, '');
+    const result = await this.dynamicService.bulkCreate({
+      modelName: 'Address',
+      records: payload.data,
+      userId: context.auth.user?.$attributes.id,
+    });
 
-    const result = await this.dynamicService.create('Address', payload);
-
-    utils.createAudity('CREATE', 'ADDRESS', result.id, context.auth.user?.$attributes.id, null, result);
-
-    const headers = utils.getHeaders();
-
-    const body = utils.getBody('CREATE_SUCCESS', result);
-
-    utils.getResponse(context, 201, headers, body);
+    return utils.handleSuccess(context, result, 'CREATE_SUCCESS', 201);
   }
 
   public async update(context: HttpContextContract) {
     const payload = await context.request.validate(UpdateAddressValidator);
 
-    const oldData = await this.dynamicService.getById('Address', payload.id);
+    const result = await this.dynamicService.bulkUpdate({
+      modelName: 'Address',
+      records: payload.data,
+      userId: context.auth.user?.$attributes.id,
+    });
 
-    const result = await this.dynamicService.update('Address', payload);
-
-    utils.createAudity('UPDATE', 'ADDRESS', result.id, context.auth.user?.$attributes.id, oldData.$attributes, result);
-
-    const headers = utils.getHeaders();
-
-    const body = utils.getBody('UPDATE_SUCCESS', result);
-
-    utils.getResponse(context, 200, headers, body);
+    return utils.handleSuccess(context, result, 'UPDATE_SUCCESS', 200);
   }
 
   public async search(context: HttpContextContract) {
-    const query = context.request.qs();
+    const query = await context.request.validate(QueryModelValidator);
 
     const result = await this.dynamicService.searchActives('Address', query);
 
-    const headers = utils.getHeaders();
-
-    const body = utils.getBody('SEARCH_SUCCESS', result);
-
-    utils.getResponse(context, 200, headers, body);
+    return utils.handleSuccess(context, result, 'SEARCH_SUCCESS', 200);
   }
 
   public async delete(context: HttpContextContract) {
     const id = context.request.params().id;
 
-    const oldData = await this.dynamicService.getById('Address', id);
+    const result = await this.dynamicService.softDelete({
+      modelName: 'Address',
+      record: { id },
+      userId: context.auth.user?.$attributes.id,
+    });
 
-    const result = await this.dynamicService.softDelete('Address', { id });
-
-    utils.createAudity('DELETE', 'ADDRESS', id, context.auth.user?.$attributes.id, oldData.$attributes, result);
-
-    const headers = utils.getHeaders();
-
-    const body = utils.getBody('DELETE_SUCCESS', result);
-
-    utils.getResponse(context, 200, headers, body);
+    return utils.handleSuccess(context, result, 'DELETE_SUCCESS', 200);
   }
 }

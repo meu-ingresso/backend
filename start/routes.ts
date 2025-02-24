@@ -48,7 +48,7 @@ Route.group(() => {
 
     Route.get('/role-permissions', 'v1/RolePermissionsController.search');
     Route.post('/role-permission', 'v1/RolePermissionsController.create');
-    Route.patch('/role-permission', 'v1/RolePermissionsController.update');
+    Route.delete('/role-permission/:id', 'v1/RolePermissionsController.delete');
 
     Route.get('/people', 'v1/PeopleController.search');
     Route.patch('/people', 'v1/PeopleController.update');
@@ -123,12 +123,10 @@ Route.group(() => {
 
     Route.get('/pdv-users', 'v1/PdvUsersController.search');
     Route.post('/pdv-user', 'v1/PdvUsersController.create');
-    Route.patch('/pdv-user', 'v1/PdvUsersController.update');
     Route.delete('/pdv-user/:id', 'v1/PdvUsersController.delete');
 
     Route.get('/pdv-tickets', 'v1/PdvTicketsController.search');
     Route.post('/pdv-ticket', 'v1/PdvTicketsController.create');
-    Route.patch('/pdv-ticket', 'v1/PdvTicketsController.update');
     Route.delete('/pdv-ticket/:id', 'v1/PdvTicketsController.delete');
 
     Route.get('/event-checkout-fields', 'v1/EventCheckoutFieldsController.search');

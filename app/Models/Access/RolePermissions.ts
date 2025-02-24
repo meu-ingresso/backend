@@ -17,9 +17,6 @@ export default class RolePermissions extends BaseModel {
   @column.dateTime({ autoCreate: true })
   public created_at: DateTime;
 
-  @column.dateTime({ autoCreate: true, autoUpdate: true })
-  public updated_at: DateTime;
-
   @belongsTo(() => Roles, {
     foreignKey: 'role_id',
   })
