@@ -1,6 +1,6 @@
 import { HttpContextContract } from '@ioc:Adonis/Core/HttpContext';
 import QueryModelValidator from 'App/Validators/v1/QueryModelValidator';
-import { CreatePdvTicketsValidator, UpdatePdvTicketsValidator } from 'App/Validators/v1/PdvTicketsValidator';
+import { CreatePdvTicketsValidator } from 'App/Validators/v1/PdvTicketsValidator';
 import DynamicService from 'App/Services/v1/DynamicService';
 import utils from 'Utils/utils';
 

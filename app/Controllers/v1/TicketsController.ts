@@ -72,7 +72,11 @@ export default class TicketsController {
       return utils.handleError(context, 403, 'FORBIDDEN', 'ACCESS_DENIED');
     }
 
-    const result = await this.dynamicService.softDelete('Ticket', { id });
+    const result = await this.dynamicService.softDelete({
+      modelName: 'Ticket',
+      record: { id },
+      userId: context.auth.user?.$attributes.id,
+    });
 
     utils.createAudity('DELETE', 'TICKET', id, context.auth.user?.$attributes.id, oldData.$attributes, result);
 
