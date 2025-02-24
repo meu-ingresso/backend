@@ -169,9 +169,6 @@ async function checkHasAdminPermission(userId: string): Promise<boolean> {
 }
 
 export default {
-  getHeaders,
-  getBody,
-  getResponse,
   createAudity,
   getInfosByRole,
   handleError,
