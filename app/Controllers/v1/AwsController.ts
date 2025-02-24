@@ -26,33 +26,28 @@ export default class AwsController {
       }
 
       const tmpPath = Application.tmpPath('uploads');
-      const results: { attachment_id: string | null; s3_url: string }[] = [];
-
-      for (let i = 0; i < files.length; i++) {
-        const file = files[i];
-        const attachmentId = attachmentIds[i] || null;
-
+      const uploadPromises = files.map(async (file, index) => {
+        const attachmentId = attachmentIds[index] || null;
         await file.move(tmpPath);
         const fullPath = `${tmpPath}/${file.fileName}`;
 
         try {
           const fileContent = fs.readFileSync(fullPath);
-
           const result = await this.awsService.upload(
             file.clientName,
             `${file.type}/${file.subtype}`,
             fileContent,
             attachmentId
           );
-
-          results.push({ attachment_id: attachmentId, s3_url: result.s3_url });
+          return { attachment_id: attachmentId, s3_url: result.s3_url };
         } finally {
           if (fs.existsSync(fullPath)) {
             fs.unlinkSync(fullPath);
           }
         }
-      }
+      });
 
+      const results = await Promise.all(uploadPromises);
       return utils.handleSuccess(context, results, 'CREATE_SUCCESS', 200);
     } catch (error) {
       return utils.handleError(context, 500, 'INTERNAL_SERVER_ERROR', error.message);
