@@ -182,26 +182,30 @@ export default class DynamicService {
     const results = await Database.transaction(async (trx) => {
       const updatedRecords: ModelObject[] = [];
 
-      for (const item of records) {
-        const model = await ModelClass.findOrFail(item.id);
-        const oldData = { ...model.$attributes };
+      try {
+        for (const item of records) {
+          const model = await ModelClass.findOrFail(item.id);
+          const oldData = { ...model.$attributes };
 
-        model.useTransaction(trx);
+          model.useTransaction(trx);
 
-        model.merge({ ...item });
+          model.merge({ ...item });
 
-        await model.save();
+          await model.save();
 
-        this.auditService.create(
-          'UPDATE',
-          modelName.toUpperCase(),
-          model.$attributes.id,
-          userId,
-          oldData,
-          model.$attributes
-        );
+          this.auditService.create(
+            'UPDATE',
+            modelName.toUpperCase(),
+            model.$attributes.id,
+            userId,
+            oldData,
+            model.$attributes
+          );
 
-        updatedRecords.push(model);
+          updatedRecords.push(model);
+        }
+      } catch (error) {
+        return [{ error: error.detail || error.message || 'Erro ao atualizar os registros.' }];
       }
 
       return updatedRecords;
