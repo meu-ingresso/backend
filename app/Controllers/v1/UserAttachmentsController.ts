@@ -39,6 +39,10 @@ export default class UserAttachmentsController {
       userId: context.auth.user?.$attributes.id,
     });
 
+    if (result[0].error) {
+      return utils.handleError(context, 400, 'UPDATE_ERROR', `${result[0].error}`);
+    }
+
     utils.createAudity(
       'UPDATE',
       'USER_ATTACHMENT',

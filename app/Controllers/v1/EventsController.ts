@@ -24,6 +24,10 @@ export default class EventsController {
       userId: context.auth.user?.$attributes.id,
     });
 
+    if (result[0].error) {
+      return utils.handleError(context, 400, 'CREATE_ERROR', `${result[0].error}`);
+    }
+
     this.dynamicService.bulkCreate({
       modelName: 'EventFee',
       records: [{ event_id: result[0].id, platform_fee: 10 }],
@@ -56,6 +60,10 @@ export default class EventsController {
       records: payload.data,
       userId: context.auth.user?.$attributes.id,
     });
+
+    if (result[0].error) {
+      return utils.handleError(context, 400, 'UPDATE_ERROR', `${result[0].error}`);
+    }
 
     return utils.handleSuccess(context, result, 'UPDATE_SUCCESS', 200);
   }
