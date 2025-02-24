@@ -24,6 +24,10 @@ export default class CouponsController {
       userId: context.auth.user?.$attributes.id,
     });
 
+    if (result[0].error) {
+      return utils.handleError(context, 400, 'CREATE_ERROR', `${result[0].error}`);
+    }
+
     return utils.handleSuccess(context, result, 'CREATE_SUCCESS', 201);
   }
 
@@ -64,7 +68,7 @@ export default class CouponsController {
   public async search(context: HttpContextContract) {
     const query = await context.request.validate(QueryModelValidator);
 
-    const result = await this.dynamicService.searchActives('Coupon', query);
+    const result = await this.dynamicService.search('Coupon', query);
 
     const resultByRole = await utils.getInfosByRole(context.auth.user!.id, result, 'Coupon');
 

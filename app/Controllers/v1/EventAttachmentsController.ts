@@ -25,6 +25,10 @@ export default class EventAttachmentsController {
       userId: context.auth.user?.$attributes.id,
     });
 
+    if (result[0].error) {
+      return utils.handleError(context, 400, 'CREATE_ERROR', `${result[0].error}`);
+    }
+
     return utils.handleSuccess(context, result, 'CREATE_SUCCESS', 201);
   }
 
@@ -45,13 +49,17 @@ export default class EventAttachmentsController {
       userId: context.auth.user?.$attributes.id,
     });
 
+    if (result[0].error) {
+      return utils.handleError(context, 400, 'UPDATE_ERROR', `${result[0].error}`);
+    }
+
     return utils.handleSuccess(context, result, 'UPDATE_SUCCESS', 200);
   }
 
   public async search(context: HttpContextContract) {
     const query = await context.request.validate(QueryModelValidator);
 
-    const result = await this.dynamicService.searchActives('EventAttachment', query);
+    const result = await this.dynamicService.search('EventAttachment', query);
 
     return utils.handleSuccess(context, result, 'SEARCH_SUCCESS', 200);
   }

@@ -24,6 +24,10 @@ export default class EventsController {
       userId: context.auth.user?.$attributes.id,
     });
 
+    if (result[0].error) {
+      return utils.handleError(context, 400, 'CREATE_ERROR', `${result[0].error}`);
+    }
+
     this.dynamicService.bulkCreate({
       modelName: 'EventFee',
       records: [{ event_id: result[0].id, platform_fee: 10 }],
@@ -57,13 +61,17 @@ export default class EventsController {
       userId: context.auth.user?.$attributes.id,
     });
 
+    if (result[0].error) {
+      return utils.handleError(context, 400, 'UPDATE_ERROR', `${result[0].error}`);
+    }
+
     return utils.handleSuccess(context, result, 'UPDATE_SUCCESS', 200);
   }
 
   public async search(context: HttpContextContract) {
     const query = await context.request.validate(QueryModelValidator);
 
-    const result = await this.dynamicService.searchActives('Event', query);
+    const result = await this.dynamicService.search('Event', query);
 
     if (result && result.data && !!result.data.length) {
       for (let i = 0; i < result.data.length; i++) {

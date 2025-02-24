@@ -26,7 +26,7 @@ export default class PdvTicketsController {
   public async search(context: HttpContextContract) {
     const query = await context.request.validate(QueryModelValidator);
 
-    const result = await this.dynamicService.searchActives('PdvTicket', query);
+    const result = await this.dynamicService.search('PdvTicket', query);
 
     return utils.handleSuccess(context, result, 'SEARCH_SUCCESS', 200);
   }

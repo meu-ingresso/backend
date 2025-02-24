@@ -122,6 +122,13 @@ export default class Query<T> {
           let value = where[1].v;
           let operation = where[1].o;
 
+          if (value === 'null' || value === null) {
+            if (operation === 'IS') {
+              builder.whereNull(where[0]);
+              continue;
+            }
+          }
+
           if (operation && operation.includes('LIKE')) {
             value = operation.replace('LIKE', value).replace(/_/g, '%');
             operation = 'ILIKE';

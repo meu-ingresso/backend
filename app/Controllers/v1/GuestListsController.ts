@@ -49,13 +49,17 @@ export default class GuestListsController {
       userId: context.auth.user?.$attributes.id,
     });
 
+    if (result[0].error) {
+      return utils.handleError(context, 400, 'UPDATE_ERROR', `${result[0].error}`);
+    }
+
     return utils.handleSuccess(context, result, 'UPDATE_SUCCESS', 200);
   }
 
   public async search(context: HttpContextContract) {
     const query = await context.request.validate(QueryModelValidator);
 
-    const result = await this.dynamicService.searchActives('GuestList', query);
+    const result = await this.dynamicService.search('GuestList', query);
 
     return utils.handleSuccess(context, result, 'SEARCH_SUCCESS', 200);
   }
