@@ -1,7 +1,7 @@
 import { DateTime } from 'luxon';
 import { v4 as uuidv4 } from 'uuid';
 import { BaseModel, column, beforeCreate, manyToMany, ManyToMany } from '@ioc:Adonis/Lucid/Orm';
-import Event from './Events';
+import Events from './Events';
 
 export default class EventGroups extends BaseModel {
   @column({ isPrimary: true })
@@ -16,12 +16,12 @@ export default class EventGroups extends BaseModel {
   @column.dateTime({ autoCreate: true })
   public created_at: DateTime;
 
-  @manyToMany(() => Event, {
+  @manyToMany(() => Events, {
     pivotTable: 'event_group_relations',
     pivotForeignKey: 'group_id',
     pivotRelatedForeignKey: 'event_id',
   })
-  public events: ManyToMany<typeof Event>;
+  public events: ManyToMany<typeof Events>;
 
   @beforeCreate()
   public static assignUuid(eventGroup: EventGroups) {

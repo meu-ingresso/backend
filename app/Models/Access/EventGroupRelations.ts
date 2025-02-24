@@ -1,11 +1,9 @@
 import { DateTime } from 'luxon';
 import { v4 as uuidv4 } from 'uuid';
-import { BaseModel, column, belongsTo, BelongsTo, beforeCreate } from '@ioc:Adonis/Lucid/Orm';
-import Event from './Events';
-import EventGroups from './EventGroups';
+import { BaseModel, column, beforeCreate } from '@ioc:Adonis/Lucid/Orm';
 
 export default class EventGroupRelations extends BaseModel {
-  @column()
+  @column({ isPrimary: true })
   public id: string;
 
   @column()
@@ -16,16 +14,6 @@ export default class EventGroupRelations extends BaseModel {
 
   @column.dateTime({ autoCreate: true })
   public created_at: DateTime;
-
-  @belongsTo(() => Event, {
-    foreignKey: 'event_id',
-  })
-  public event: BelongsTo<typeof Event>;
-
-  @belongsTo(() => EventGroups, {
-    foreignKey: 'group_id',
-  })
-  public group: BelongsTo<typeof EventGroups>;
 
   @beforeCreate()
   public static assignUuid(eventGroupRelation: EventGroupRelations) {

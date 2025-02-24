@@ -9,6 +9,8 @@ export default class EventGroupsSchema extends BaseSchema {
       table.string('name', 100).notNullable();
       table.text('description').nullable();
       table.timestamp('created_at', { useTz: true }).defaultTo(this.now());
+
+      table.unique(['name']);
     });
   }
 
