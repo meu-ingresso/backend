@@ -9,15 +9,21 @@ export default class EventAccessMiddleware {
     try {
       await auth.check();
 
-      const user = await Users.query().where('id', auth.user!.id).preload('role').firstOrFail();
+      const user = await Users.query().where('id', auth.user!.id).whereNull('deleted_at').preload('role').firstOrFail();
 
       if (user.role?.name === 'Admin') {
         return await next();
       }
 
-      const promotedEvents = await Events.query().where('promoter_id', user.id).select('id', 'name', 'promoter_id');
+      const promotedEvents = await Events.query()
+        .where('promoter_id', user.id)
+        .whereNull('deleted_at')
+        .select('id', 'name', 'promoter_id');
 
-      const collaboratedEventIds = await EventCollaborators.query().where('user_id', user.id).select('event_id');
+      const collaboratedEventIds = await EventCollaborators.query()
+        .where('user_id', user.id)
+        .whereNull('deleted_at')
+        .select('event_id');
 
       const accessibleEvents = [
         ...promotedEvents.map((event) => ({
