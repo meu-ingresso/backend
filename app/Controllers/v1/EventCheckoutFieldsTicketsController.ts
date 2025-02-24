@@ -26,7 +26,7 @@ export default class EventCheckoutFieldsTicketsController {
   public async search(context: HttpContextContract) {
     const query = await context.request.validate(QueryModelValidator);
 
-    const result = await this.dynamicService.searchActives('EventCheckoutFieldTicket', query);
+    const result = await this.dynamicService.search('EventCheckoutFieldTicket', query);
 
     return utils.handleSuccess(context, result, 'SEARCH_SUCCESS', 200);
   }
