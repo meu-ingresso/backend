@@ -10,56 +10,36 @@ export default class EventCheckoutFieldsTicketsController {
   public async create(context: HttpContextContract) {
     const payload = await context.request.validate(CreateEventCheckoutFieldTicketValidator);
 
-    const result = await this.dynamicService.create('EventCheckoutFieldTicket', payload);
+    const result = await this.dynamicService.bulkCreate({
+      modelName: 'EventCheckoutFieldTicket',
+      records: payload.data,
+      userId: context.auth.user?.$attributes.id,
+    });
 
-    utils.createAudity(
-      'CREATE',
-      'EVENT_CHECKOUT_FIELD_TICKET',
-      result.id,
-      context.auth.user?.$attributes.id,
-      null,
-      result
-    );
+    if (result[0].error) {
+      return utils.handleError(context, 400, 'CREATE_ERROR', `${result[0].error}`);
+    }
 
-    const headers = utils.getHeaders();
-
-    const body = utils.getBody('CREATE_SUCCESS', result);
-
-    utils.getResponse(context, 201, headers, body);
+    return utils.handleSuccess(context, result, 'CREATE_SUCCESS', 201);
   }
 
   public async search(context: HttpContextContract) {
-    const payload = await context.request.validate(QueryModelValidator);
+    const query = await context.request.validate(QueryModelValidator);
 
-    const result = await this.dynamicService.searchActives('EventCheckoutFieldTicket', payload);
+    const result = await this.dynamicService.searchActives('EventCheckoutFieldTicket', query);
 
-    const headers = utils.getHeaders();
-
-    const body = utils.getBody('SEARCH_SUCCESS', result);
-
-    utils.getResponse(context, 200, headers, body);
+    return utils.handleSuccess(context, result, 'SEARCH_SUCCESS', 200);
   }
 
   public async delete(context: HttpContextContract) {
     const id = context.request.params().id;
 
-    const oldData = await this.dynamicService.getById('EventCheckoutFieldTicket', id);
+    const result = await this.dynamicService.softDelete({
+      modelName: 'EventCheckoutFieldTicket',
+      record: { id },
+      userId: context.auth.user?.$attributes.id,
+    });
 
-    const result = await this.dynamicService.softDelete('EventCheckoutFieldTicket', { id });
-
-    utils.createAudity(
-      'DELETE',
-      'EVENT_CHECKOUT_FIELD_TICKET',
-      id,
-      context.auth.user?.$attributes.id,
-      oldData.$attributes,
-      result
-    );
-
-    const headers = utils.getHeaders();
-
-    const body = utils.getBody('DELETE_SUCCESS', result);
-
-    utils.getResponse(context, 200, headers, body);
+    return utils.handleSuccess(context, result, 'DELETE_SUCCESS', 200);
   }
 }

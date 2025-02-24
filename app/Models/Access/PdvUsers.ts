@@ -17,12 +17,6 @@ export default class PdvUsers extends BaseModel {
   @column.dateTime({ autoCreate: true })
   public created_at: DateTime;
 
-  @column.dateTime({ autoCreate: true, autoUpdate: true })
-  public updated_at: DateTime;
-
-  @column.dateTime()
-  public deleted_at: DateTime | null;
-
   @belongsTo(() => Pdv, {
     foreignKey: 'pdv_id',
   })

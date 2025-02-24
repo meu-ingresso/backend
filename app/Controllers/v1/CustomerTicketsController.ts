@@ -7,81 +7,70 @@ import {
 import DynamicService from 'App/Services/v1/DynamicService';
 import utils from 'Utils/utils';
 import { DateTime } from 'luxon';
+import StatusService from 'App/Services/v1/StatusService';
 export default class CustomerTicketsController {
   private dynamicService: DynamicService = new DynamicService();
+  private statusService: StatusService = new StatusService();
 
   public async create(context: HttpContextContract) {
     const payload = await context.request.validate(CreateCustomerTicketValidator);
 
-    const result = await this.dynamicService.create('CustomerTicket', payload);
+    const result = await this.dynamicService.bulkCreate({
+      modelName: 'CustomerTicket',
+      records: payload.data,
+      userId: context.auth.user?.$attributes.id,
+    });
 
-    utils.createAudity('CREATE', 'CUSTOMER_TICKET', result.id, context.auth.user?.$attributes.id, null, result);
-
-    const headers = utils.getHeaders();
-
-    const body = utils.getBody('CREATE_SUCCESS', result);
-
-    utils.getResponse(context, 201, headers, body);
+    return utils.handleSuccess(context, result, 'CREATE_SUCCESS', 201);
   }
 
   public async update(context: HttpContextContract) {
     const payload = await context.request.validate(UpdateCustomerTicketValidator);
 
-    if (payload.validated) {
-      payload.validated_by = context.auth.user!.id;
-      payload.validated_at = DateTime.now().toISO();
-    } else {
-      // @ts-ignore
-      payload.validated_by = null;
-      // @ts-ignore
-      payload.validated_at = null;
-    }
+    payload.data = await Promise.all(
+      payload.data.map(async (record) => {
+        if (record.validated) {
+          const statusValidated = await this.statusService.searchStatusByName('Validado', 'customer_ticket');
 
-    const oldData = await this.dynamicService.getById('CustomerTicket', payload.id);
-
-    const result = await this.dynamicService.update('CustomerTicket', payload);
-
-    utils.createAudity(
-      'UPDATE',
-      'CUSTOMER_TICKET',
-      result.id,
-      context.auth.user?.$attributes.id,
-      oldData.$attributes,
-      result
+          record.validated_by = context.auth.user!.id;
+          record.validated_at = DateTime.now().toISO();
+          record.status_id = statusValidated?.id;
+        } else {
+          // @ts-ignore
+          record.validated_by = null;
+          // @ts-ignore
+          record.validated_at = null;
+        }
+        return record;
+      })
     );
 
-    const headers = utils.getHeaders();
+    const result = await this.dynamicService.bulkUpdate({
+      modelName: 'CustomerTicket',
+      records: payload.data,
+      userId: context.auth.user?.$attributes.id,
+    });
 
-    const body = utils.getBody('UPDATE_SUCCESS', result);
-
-    utils.getResponse(context, 200, headers, body);
+    return utils.handleSuccess(context, result, 'UPDATE_SUCCESS', 200);
   }
 
   public async search(context: HttpContextContract) {
-    const payload = await context.request.validate(QueryModelValidator);
+    const query = await context.request.validate(QueryModelValidator);
 
-    const result = await this.dynamicService.searchActives('CustomerTicket', payload);
+    const result = await this.dynamicService.searchActives('CustomerTicket', query);
 
-    const headers = utils.getHeaders();
-
-    const body = utils.getBody('SEARCH_SUCCESS', result);
-
-    utils.getResponse(context, 200, headers, body);
+    return utils.handleSuccess(context, result, 'SEARCH_SUCCESS', 200);
   }
 
   public async delete(context: HttpContextContract) {
     const id = context.request.params().id;
 
-    const oldData = await this.dynamicService.getById('CustomerTicket', id);
+    const result = await this.dynamicService.softDelete({
+      modelName: 'CustomerTicket',
+      record: { id },
+      userId: context.auth.user?.$attributes.id,
+    });
 
-    const result = await this.dynamicService.softDelete('CustomerTicket', { id });
-
-    utils.createAudity('DELETE', 'CUSTOMER_TICKET', id, context.auth.user?.$attributes.id, oldData.$attributes, result);
-
-    const headers = utils.getHeaders();
-
-    const body = utils.getBody('DELETE_SUCCESS', result);
-
-    utils.getResponse(context, 200, headers, body);
+    return utils.handleSuccess(context, result, 'DELETE_SUCCESS', 200);
   }
 }

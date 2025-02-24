@@ -8,15 +8,21 @@ class CreatePdvTicketsValidator {
   public reporter = ReportHandler;
 
   public schema = schema.create({
-    pdv_id: schema.string({}, [rules.exists({ table: 'pdvs', column: 'id' })]),
-    ticket_id: schema.string({}, [rules.exists({ table: 'tickets', column: 'id' })]),
+    data: schema.array().members(
+      schema.object().members({
+        pdv_id: schema.string({}, [rules.exists({ table: 'pdvs', column: 'id' })]),
+        ticket_id: schema.string({}, [rules.exists({ table: 'tickets', column: 'id' })]),
+      })
+    ),
   });
 
   public messages = {
-    'pdv_id.required': 'O campo "pdv_id" é obrigatório.',
-    'pdv_id.exists': 'O pdv especificado não existe.',
-    'ticket_id.required': 'O campo "ticket_id" é obrigatório.',
-    'ticket_id.exists': 'O ticket especificado não existe.',
+    'data.required': 'O campo "data" é obrigatório.',
+    'data.array': 'O campo data deve ser um array.',
+    'data.*.pdv_id.required': 'O campo "pdv_id" é obrigatório.',
+    'data.*.pdv_id.exists': 'O pdv especificado não existe.',
+    'data.*.ticket_id.required': 'O campo "ticket_id" é obrigatório.',
+    'data.*.ticket_id.exists': 'O ticket especificado não existe.',
   };
 }
 
@@ -26,16 +32,22 @@ class UpdatePdvTicketsValidator {
   public reporter = ReportHandler;
 
   public schema = schema.create({
-    id: schema.string({}, [rules.exists({ table: 'pdv_tickets', column: 'id' })]),
-    pdv_id: schema.string.optional({}, [rules.exists({ table: 'pdvs', column: 'id' })]),
-    ticket_id: schema.string.optional({}, [rules.exists({ table: 'tickets', column: 'id' })]),
+    data: schema.array().members(
+      schema.object().members({
+        id: schema.string({}, [rules.exists({ table: 'pdv_tickets', column: 'id' })]),
+        pdv_id: schema.string.optional({}, [rules.exists({ table: 'pdvs', column: 'id' })]),
+        ticket_id: schema.string.optional({}, [rules.exists({ table: 'tickets', column: 'id' })]),
+      })
+    ),
   });
 
   public messages = {
-    'id.required': 'O campo "id" é obrigatório.',
-    'id.exists': 'O pdv ticket especificado não existe.',
-    'pdv_id.exists': 'O pdv especificado não existe.',
-    'ticket_id.exists': 'O ticket especificado não existe.',
+    'data.required': 'O campo "data" é obrigatório.',
+    'data.array': 'O campo data deve ser um array.',
+    'data.*.id.required': 'O campo "id" é obrigatório.',
+    'data.*.id.exists': 'O pdv ticket especificado não existe.',
+    'data.*.pdv_id.exists': 'O pdv especificado não existe.',
+    'data.*.ticket_id.exists': 'O ticket especificado não existe.',
   };
 }
 

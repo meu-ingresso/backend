@@ -1,6 +1,7 @@
 import { DateTime } from 'luxon';
-import { BaseModel, column, hasOne, HasOne } from '@ioc:Adonis/Lucid/Orm';
+import { BaseModel, column, hasOne, HasOne, beforeCreate } from '@ioc:Adonis/Lucid/Orm';
 import User from './Users';
+import { v4 as uuidv4 } from 'uuid';
 
 export default class People extends BaseModel {
   @column({ isPrimary: true })
@@ -24,6 +25,9 @@ export default class People extends BaseModel {
   @column()
   public person_type: string;
 
+  @column()
+  public birth_date: string;
+
   @column.dateTime({ autoCreate: true })
   public created_at: DateTime;
 
@@ -37,4 +41,9 @@ export default class People extends BaseModel {
     foreignKey: 'people_id',
   })
   public user: HasOne<typeof User>;
+
+  @beforeCreate()
+  public static assignUuid(people: People) {
+    people.id = uuidv4();
+  }
 }

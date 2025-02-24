@@ -16,7 +16,6 @@ export default class GuestListMembersValidatedSchema extends BaseSchema {
       table.uuid('validated_by').notNullable().references('id').inTable('users').onDelete('CASCADE');
 
       table.timestamp('created_at', { useTz: true }).defaultTo(this.now());
-      table.timestamp('updated_at', { useTz: true }).defaultTo(this.now());
     });
   }
 

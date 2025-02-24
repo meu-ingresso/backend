@@ -10,51 +10,46 @@ export default class PeopleController {
   public async create(context: HttpContextContract) {
     const payload = await context.request.validate(CreatePeopleValidator);
 
-    const result = await this.dynamicService.create('People', payload);
+    const result = await this.dynamicService.bulkCreate({
+      modelName: 'People',
+      records: payload.data,
+      userId: context.auth.user?.$attributes.id,
+    });
 
-    utils.createAudity('CREATE', 'PEOPLE', result.id, context.auth.user?.$attributes.id, null, result);
+    if (result[0].error) {
+      return utils.handleError(context, 400, 'CREATE_ERROR', `${result[0].error}`);
+    }
 
-    const headers = utils.getHeaders();
-
-    const body = utils.getBody('CREATE_SUCCESS', result);
-
-    utils.getResponse(context, 201, headers, body);
+    return utils.handleSuccess(context, result, 'CREATE_SUCCESS', 201);
   }
 
   public async update(context: HttpContextContract) {
     const payload = await context.request.validate(UpdatePeopleValidator);
 
-    const oldData = await this.dynamicService.getById('People', payload.id);
+    const oldData = await this.dynamicService.getById('People', payload.data[0].id);
 
     const ableToUpdate = await utils.checkHasAdminPermission(context.auth.user!.id);
-
     const isOwnPeople = oldData.id === context.auth.user!.id;
 
     if (!ableToUpdate && !isOwnPeople) {
-      return utils.getResponse(context, 403, utils.getHeaders(), utils.getBody('FORBIDDEN', null));
+      return utils.handleError(context, 403, 'FORBIDDEN', 'Você não tem permissão para atualizar este registro.');
     }
 
-    const result = await this.dynamicService.update('People', payload);
+    const result = await this.dynamicService.bulkUpdate({
+      modelName: 'People',
+      records: payload.data,
+      userId: context.auth.user?.$attributes.id,
+    });
 
-    utils.createAudity('UPDATE', 'PEOPLE', result.id, context.auth.user?.$attributes.id, oldData.$attributes, result);
-
-    const headers = utils.getHeaders();
-
-    const body = utils.getBody('UPDATE_SUCCESS', result);
-
-    utils.getResponse(context, 200, headers, body);
+    return utils.handleSuccess(context, result, 'UPDATE_SUCCESS', 200);
   }
 
   public async search(context: HttpContextContract) {
-    const payload = await context.request.validate(QueryModelValidator);
+    const query = await context.request.validate(QueryModelValidator);
 
-    const result = await this.dynamicService.searchActives('People', payload);
+    const result = await this.dynamicService.searchActives('People', query);
 
-    const headers = utils.getHeaders();
-
-    const body = utils.getBody('SEARCH_SUCCESS', result);
-
-    utils.getResponse(context, 200, headers, body);
+    return utils.handleSuccess(context, result, 'SEARCH_SUCCESS', 200);
   }
 
   public async delete(context: HttpContextContract) {
@@ -63,21 +58,18 @@ export default class PeopleController {
     const oldData = await this.dynamicService.getById('People', id);
 
     const ableToDelete = await utils.checkHasAdminPermission(context.auth.user!.id);
-
     const isOwnPeople = oldData.id === context.auth.user!.id;
 
     if (!ableToDelete && !isOwnPeople) {
-      return utils.getResponse(context, 403, utils.getHeaders(), utils.getBody('FORBIDDEN', null));
+      return utils.handleError(context, 403, 'FORBIDDEN', 'Você não tem permissão para excluir este registro.');
     }
 
-    const result = await this.dynamicService.softDelete('People', { id });
+    const result = await this.dynamicService.softDelete({
+      modelName: 'People',
+      record: { id },
+      userId: context.auth.user?.$attributes.id,
+    });
 
-    utils.createAudity('DELETE', 'PEOPLE', id, context.auth.user?.$attributes.id, oldData.$attributes, result);
-
-    const headers = utils.getHeaders();
-
-    const body = utils.getBody('DELETE_SUCCESS', result);
-
-    utils.getResponse(context, 200, headers, body);
+    return utils.handleSuccess(context, result, 'DELETE_SUCCESS', 200);
   }
 }

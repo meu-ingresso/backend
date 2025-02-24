@@ -10,65 +10,36 @@ export default class PdvTicketsController {
   public async create(context: HttpContextContract) {
     const payload = await context.request.validate(CreatePdvTicketsValidator);
 
-    const result = await this.dynamicService.create('PdvTicket', payload);
+    const result = await this.dynamicService.bulkCreate({
+      modelName: 'PdvTicket',
+      records: payload.data,
+      userId: context.auth.user?.$attributes.id,
+    });
 
-    utils.createAudity('CREATE', 'PDV_TICKET', result.id, context.auth.user?.$attributes.id, null, result);
+    if (result[0].error) {
+      return utils.handleError(context, 400, 'CREATE_ERROR', `${result[0].error}`);
+    }
 
-    const headers = utils.getHeaders();
-
-    const body = utils.getBody('CREATE_SUCCESS', result);
-
-    utils.getResponse(context, 201, headers, body);
-  }
-
-  public async update(context: HttpContextContract) {
-    const payload = await context.request.validate(UpdatePdvTicketsValidator);
-
-    const oldData = await this.dynamicService.getById('PdvTicket', payload.id);
-
-    const result = await this.dynamicService.update('PdvTicket', payload);
-
-    utils.createAudity(
-      'UPDATE',
-      'PDV_TICKET',
-      result.id,
-      context.auth.user?.$attributes.id,
-      oldData.$attributes,
-      result
-    );
-
-    const headers = utils.getHeaders();
-
-    const body = utils.getBody('UPDATE_SUCCESS', result);
-
-    utils.getResponse(context, 200, headers, body);
+    return utils.handleSuccess(context, result, 'CREATE_SUCCESS', 201);
   }
 
   public async search(context: HttpContextContract) {
-    const payload = await context.request.validate(QueryModelValidator);
+    const query = await context.request.validate(QueryModelValidator);
 
-    const result = await this.dynamicService.searchActives('PdvTicket', payload);
+    const result = await this.dynamicService.searchActives('PdvTicket', query);
 
-    const headers = utils.getHeaders();
-
-    const body = utils.getBody('SEARCH_SUCCESS', result);
-
-    utils.getResponse(context, 200, headers, body);
+    return utils.handleSuccess(context, result, 'SEARCH_SUCCESS', 200);
   }
 
   public async delete(context: HttpContextContract) {
     const id = context.request.params().id;
 
-    const oldData = await this.dynamicService.getById('PdvTicket', id);
+    const result = await this.dynamicService.delete({
+      modelName: 'PdvTicket',
+      record: { id },
+      userId: context.auth.user?.$attributes.id,
+    });
 
-    const result = await this.dynamicService.softDelete('PdvTicket', { id });
-
-    utils.createAudity('DELETE', 'PDV_TICKET', id, context.auth.user?.$attributes.id, oldData.$attributes, result);
-
-    const headers = utils.getHeaders();
-
-    const body = utils.getBody('DELETE_SUCCESS', result);
-
-    utils.getResponse(context, 200, headers, body);
+    return utils.handleSuccess(context, result, 'DELETE_SUCCESS', 200);
   }
 }

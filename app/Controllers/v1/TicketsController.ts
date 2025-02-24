@@ -12,21 +12,19 @@ export default class TicketsController {
   public async create(context: HttpContextContract) {
     const payload = await context.request.validate(CreateTicketValidator);
 
-    const ableToCreate = await utils.checkHasEventPermission(context.auth.user!.id, payload.event_id);
+    const ableToCreate = await utils.checkHasEventPermission(context.auth.user!.id, payload.data[0].event_id);
 
     if (!ableToCreate) {
-      return utils.getResponse(context, 403, utils.getHeaders(), utils.getBody('FORBIDDEN', null));
+      return utils.handleError(context, 403, 'FORBIDDEN', 'ACCESS_DENIED');
     }
 
-    const result = await this.dynamicService.create('Ticket', payload);
+    const result = await this.dynamicService.bulkCreate({
+      modelName: 'Ticket',
+      records: payload.data,
+      userId: context.auth.user?.$attributes.id,
+    });
 
-    utils.createAudity('CREATE', 'TICKET', result.id, context.auth.user?.$attributes.id, null, result);
-
-    const headers = utils.getHeaders();
-
-    const body = utils.getBody('CREATE_SUCCESS', result);
-
-    utils.getResponse(context, 201, headers, body);
+    return utils.handleSuccess(context, result, 'CREATE_SUCCESS', 201);
   }
 
   public async update(context: HttpContextContract) {
@@ -44,15 +42,13 @@ export default class TicketsController {
       }
     });
 
-    const result = await this.dynamicService.bulkUpdate('Ticket', payload.data);
+    const result = await this.dynamicService.bulkUpdate({
+      modelName: 'Ticket',
+      records: payload.data,
+      userId: context.auth.user?.$attributes.id,
+    });
 
-    utils.createAudity('UPDATE', 'TICKET', result.id, context.auth.user?.$attributes.id, null, result);
-
-    const headers = utils.getHeaders();
-
-    const body = utils.getBody('UPDATE_SUCCESS', result);
-
-    utils.getResponse(context, 200, headers, body);
+    return utils.handleSuccess(context, result, 'UPDATE_SUCCESS', 200);
   }
 
   public async search(context: HttpContextContract) {
@@ -62,11 +58,7 @@ export default class TicketsController {
 
     const resultByRole = await utils.getInfosByRole(context.auth.user!.id, result, 'Ticket');
 
-    const headers = utils.getHeaders();
-
-    const body = utils.getBody('SEARCH_SUCCESS', resultByRole);
-
-    utils.getResponse(context, 200, headers, body);
+    return utils.handleSuccess(context, resultByRole, 'SEARCH_SUCCESS', 200);
   }
 
   public async delete(context: HttpContextContract) {
@@ -77,17 +69,13 @@ export default class TicketsController {
     const ableToDelete = await utils.checkHasEventPermission(context.auth.user!.id, oldData.event_id);
 
     if (!ableToDelete) {
-      return utils.getResponse(context, 403, utils.getHeaders(), utils.getBody('FORBIDDEN', null));
+      return utils.handleError(context, 403, 'FORBIDDEN', 'ACCESS_DENIED');
     }
 
     const result = await this.dynamicService.softDelete('Ticket', { id });
 
     utils.createAudity('DELETE', 'TICKET', id, context.auth.user?.$attributes.id, oldData.$attributes, result);
 
-    const headers = utils.getHeaders();
-
-    const body = utils.getBody('DELETE_SUCCESS', result);
-
-    utils.getResponse(context, 200, headers, body);
+    return utils.handleSuccess(context, result, 'DELETE_SUCCESS', 200);
   }
 }

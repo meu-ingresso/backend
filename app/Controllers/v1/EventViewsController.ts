@@ -1,11 +1,13 @@
 import { HttpContextContract } from '@ioc:Adonis/Core/HttpContext';
 import { CreateEventViewValidator } from 'App/Validators/v1/EventViewsValidator';
+import DynamicService from 'App/Services/v1/DynamicService';
 import EventViewService from 'App/Services/v1/EventViewService';
 import utils from 'Utils/utils';
 import { v4 as uuidv4 } from 'uuid';
 import { DateTime } from 'luxon';
 
 export default class EventViewsController {
+  private dynamicService: DynamicService = new DynamicService();
   private eventViewService: EventViewService = new EventViewService();
 
   public async create(context: HttpContextContract) {
@@ -14,38 +16,31 @@ export default class EventViewsController {
     let result: any = {};
     let shouldCreateNewRecord = true;
 
-    if (payload.session) {
-      result = await this.eventViewService.searchBySession(payload.session);
+    if (payload.data[0].session) {
+      result = await this.eventViewService.searchBySession(payload.data[0].session);
 
       if (result) {
         const createdAt = DateTime.fromISO(result.created_at);
-
         const thirtyMinutesFromCreation = createdAt.plus({ minutes: 30 });
 
         if (DateTime.local() < thirtyMinutesFromCreation) {
           shouldCreateNewRecord = false;
         }
       } else {
-        const headers = utils.getHeaders();
-
-        const body = utils.getBody('SESSION_NOT_FOUND', null);
-
-        return utils.getResponse(context, 404, headers, body);
+        return utils.handleError(context, 404, 'SESSION_NOT_FOUND', 'Sessão não encontrada');
       }
     }
 
     if (shouldCreateNewRecord) {
-      payload.session = uuidv4();
+      payload.data[0].session = uuidv4();
 
-      result = await this.eventViewService.create(payload);
+      result = await this.dynamicService.bulkCreate({
+        modelName: 'EventView',
+        records: payload.data,
+        userId: context.auth.user?.$attributes.id,
+      });
     }
 
-    utils.createAudity('CREATE', 'EVENT_VIEW', result?.id || null, context.auth.user?.$attributes.id, null, result);
-
-    const headers = utils.getHeaders();
-
-    const body = utils.getBody('CREATE_SUCCESS', result);
-
-    utils.getResponse(context, 201, headers, body);
+    return utils.handleSuccess(context, result, 'CREATE_SUCCESS', 201);
   }
 }
