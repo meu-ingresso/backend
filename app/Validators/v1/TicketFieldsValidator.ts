@@ -8,17 +8,23 @@ class CreateTicketFieldValidator {
   public reporter = ReportHandler;
 
   public schema = schema.create({
-    customer_ticket_id: schema.string({ trim: true }, [rules.exists({ table: 'customer_tickets', column: 'id' })]),
-    field_id: schema.string({ trim: true }, [rules.exists({ table: 'event_checkout_fields', column: 'id' })]),
-    value: schema.string({ trim: true }),
+    data: schema.array().members(
+      schema.object().members({
+        customer_ticket_id: schema.string({ trim: true }, [rules.exists({ table: 'customer_tickets', column: 'id' })]),
+        field_id: schema.string({ trim: true }, [rules.exists({ table: 'event_checkout_fields', column: 'id' })]),
+        value: schema.string({ trim: true }),
+      })
+    ),
   });
 
   public messages = {
-    'customer_ticket_id.required': 'O campo "customer_ticket_id" é obrigatório.',
-    'customer_ticket_id.exists': 'O campo "customer_ticket_id" deve referenciar um ticket válido.',
-    'field_id.required': 'O campo "field_id" é obrigatório.',
-    'field_id.exists': 'O campo "field_id" deve referenciar um campo válido.',
-    'value.required': 'O campo "value" é obrigatório.',
+    'data.required': 'O campo "data" é obrigatório.',
+    'data.array': 'O campo data deve ser um array.',
+    'data.*.customer_ticket_id.required': 'O campo "customer_ticket_id" é obrigatório.',
+    'data.*.customer_ticket_id.exists': 'O campo "customer_ticket_id" deve referenciar um ticket válido.',
+    'data.*.field_id.required': 'O campo "field_id" é obrigatório.',
+    'data.*.field_id.exists': 'O campo "field_id" deve referenciar um campo válido.',
+    'data.*.value.required': 'O campo "value" é obrigatório.',
   };
 }
 
@@ -28,20 +34,27 @@ class UpdateTicketFieldValidator {
   public reporter = ReportHandler;
 
   public schema = schema.create({
-    id: schema.string({ trim: true }),
-    customer_ticket_id: schema.string.optional({ trim: true }, [
-      rules.exists({ table: 'customer_tickets', column: 'id' }),
-    ]),
-    field_id: schema.string.optional({ trim: true }, [rules.exists({ table: 'checkout_fields', column: 'id' })]),
-    value: schema.string.optional({ trim: true }),
+    data: schema.array().members(
+      schema.object().members({
+        id: schema.string({ trim: true }, [rules.exists({ table: 'tickets_fields', column: 'id' })]),
+        customer_ticket_id: schema.string.optional({ trim: true }, [
+          rules.exists({ table: 'customer_tickets', column: 'id' }),
+        ]),
+        field_id: schema.string.optional({ trim: true }, [
+          rules.exists({ table: 'event_checkout_fields', column: 'id' }),
+        ]),
+        value: schema.string.optional({ trim: true }),
+      })
+    ),
   });
 
   public messages = {
-    'id.required': 'O campo "id" é obrigatório.',
-    'id.exists': 'O campo "field_id" deve referenciar um campo válido.',
-    'customer_ticket_id.exists': 'O campo "customer_ticket_id" deve referenciar um campo válido.',
-    'field_id.exists': 'O campo "field_id" deve referenciar um campo válido.',
-    'value.string': 'O campo "value" precisa ser uma string válida.',
+    'data.required': 'O campo "data" é obrigatório.',
+    'data.array': 'O campo data deve ser um array.',
+    'data.*.id.exists': 'O campo não existe.',
+    'data.*.customer_ticket_id.exists': 'O campo "customer_ticket_id" deve referenciar um ticket válido.',
+    'data.*.field_id.exists': 'O campo "field_id" deve referenciar um campo válido.',
+    'data.*.value.string': 'O campo "value" precisa ser uma string válida.',
   };
 }
 
