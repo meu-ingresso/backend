@@ -48,7 +48,7 @@ Route.group(() => {
 
     Route.get('/role-permissions', 'v1/RolePermissionsController.search');
     Route.post('/role-permission', 'v1/RolePermissionsController.create');
-    Route.patch('/role-permission', 'v1/RolePermissionsController.update');
+    Route.delete('/role-permission/:id', 'v1/RolePermissionsController.delete');
 
     Route.get('/people', 'v1/PeopleController.search');
     Route.patch('/people', 'v1/PeopleController.update');
