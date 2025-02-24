@@ -9,33 +9,46 @@ export default class AwsController {
 
   public async create(context: HttpContextContract) {
     try {
-      const fileAttached = context.request.file('file');
-      const attachment_id = context.request.input('attachment_id');
+      const files = context.request.files('files');
+      const attachmentIds = context.request.input('attachment_ids', []);
 
-      if (!fileAttached) {
+      if (!files || files.length === 0) {
         return utils.handleError(context, 400, 'BAD_REQUEST', 'Nenhum arquivo foi enviado.');
       }
 
-      const tmpPath = Application.tmpPath('uploads');
-      await fileAttached.move(tmpPath);
-      const fullPath = `${tmpPath}/${fileAttached.fileName}`;
-
-      try {
-        const fileContent = fs.readFileSync(fullPath);
-
-        const result = await this.awsService.upload(
-          fileAttached.clientName,
-          `${fileAttached.type}/${fileAttached.subtype}`,
-          fileContent,
-          attachment_id
+      if (attachmentIds.length > 0 && attachmentIds.length !== files.length) {
+        return utils.handleError(
+          context,
+          400,
+          'BAD_REQUEST',
+          'O número de attachment_ids deve corresponder ao número de arquivos.'
         );
-
-        return utils.handleSuccess(context, result, 'CREATE_SUCCESS', 200);
-      } finally {
-        if (fs.existsSync(fullPath)) {
-          fs.unlinkSync(fullPath);
-        }
       }
+
+      const tmpPath = Application.tmpPath('uploads');
+      const uploadPromises = files.map(async (file, index) => {
+        const attachmentId = attachmentIds[index] || null;
+        await file.move(tmpPath);
+        const fullPath = `${tmpPath}/${file.fileName}`;
+
+        try {
+          const fileContent = fs.readFileSync(fullPath);
+          const result = await this.awsService.upload(
+            file.clientName,
+            `${file.type}/${file.subtype}`,
+            fileContent,
+            attachmentId
+          );
+          return { attachment_id: attachmentId, s3_url: result.s3_url };
+        } finally {
+          if (fs.existsSync(fullPath)) {
+            fs.unlinkSync(fullPath);
+          }
+        }
+      });
+
+      const results = await Promise.all(uploadPromises);
+      return utils.handleSuccess(context, results, 'CREATE_SUCCESS', 200);
     } catch (error) {
       return utils.handleError(context, 500, 'INTERNAL_SERVER_ERROR', error.message);
     }
