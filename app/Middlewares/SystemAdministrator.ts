@@ -10,7 +10,7 @@ export default class AdminRoleMiddleware {
       throw new AuthenticationException('Unauthorized access', 'E_UNAUTHORIZED_ACCESS', auth.name, this.redirectTo);
     }
 
-    const user = await Users.query().where('id', auth.user!.id).preload('role').firstOrFail();
+    const user = await Users.query().where('id', auth.user!.id).whereNull('deleted_at').preload('role').firstOrFail();
 
     if (!user.role || user.role.name !== 'system_admin') {
       throw new AuthenticationException(

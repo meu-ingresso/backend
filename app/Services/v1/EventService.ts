@@ -68,6 +68,7 @@ export default class EventService {
   public async getEventByIdWithAllPreloads(event_id: string): Promise<any> {
     return Event.query()
       .where('id', event_id)
+      .whereNull('deleted_at')
       .preload('tickets')
       .preload('attachments')
       .preload('collaborators')
