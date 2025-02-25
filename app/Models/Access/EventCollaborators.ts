@@ -3,6 +3,7 @@ import { BaseModel, column, belongsTo, BelongsTo, beforeCreate } from '@ioc:Adon
 import { v4 as uuidv4 } from 'uuid';
 import Events from './Events';
 import Users from './Users';
+import Roles from './Roles';
 
 export default class EventCollaborators extends BaseModel {
   @column({ isPrimary: true })
@@ -31,6 +32,9 @@ export default class EventCollaborators extends BaseModel {
 
   @belongsTo(() => Users, { foreignKey: 'user_id' })
   public user: BelongsTo<typeof Users>;
+
+  @belongsTo(() => Roles, { foreignKey: 'role_id' })
+  public role: BelongsTo<typeof Roles>;
 
   @beforeCreate()
   public static assignUuid(eventCollaborator: EventCollaborators) {
