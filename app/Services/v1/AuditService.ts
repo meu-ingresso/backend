@@ -31,4 +31,33 @@ export default class AuditService {
       console.error('Error creating audit log:', error);
     }
   }
+
+  public async bulkCreate(
+    records: Array<{
+      action: string;
+      model_name: string;
+      record_id: string | null;
+      user_id: string | null;
+      old_data: Record<string, any> | null;
+      new_data: Record<string, any> | null;
+    }>
+  ): Promise<void> {
+    try {
+      await Database.transaction(async (trx) => {
+        await AuditLog.createMany(
+          records.map((record) => ({
+            action: record.action,
+            entity: record.model_name,
+            entity_id: record.record_id,
+            user_id: record.user_id,
+            old_data: record.old_data,
+            new_data: record.new_data,
+          })),
+          { client: trx }
+        );
+      });
+    } catch (error) {
+      console.error('Error creating bulk audit logs:', error);
+    }
+  }
 }
