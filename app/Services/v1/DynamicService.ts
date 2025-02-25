@@ -145,32 +145,24 @@ export default class DynamicService {
     }
 
     const results = await Database.transaction(async (trx) => {
-      const createdRecords: ModelObject[] = [];
-
       try {
-        for (const item of records) {
-          const model = new ModelClass().fill(item);
+        const createdRecords = await ModelClass.createMany(records, { client: trx });
 
-          model.useTransaction(trx);
+        const auditRecords = createdRecords.map((model) => ({
+          action: 'CREATE',
+          model_name: modelName.toUpperCase(),
+          record_id: model.$attributes.id,
+          user_id: userId || null,
+          old_data: null,
+          new_data: model.$attributes,
+        }));
 
-          await model.save();
+        await this.auditService.bulkCreate(auditRecords);
 
-          this.auditService.create(
-            'CREATE',
-            modelName.toUpperCase(),
-            model.$attributes.id,
-            userId,
-            null,
-            model.$attributes
-          );
-
-          createdRecords.push(model);
-        }
+        return createdRecords;
       } catch (error) {
         return [{ error: error.detail || error.message || 'Erro ao criar os registros.' }];
       }
-
-      return createdRecords;
     });
 
     return results;
@@ -184,35 +176,35 @@ export default class DynamicService {
     }
 
     const results = await Database.transaction(async (trx) => {
-      const updatedRecords: ModelObject[] = [];
-
       try {
-        for (const item of records) {
-          const model = await ModelClass.findOrFail(item.id);
-          const oldData = { ...model.$attributes };
+        const updatedRecords = await Promise.all(
+          records.map(async (item) => {
+            const model = await ModelClass.findOrFail(item.id);
+            const oldData = { ...model.$attributes };
 
-          model.useTransaction(trx);
+            model.useTransaction(trx);
+            model.merge(item);
+            await model.save();
 
-          model.merge({ ...item });
+            return { model, oldData };
+          })
+        );
 
-          await model.save();
+        const auditRecords = updatedRecords.map(({ model, oldData }) => ({
+          action: 'UPDATE',
+          model_name: modelName.toUpperCase(),
+          record_id: model.$attributes.id,
+          user_id: userId || null,
+          old_data: oldData,
+          new_data: model.$attributes,
+        }));
 
-          this.auditService.create(
-            'UPDATE',
-            modelName.toUpperCase(),
-            model.$attributes.id,
-            userId,
-            oldData,
-            model.$attributes
-          );
+        await this.auditService.bulkCreate(auditRecords);
 
-          updatedRecords.push(model);
-        }
+        return updatedRecords.map(({ model }) => model);
       } catch (error) {
         return [{ error: error.detail || error.message || 'Erro ao atualizar os registros.' }];
       }
-
-      return updatedRecords;
     });
 
     return results;
