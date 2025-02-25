@@ -24,9 +24,6 @@ export default class EventCollaborators extends BaseModel {
   @column.dateTime({ autoCreate: true, autoUpdate: true })
   public updated_at: DateTime;
 
-  @column.dateTime()
-  public deleted_at: DateTime | null;
-
   @belongsTo(() => Events, { foreignKey: 'event_id' })
   public event: BelongsTo<typeof Events>;
 

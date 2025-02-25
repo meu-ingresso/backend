@@ -74,7 +74,7 @@ export default class EventCollaboratorsController {
       return utils.handleError(context, 403, 'FORBIDDEN', 'ACCESS_DENIED');
     }
 
-    const result = await this.dynamicService.softDelete({
+    const result = await this.dynamicService.delete({
       modelName: 'EventCollaborator',
       record: { id },
       userId: context.auth.user?.$attributes.id,
