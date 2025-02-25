@@ -11,7 +11,7 @@ class CreateTicketEventCategoryValidator {
     data: schema.array().members(
       schema.object().members({
         event_id: schema.string({ trim: true }, [rules.exists({ table: 'events', column: 'id' })]),
-        name: schema.string({ trim: true }, [rules.unique({ table: 'ticket_event_categories', column: 'name' })]),
+        name: schema.string({ trim: true }),
       })
     ),
   });
