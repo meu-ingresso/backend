@@ -236,7 +236,7 @@ export default class DatabaseSeeder extends BaseSeeder {
       },
       {
         id: uuidv4(),
-        name: 'Aguardando Aprovação',
+        name: 'Em Análise',
         description: 'Evento publicado pelo promoter, mas aguardando aprovaçnao da Equipe Meu Ingresso)',
         module: 'event',
       },
