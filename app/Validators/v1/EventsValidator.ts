@@ -45,6 +45,7 @@ class CreateEventValidator {
         sale_type: schema.enum(['Ingresso', 'Inscrição']),
         event_type: schema.enum(['Presencial', 'Online', 'Híbrido']),
         is_featured: schema.boolean.optional(),
+        group_id: schema.string.optional({ trim: true }, [rules.exists({ table: 'event_groups', column: 'id' })]),
         promoter_id: schema.string({ trim: true }, [rules.exists({ table: 'users', column: 'id' })]),
       })
     ),
@@ -61,6 +62,7 @@ class CreateEventValidator {
     'data.*.availability.enum': 'O campo "availability" deve ser Publico, Privado ou Página.',
     'data.*.sale_type.enum': 'O campo "sale_type" deve ser Ingresso ou Inscrição.',
     'data.*.event_type.enum': 'O campo "event_type" deve ser Presencial, Online ou Híbrido.',
+    'data.*.group_id.exists': 'O "group_id" fornecido não existe na tabela de grupos de eventos.',
     'data.*.promoter_id.required': 'O campo "promoter_id" é obrigatório.',
     'data.*.absorb_service_fee.boolean': 'O campo "absorb_service_fee" deve ser um booleano.',
     'data.*.is_featured.boolean': 'O campo "is_featured" deve ser um booleano.',
@@ -112,6 +114,7 @@ class UpdateEventValidator {
         availability: schema.enum.optional(['Publico', 'Oculto']),
         sale_type: schema.enum.optional(['Ingresso', 'Inscrição']),
         event_type: schema.enum.optional(['Presencial', 'Online', 'Híbrido']),
+        group_id: schema.string.optional({ trim: true }, [rules.exists({ table: 'event_groups', column: 'id' })]),
         is_featured: schema.boolean.optional(),
         promoter_id: schema.string.optional({ trim: true }, [rules.exists({ table: 'users', column: 'id' })]),
       })
@@ -129,6 +132,7 @@ class UpdateEventValidator {
     'data.*.event_type.enum': 'O campo "event_type" deve ser Presencial, Online ou Híbrido.',
     'data.*.absorb_service_fee.boolean': 'O campo "absorb_service_fee" deve ser um booleano.',
     'data.*.is_featured.boolean': 'O campo "is_featured" deve ser um booleano.',
+    'data.*.group_id.exists': 'O "group_id" fornecido não existe na tabela de grupos de eventos.',
   };
 }
 

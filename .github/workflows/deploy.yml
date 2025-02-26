@@ -34,7 +34,7 @@ jobs:
             exit 1
           fi
 
-          ssh -o StrictHostKeyChecking=no ubuntu@18.207.6.216 << EOF
+          ssh -o StrictHostKeyChecking=no ubuntu@54.207.11.72 << EOF
             export NVM_DIR="/home/ubuntu/.nvm"
             [ -s "\$NVM_DIR/nvm.sh" ] && \. "\$NVM_DIR/nvm.sh"
             export PATH="\$PATH:$(yarn global bin)"
