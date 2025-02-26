@@ -18,6 +18,12 @@ export default class EventsController {
       return utils.handleError(context, 403, 'FORBIDDEN', 'ACCESS_DENIED');
     }
 
+    let group_id = payload.data[0].group_id || null;
+
+    payload.data.forEach((event) => {
+      delete event.group_id;
+    });
+
     const result = await this.dynamicService.bulkCreate({
       modelName: 'Event',
       records: payload.data,
@@ -41,18 +47,22 @@ export default class EventsController {
       userId: context.auth.user?.$attributes.id,
     });
 
-    const groupPayload = {
-      name: payload.data[0].name + ' - ' + result[0].id,
-      description: payload.data[0].description,
-    };
+    if (!group_id) {
+      const groupPayload = {
+        name: payload.data[0].name + ' - ' + result[0].id,
+        description: payload.data[0].description,
+      };
 
-    const group = await this.dynamicService.create('EventGroup', groupPayload);
+      const group = await this.dynamicService.create('EventGroup', groupPayload);
+
+      group_id = group.id;
+    }
 
     this.dynamicService.bulkCreate({
       modelName: 'EventGroupRelation',
       records: result.map((event) => {
         return {
-          group_id: group.id,
+          group_id,
           event_id: event.id,
         };
       }),

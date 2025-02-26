@@ -76,6 +76,9 @@ export default class Events extends BaseModel {
   public event_type: 'Presencial' | 'Online' | 'Híbrido';
 
   @column()
+  public group_id: string | null;
+
+  @column()
   public promoter_id: string;
 
   @column()
