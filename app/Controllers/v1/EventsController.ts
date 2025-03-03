@@ -34,9 +34,9 @@ export default class EventsController {
       return utils.handleError(context, 400, 'CREATE_ERROR', `${result[0].error}`);
     }
 
-    const fees = payload.data.map(() => {
+    const fees = result.map((element) => {
       return {
-        event_id: result[0].id,
+        event_id: element.id,
         platform_fee: 10,
       };
     });
