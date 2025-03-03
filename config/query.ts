@@ -301,19 +301,35 @@ export default class Query<T> {
         let operation = search[1].o;
 
         if (operation && operation.includes('LIKE')) {
-          value = operation.replace('LIKE', value).replace(/_/g, '%');
+          value = `%${value}%`;
           operation = 'ILIKE';
         }
 
         const orFields: Array<string> = search[0].split(':');
 
         for (let index = 0; index < orFields.length; index++) {
-          builder.orWhere(orFields[index], operation || '=', value);
+          const field = orFields[index];
+          builder.orWhereRaw(`unaccent(${field}) ${operation || '='} unaccent(?)`, [value]);
         }
       } else {
-        builder.orWhereHas(search[0], (subQuery: any) =>
-          this.querySearchRecursive(subQuery, Object.entries(search[1]))
-        );
+        const relationName = search[0];
+        const relationConditions = search[1];
+
+        builder.orWhereHas(relationName, (relationQuery: any) => {
+          Object.entries(relationConditions).forEach(([field, condition]: any) => {
+            if (condition.v) {
+              let value = condition.v;
+              let operation = condition.o;
+
+              if (operation && operation.includes('LIKE')) {
+                value = `%${value}%`;
+                operation = 'ILIKE';
+              }
+
+              relationQuery.whereRaw(`unaccent(${field}) ${operation || '='} unaccent(?)`, [value]);
+            }
+          });
+        });
       }
     }
 
