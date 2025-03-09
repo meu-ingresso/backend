@@ -307,9 +307,15 @@ export default class Query<T> {
 
         const orFields: Array<string> = search[0].split(':');
 
-        for (let index = 0; index < orFields.length; index++) {
-          const field = orFields[index];
-          builder.orWhereRaw(`unaccent(${field}) ${operation || '='} unaccent(?)`, [value]);
+        if (orFields.length > 1) {
+          builder.orWhere((subBuilder: any) => {
+            for (let index = 0; index < orFields.length; index++) {
+              const field = orFields[index];
+              subBuilder.orWhereRaw(`unaccent(${field}) ${operation || '='} unaccent(?)`, [value]);
+            }
+          });
+        } else {
+          builder.orWhereRaw(`unaccent(${orFields[0]}) ${operation || '='} unaccent(?)`, [value]);
         }
       } else {
         const relationName = search[0];
@@ -326,7 +332,16 @@ export default class Query<T> {
                 operation = 'ILIKE';
               }
 
-              relationQuery.whereRaw(`unaccent(${field}) ${operation || '='} unaccent(?)`, [value]);
+              const orFields = field.split(':');
+              if (orFields.length > 1) {
+                relationQuery.where((subQuery: any) => {
+                  orFields.forEach((field: string) => {
+                    subQuery.orWhereRaw(`unaccent(${field}) ${operation || '='} unaccent(?)`, [value]);
+                  });
+                });
+              } else {
+                relationQuery.whereRaw(`unaccent(${field}) ${operation || '='} unaccent(?)`, [value]);
+              }
             }
           });
         });
