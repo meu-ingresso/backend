@@ -17,7 +17,7 @@ export default class UserAttachments extends BaseModel {
   public type: string | null;
 
   @column()
-  public url: string | null;
+  public value: string | null;
 
   @column.dateTime({ autoCreate: true })
   public created_at: DateTime;
