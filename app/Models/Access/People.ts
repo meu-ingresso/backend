@@ -14,6 +14,12 @@ export default class People extends BaseModel {
   public last_name: string;
 
   @column()
+  public social_name: string | null;
+
+  @column()
+  public fantasy_name: string | null;
+
+  @column()
   public email: string;
 
   @column()
@@ -24,6 +30,9 @@ export default class People extends BaseModel {
 
   @column()
   public person_type: string;
+
+  @column()
+  public address_id: string | null;
 
   @column()
   public birth_date: string;

@@ -13,6 +13,9 @@ class CreatePeopleValidator {
         person_type: schema.enum(['PF', 'PJ', 'ESTRANGEIRO']),
         first_name: schema.string({ trim: true }),
         last_name: schema.string({ trim: true }),
+        social_name: schema.string.optional({ trim: true }),
+        fantasy_name: schema.string.optional({ trim: true }),
+        address_id: schema.string.optional({ trim: true }, [rules.exists({ table: 'addresses', column: 'id' })]),
         tax: schema.string.optional({ trim: true }),
         birth_date: schema.date.optional({}, [rules.requiredWhen('person_type', '=', 'PF')]),
         phone: schema.string.optional({ trim: true }),
@@ -41,6 +44,7 @@ class CreatePeopleValidator {
     'data.*.email.required': 'O campo "email" é obrigatório.',
     'data.*.email.email': 'O campo "email" deve conter um endereço de e-mail válido.',
     'data.*.email.unique': 'O e-mail fornecido já está registrado.',
+    'data.*.address_id.exists': 'O endereço informado não existe.',
   };
 }
 
@@ -56,6 +60,9 @@ class UpdatePeopleValidator {
         person_type: schema.enum.optional(['PF', 'PJ', 'ESTRANGEIRO']),
         first_name: schema.string.optional({ trim: true }),
         last_name: schema.string.optional({ trim: true }),
+        social_name: schema.string.optional({ trim: true }),
+        fantasy_name: schema.string.optional({ trim: true }),
+        address_id: schema.string.optional({ trim: true }, [rules.exists({ table: 'addresses', column: 'id' })]),
         tax: schema.string.optional({ trim: true }),
         birth_date: schema.date.optional(),
         phone: schema.string.optional({ trim: true }),
@@ -86,6 +93,7 @@ class UpdatePeopleValidator {
     'data.*.person_type.enum': 'O campo "person_type" deve ser PF, PJ ou ESTRANGEIRO.',
     'data.*.email.email': 'O campo "email" deve conter um endereço de e-mail válido.',
     'data.*.email.unique': 'O e-mail fornecido já está registrado.',
+    'data.*.address_id.exists': 'O endereço informado não existe.',
   };
 }
 
