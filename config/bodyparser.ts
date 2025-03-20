@@ -41,7 +41,7 @@ const bodyParserConfig: BodyParserConfig = {
 
     maxFields: 1000,
 
-    limit: '20mb',
+    limit: '1000mb',
 
     types: ['multipart/form-data'],
   },
