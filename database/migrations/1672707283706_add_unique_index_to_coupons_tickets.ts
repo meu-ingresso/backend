@@ -7,7 +7,6 @@ export default class AddUniqueIndexToCouponsTicketsSchema extends BaseSchema {
     await this.db.rawQuery(`
       CREATE UNIQUE INDEX IF NOT EXISTS coupons_tickets_unique 
       ON ${this.tableName} (coupon_id, ticket_id) 
-      WHERE deleted_at IS NULL
     `);
   }
 
