@@ -7,7 +7,6 @@ export default class AddUniqueIndexToEventCheckoutFieldsTicketsSchema extends Ba
     await this.db.rawQuery(`
       CREATE UNIQUE INDEX IF NOT EXISTS event_checkout_fields_tickets_unique 
       ON ${this.tableName} (event_checkout_field_id, ticket_id) 
-      WHERE deleted_at IS NULL
     `);
   }
 
