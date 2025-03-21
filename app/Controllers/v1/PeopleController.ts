@@ -26,10 +26,9 @@ export default class PeopleController {
   public async update(context: HttpContextContract) {
     const payload = await context.request.validate(UpdatePeopleValidator);
 
-    const oldData = await this.dynamicService.getById('People', payload.data[0].id);
-
     const ableToUpdate = await utils.checkHasAdminPermission(context.auth.user!.id);
-    const isOwnPeople = oldData.id === context.auth.user!.id;
+
+    const isOwnPeople = payload.data[0].id === context.auth.user!.id;
 
     if (!ableToUpdate && !isOwnPeople) {
       return utils.handleError(context, 403, 'FORBIDDEN', 'Você não tem permissão para atualizar este registro.');
