@@ -20,18 +20,14 @@ export default class UsersController {
       return utils.handleError(context, 400, 'CREATE_ERROR', `${result[0].error}`);
     }
 
-    utils.createAudity('CREATE', 'USER', result[0].id, context.auth.user?.$attributes.id, null, result);
-
     return utils.handleSuccess(context, result, 'CREATE_SUCCESS', 201);
   }
 
   public async update(context: HttpContextContract) {
     const payload = await context.request.validate(UpdateUserValidator);
 
-    const oldData = await this.dynamicService.getById('User', payload.data[0].id);
-
     const ableToUpdate = await utils.checkHasAdminPermission(context.auth.user!.id);
-    const isOwnUser = oldData.id === context.auth.user!.id;
+    const isOwnUser = payload.data[0].id === context.auth.user!.id;
 
     if (!ableToUpdate && !isOwnUser) {
       return utils.handleError(context, 403, 'FORBIDDEN', 'ACCESS_DENIED');
@@ -47,8 +43,6 @@ export default class UsersController {
       return utils.handleError(context, 400, 'UPDATE_ERROR', `${result[0].error}`);
     }
 
-    utils.createAudity('UPDATE', 'USER', result[0].id, context.auth.user?.$attributes.id, oldData.$attributes, result);
-
     return utils.handleSuccess(context, result, 'UPDATE_SUCCESS', 200);
   }
 
@@ -63,10 +57,8 @@ export default class UsersController {
   public async delete(context: HttpContextContract) {
     const id = context.request.params().id;
 
-    const oldData = await this.dynamicService.getById('User', id);
-
     const ableToDelete = await utils.checkHasAdminPermission(context.auth.user!.id);
-    const isOwnUser = oldData.id === context.auth.user!.id;
+    const isOwnUser = id === context.auth.user!.id;
 
     if (!ableToDelete && !isOwnUser) {
       return utils.handleError(context, 403, 'FORBIDDEN', 'ACCESS_DENIED');
@@ -77,8 +69,6 @@ export default class UsersController {
       record: { id },
       userId: context.auth.user?.$attributes.id,
     });
-
-    utils.createAudity('DELETE', 'USER', id, context.auth.user?.$attributes.id, oldData.$attributes, result);
 
     return utils.handleSuccess(context, result, 'DELETE_SUCCESS', 200);
   }
