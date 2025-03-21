@@ -86,8 +86,6 @@ export default class TicketsController {
       userId: context.auth.user?.$attributes.id,
     });
 
-    utils.createAudity('DELETE', 'TICKET', id, context.auth.user?.$attributes.id, oldData.$attributes, result);
-
     return utils.handleSuccess(context, result, 'DELETE_SUCCESS', 200);
   }
 }
