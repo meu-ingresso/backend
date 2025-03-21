@@ -58,10 +58,9 @@ export default class PeopleController {
   public async delete(context: HttpContextContract) {
     const id = context.request.params().id;
 
-    const oldData = await this.dynamicService.getById('People', id);
-
     const ableToDelete = await utils.checkHasAdminPermission(context.auth.user!.id);
-    const isOwnPeople = oldData.id === context.auth.user!.id;
+
+    const isOwnPeople = id === context.auth.user!.id;
 
     if (!ableToDelete && !isOwnPeople) {
       return utils.handleError(context, 403, 'FORBIDDEN', 'Você não tem permissão para excluir este registro.');
