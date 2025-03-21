@@ -28,7 +28,12 @@ export default class PeopleController {
 
     const ableToUpdate = await utils.checkHasAdminPermission(context.auth.user!.id);
 
-    const isOwnPeople = payload.data[0].id === context.auth.user!.id;
+    const user = await this.dynamicService.search('User', {
+      where: { id: { v: context.auth.user!.id } },
+    });
+
+    const isOwnPeople =
+      payload.data[0].id === (user && user.data && user.data.length > 0 ? user.data[0].people_id : null);
 
     if (!ableToUpdate && !isOwnPeople) {
       return utils.handleError(context, 403, 'FORBIDDEN', 'Você não tem permissão para atualizar este registro.');
@@ -60,7 +65,11 @@ export default class PeopleController {
 
     const ableToDelete = await utils.checkHasAdminPermission(context.auth.user!.id);
 
-    const isOwnPeople = id === context.auth.user!.id;
+    const user = await this.dynamicService.search('User', {
+      where: { id: { v: context.auth.user!.id } },
+    });
+
+    const isOwnPeople = id === (user && user.data && user.data.length > 0 ? user.data[0].people_id : null);
 
     if (!ableToDelete && !isOwnPeople) {
       return utils.handleError(context, 403, 'FORBIDDEN', 'Você não tem permissão para excluir este registro.');
