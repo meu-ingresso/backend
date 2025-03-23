@@ -16,6 +16,7 @@ class CreatePaymentValidator {
         gross_value: schema.number(),
         net_value: schema.number.optional(),
         coupon_id: schema.string.optional({}, [rules.exists({ table: 'coupons', column: 'id' })]),
+        pdv_id: schema.string.optional({}, [rules.exists({ table: 'pdvs', column: 'id' })]),
         paid_at: schema.date.optional(),
       })
     ),
@@ -34,6 +35,7 @@ class CreatePaymentValidator {
     'data.*.gross_value.number': 'O campo "gross_value" deve ser um número válido.',
     'data.*.net_value.number': 'O campo "net_value" deve ser um número válido.',
     'data.*.coupon_id.exists': 'O cupom especificado não existe.',
+    'data.*.pdv_id.exists': 'O pdv especificado não existe.',
   };
 }
 
@@ -52,6 +54,7 @@ class UpdatePaymentValidator {
         gross_value: schema.number.optional(),
         net_value: schema.number.optional(),
         coupon_id: schema.string.optional({}, [rules.exists({ table: 'coupons', column: 'id' })]),
+        pdv_id: schema.string.optional({}, [rules.exists({ table: 'pdvs', column: 'id' })]),
         paid_at: schema.date.optional(),
       })
     ),
@@ -68,6 +71,7 @@ class UpdatePaymentValidator {
     'data.*.gross_value.number': 'O campo "gross_value" deve ser um número válido.',
     'data.*.net_value.number': 'O campo "net_value" deve ser um número válido.',
     'data.*.coupon_id.exists': 'O cupom especificado não existe.',
+    'data.*.pdv_id.exists': 'O pdv especificado não existe.',
   };
 }
 

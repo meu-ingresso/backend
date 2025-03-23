@@ -1,8 +1,9 @@
 import { DateTime } from 'luxon';
 import { v4 as uuidv4 } from 'uuid';
-import { BaseModel, column, beforeCreate, belongsTo, BelongsTo } from '@ioc:Adonis/Lucid/Orm';
+import { BaseModel, column, beforeCreate, belongsTo, BelongsTo, hasMany, HasMany } from '@ioc:Adonis/Lucid/Orm';
 import Events from './Events';
 import Status from './Statuses';
+import Payments from './Payments';
 
 export default class Pdv extends BaseModel {
   @column({ isPrimary: true })
@@ -35,6 +36,11 @@ export default class Pdv extends BaseModel {
     foreignKey: 'status_id',
   })
   public status: BelongsTo<typeof Status>;
+
+  @hasMany(() => Payments, {
+    foreignKey: 'pdv_id',
+  })
+  public payments: HasMany<typeof Payments>;
 
   @beforeCreate()
   public static assignUuid(pdv: Pdv) {
