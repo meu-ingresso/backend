@@ -1,6 +1,7 @@
 import { DateTime } from 'luxon';
-import { BaseModel, column, hasOne, HasOne, beforeCreate } from '@ioc:Adonis/Lucid/Orm';
+import { BaseModel, column, hasOne, HasOne, beforeCreate, BelongsTo, belongsTo } from '@ioc:Adonis/Lucid/Orm';
 import User from './Users';
+import Addresses from './Addresses';
 import { v4 as uuidv4 } from 'uuid';
 
 export default class People extends BaseModel {
@@ -50,6 +51,9 @@ export default class People extends BaseModel {
     foreignKey: 'people_id',
   })
   public user: HasOne<typeof User>;
+
+  @belongsTo(() => Addresses, { foreignKey: 'address_id' })
+  public address: BelongsTo<typeof Addresses>;
 
   @beforeCreate()
   public static assignUuid(people: People) {
