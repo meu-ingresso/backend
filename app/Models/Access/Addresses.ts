@@ -3,6 +3,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { BaseModel, column, beforeCreate, hasMany, HasMany } from '@ioc:Adonis/Lucid/Orm';
 // import Cities from './Cities';
 import Events from './Events';
+import People from './People';
 
 export default class Addresses extends BaseModel {
   @column({ isPrimary: true })
@@ -50,6 +51,11 @@ export default class Addresses extends BaseModel {
     foreignKey: 'address_id',
   })
   public events: HasMany<typeof Events>;
+
+  @hasMany(() => People, {
+    foreignKey: 'address_id',
+  })
+  public people: HasMany<typeof People>;
 
   @beforeCreate()
   public static assignUuid(address: Addresses) {

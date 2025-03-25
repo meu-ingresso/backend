@@ -4,7 +4,7 @@ import { BaseModel, column, beforeCreate, belongsTo, BelongsTo } from '@ioc:Adon
 import Users from './Users';
 import Statuses from './Statuses';
 import Coupons from './Coupons';
-
+import Pdv from './Pdvs';
 export default class Payments extends BaseModel {
   @column({ isPrimary: true })
   public id: string;
@@ -26,6 +26,9 @@ export default class Payments extends BaseModel {
 
   @column()
   public coupon_id: string | null;
+
+  @column()
+  public pdv_id: string | null;
 
   @column.dateTime()
   public paid_at: DateTime | null;
@@ -50,6 +53,11 @@ export default class Payments extends BaseModel {
     foreignKey: 'coupon_id',
   })
   public coupon: BelongsTo<typeof Coupons>;
+
+  @belongsTo(() => Pdv, {
+    foreignKey: 'pdv_id',
+  })
+  public pdv: BelongsTo<typeof Pdv>;
 
   @beforeCreate()
   public static assignUuid(payment: Payments) {
