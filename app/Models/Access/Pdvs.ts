@@ -4,7 +4,8 @@ import { BaseModel, column, beforeCreate, belongsTo, BelongsTo, hasMany, HasMany
 import Events from './Events';
 import Status from './Statuses';
 import Payments from './Payments';
-
+import PdvTickets from './PdvTickets';
+import PdvUsers from './PdvUsers';
 export default class Pdv extends BaseModel {
   @column({ isPrimary: true })
   public id: string;
@@ -41,6 +42,16 @@ export default class Pdv extends BaseModel {
     foreignKey: 'pdv_id',
   })
   public payments: HasMany<typeof Payments>;
+  
+  @hasMany(() => PdvTickets, {
+    foreignKey: 'pdv_id',
+  })
+  public pdvTickets: HasMany<typeof PdvTickets>;
+
+  @hasMany(() => PdvUsers, {
+    foreignKey: 'pdv_id',
+  })
+  public pdvUsers: HasMany<typeof PdvUsers>;
 
   @beforeCreate()
   public static assignUuid(pdv: Pdv) {
