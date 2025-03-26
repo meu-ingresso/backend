@@ -7,7 +7,7 @@ export default class CustomerTicketsSchema extends BaseSchema {
     this.schema.createTable(this.tableName, (table) => {
       table.uuid('id').primary();
       table.uuid('ticket_id').notNullable().references('id').inTable('tickets').onDelete('CASCADE');
-      table.uuid('current_owner_id').notNullable().references('id').inTable('people').onDelete('CASCADE');
+      table.uuid('current_owner_id').nullable().references('id').inTable('people').onDelete('CASCADE');
       table.uuid('previous_owner_id').nullable().references('id').inTable('people').onDelete('CASCADE');
       table.uuid('status_id').notNullable().references('id').inTable('statuses').onDelete('CASCADE');
       table.uuid('payment_id').notNullable().references('id').inTable('payments').onDelete('CASCADE');

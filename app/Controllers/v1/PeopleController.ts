@@ -26,6 +26,34 @@ export default class PeopleController {
   public async update(context: HttpContextContract) {
     const payload = await context.request.validate(UpdatePeopleValidator);
 
+    const originalData = context.request.body()?.data || [];
+
+    const processedData = payload.data.map((item, index) => {
+      const original = originalData[index] || {};
+      const result: any = { ...item };
+
+      for (const key of [
+        'first_name',
+        'last_name',
+        'social_name',
+        'phone',
+        'fantasy_name',
+        'tax',
+        'email',
+        'address_id',
+      ]) {
+        if (original[key] === '') {
+          if (key === 'address_id') {
+            result[key] = null;
+          } else {
+            result[key] = '';
+          }
+        }
+      }
+
+      return result;
+    });
+
     const ableToUpdate = await utils.checkHasAdminPermission(context.auth.user!.id);
 
     const user = await this.dynamicService.search('User', {
@@ -41,7 +69,7 @@ export default class PeopleController {
 
     const result = await this.dynamicService.bulkUpdate({
       modelName: 'People',
-      records: payload.data,
+      records: processedData,
       userId: context.auth.user?.$attributes.id,
     });
 
