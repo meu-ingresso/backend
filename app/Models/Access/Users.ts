@@ -17,6 +17,7 @@ import People from './People';
 import Notifications from './Notifications';
 import PdvUsers from './PdvUsers';
 import Hash from '@ioc:Adonis/Core/Hash';
+import UserAttachments from './UserAttachments';
 
 export default class Users extends BaseModel {
   @column({ isPrimary: true })
@@ -78,6 +79,11 @@ export default class Users extends BaseModel {
     foreignKey: 'sender_id',
   })
   public notifications: HasMany<typeof Notifications>;
+
+  @hasMany(() => UserAttachments, {
+    foreignKey: 'user_id',
+  })
+  public attachments: HasMany<typeof UserAttachments>;
 
   @beforeCreate()
   public static assignUuid(user: Users) {
