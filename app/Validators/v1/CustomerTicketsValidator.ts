@@ -11,7 +11,7 @@ class CreateCustomerTicketValidator {
     data: schema.array().members(
       schema.object().members({
         ticket_id: schema.string({}, [rules.exists({ table: 'tickets', column: 'id' })]),
-        current_owner_id: schema.string({}, [rules.exists({ table: 'people', column: 'id' })]),
+        current_owner_id: schema.string.optional({}, [rules.exists({ table: 'people', column: 'id' })]),
         previous_owner_id: schema.string.optional({}, [rules.exists({ table: 'people', column: 'id' })]),
         status_id: schema.string({}, [rules.exists({ table: 'statuses', column: 'id' })]),
         payment_id: schema.string({}, [rules.exists({ table: 'payments', column: 'id' })]),
