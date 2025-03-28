@@ -65,11 +65,17 @@ async function getInfosByRole(userId: string, data: any, module: string): Promis
           event_id = coupon?.event_id;
 
           break;
+        case 'TicketField':
+          event_id = item?.checkoutField?.event_id;
+
+          break;
         default:
           event_id = item.event_id;
       }
 
       if (!event_id) return null;
+
+      console.log(event_id);
 
       const event = await eventService.getEventByIdWithAllPreloads(event_id);
 
