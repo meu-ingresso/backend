@@ -157,7 +157,7 @@ export default class DynamicService {
           new_data: model.$attributes,
         }));
 
-        await this.auditService.bulkCreate(auditRecords);
+        this.auditService.bulkCreate(auditRecords);
 
         return createdRecords;
       } catch (error) {
@@ -199,7 +199,7 @@ export default class DynamicService {
           new_data: model.$attributes,
         }));
 
-        await this.auditService.bulkCreate(auditRecords);
+        this.auditService.bulkCreate(auditRecords);
 
         return updatedRecords.map(({ model }) => model);
       } catch (error) {
