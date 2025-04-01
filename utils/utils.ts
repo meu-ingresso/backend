@@ -75,8 +75,6 @@ async function getInfosByRole(userId: string, data: any, module: string): Promis
 
       if (!event_id) return null;
 
-      console.log(event_id);
-
       const event = await eventService.getEventByIdWithAllPreloads(event_id);
 
       const isPromoter = event.promoter_id === user.id;

@@ -44,8 +44,6 @@ export default class TicketFieldsController {
 
     const result = await this.dynamicService.search('TicketField', query);
 
-    console.log('entrou');
-
     const resultByRole = await utils.getInfosByRole(context.auth.user!.id, result, 'TicketField');
 
     return utils.handleSuccess(context, resultByRole, 'SEARCH_SUCCESS', 200);
