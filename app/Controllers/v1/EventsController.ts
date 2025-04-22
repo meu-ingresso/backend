@@ -120,7 +120,16 @@ export default class EventsController {
   }
 
   public async showcase(context: HttpContextContract) {
-    const query = await context.request.validate(QueryModelValidator);
+    let query = await context.request.validate(QueryModelValidator);
+
+    query = {
+      ...query,
+      whereHas: {
+        status: {
+          name: { v: 'Publicado' },
+        },
+      },
+    };
 
     const result = await this.dynamicService.search('Event', query);
 
