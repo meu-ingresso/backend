@@ -119,6 +119,14 @@ export default class EventsController {
     return utils.handleSuccess(context, resultByRole, 'SEARCH_SUCCESS', 200);
   }
 
+  public async showcase(context: HttpContextContract) {
+    const query = await context.request.validate(QueryModelValidator);
+
+    const result = await this.dynamicService.search('Event', query);
+
+    return utils.handleSuccess(context, result, 'SEARCH_SUCCESS', 200);
+  }
+
   public async delete(context: HttpContextContract) {
     const id = context.request.params().id;
 
