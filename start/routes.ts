@@ -18,6 +18,8 @@ Route.group(() => {
 
   Route.post('/event/view', 'v1/EventViewsController.create');
 
+  Route.post('/payment/webhook', 'v1/MercadoPagoController.handleWebhook');
+
   // ROTAS COM AUTENTICAÇÃO
   Route.group(() => {
     Route.get('/logout', 'v1/AuthController.logout');
@@ -181,11 +183,6 @@ Route.group(() => {
     Route.patch('/customer-ticket', 'v1/CustomerTicketsController.update');
     Route.delete('/customer-ticket/:id', 'v1/CustomerTicketsController.delete');
 
-    Route.get('/payments', 'v1/PaymentsController.search');
-    Route.post('/payment', 'v1/PaymentsController.create');
-    Route.patch('/payment', 'v1/PaymentsController.update');
-    Route.delete('/payment/:id', 'v1/PaymentsController.delete');
-
     Route.get('/parameters', 'v1/ParametersController.search');
     Route.post('/parameter', 'v1/ParametersController.create');
     Route.patch('/parameter', 'v1/ParametersController.update');
@@ -197,5 +194,16 @@ Route.group(() => {
     Route.delete('/notification/:id', 'v1/NotificationsController.delete');
 
     Route.post('/upload', 'v1/AwsController.create');
+
+    // PAYMENTS
+    Route.get('/payments', 'v1/PaymentsController.search');
+    Route.post('/payment', 'v1/PaymentsController.create');
+    Route.patch('/payment', 'v1/PaymentsController.update');
+    Route.delete('/payment/:id', 'v1/PaymentsController.delete');
+
+    // MERCADO PAGO
+    Route.post('/payment/card', 'v1/MercadoPagoController.processCardPayment');
+    Route.post('/payment/pix', 'v1/MercadoPagoController.processPixPayment');
+    Route.get('/payment/:id', 'v1/MercadoPagoController.getPayment');
   }).middleware(['auth']);
 }).prefix('v1');

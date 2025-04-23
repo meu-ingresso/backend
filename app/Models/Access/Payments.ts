@@ -39,6 +39,31 @@ export default class Payments extends BaseModel {
   @column.dateTime()
   public deleted_at: DateTime | null;
 
+  // Campos para integração com Mercado Pago
+  @column()
+  public external_id: string | null;
+
+  @column()
+  public external_status: string | null;
+
+  @column()
+  public payment_method_details: string | null;
+
+  @column()
+  public installments: number | null;
+
+  @column()
+  public pix_qr_code: string | null;
+
+  @column()
+  public pix_qr_code_base64: string | null;
+
+  @column()
+  public last_four_digits: string | null;
+
+  @column()
+  public response_data: any;
+
   @belongsTo(() => Users, {
     foreignKey: 'user_id',
   })
