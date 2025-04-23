@@ -2,6 +2,90 @@ import { schema, rules } from '@ioc:Adonis/Core/Validator';
 import { HttpContextContract } from '@ioc:Adonis/Core/HttpContext';
 import ReportHandler from './Reporters/ReportHandler';
 
+class CardPaymentValidator {
+  constructor(protected context: HttpContextContract) {}
+
+  public reporter = ReportHandler;
+
+  public schema = schema.create({
+    user_id: schema.string.optional({}, [rules.exists({ table: 'users', column: 'id' })]),
+    coupon_id: schema.string.optional({}, [rules.exists({ table: 'coupons', column: 'id' })]),
+    pdv_id: schema.string.optional({}, [rules.exists({ table: 'pdvs', column: 'id' })]),
+    description: schema.string(),
+    transaction_amount: schema.number([rules.unsigned()]),
+    gross_value: schema.number([rules.unsigned()]),
+    net_value: schema.number([rules.unsigned()]),
+    token: schema.string(),
+    payment_method_id: schema.string(),
+    installments: schema.number.optional(),
+    payer: schema.object().members({
+      email: schema.string({}, [rules.email()]),
+      identification: schema.object.optional().members({
+        type: schema.string.optional(),
+        number: schema.string.optional(),
+      }),
+    }),
+  });
+
+  public messages = {
+    'user_id.exists': 'O usuário informado não existe',
+    'user_id.string': 'O usuário informado deve ser uma string',
+    'coupon_id.exists': 'O cupom informado não existe',
+    'coupon_id.string': 'O cupom informado deve ser uma string',
+    'pdv_id.exists': 'O pdv informado não existe',
+    'pdv_id.string': 'O pdv informado deve ser uma string',
+    'description.required': 'A descrição é obrigatória',
+    'description.string': 'A descrição deve ser uma string',
+    'transaction_amount.unsigned': 'O valor da transação deve ser positivo',
+    'transaction_amount.number': 'O valor da transação deve ser um número',
+    'gross_value.unsigned': 'O valor bruto da transação deve ser positivo',
+    'gross_value.number': 'O valor bruto da transação deve ser um número',
+    'net_value.unsigned': 'O valor líquido da transação deve ser positivo',
+    'net_value.number': 'O valor líquido da transação deve ser um número',
+    'token.required': 'O token é obrigatório',
+    'token.string': 'O token deve ser uma string',
+    'payment_method_id.required': 'O método de pagamento é obrigatório',
+    'payment_method_id.string': 'O método de pagamento deve ser uma string',
+    'payer.email.required': 'O e-mail do pagador é obrigatório',
+    'payer.email.email': 'O e-mail do pagador deve ser um e-mail válido',
+    'installments.unsigned': 'O número de parcelas deve ser um número positivo',
+    'installments.range': 'O número de parcelas deve estar entre 1 e 12',
+  };
+}
+
+class PixPaymentValidator {
+  constructor(protected context: HttpContextContract) {}
+
+  public reporter = ReportHandler;
+
+  public schema = schema.create({
+    user_id: schema.string.optional({}, [rules.exists({ table: 'users', column: 'id' })]),
+    description: schema.string(),
+    transaction_amount: schema.number([rules.unsigned()]),
+    gross_value: schema.number([rules.unsigned()]),
+    net_value: schema.number([rules.unsigned()]),
+    payer: schema.object().members({
+      email: schema.string({}, [rules.email()]),
+      first_name: schema.string.optional(),
+      last_name: schema.string.optional(),
+      identification: schema.object.optional().members({
+        type: schema.string.optional(),
+        number: schema.string.optional(),
+      }),
+    }),
+  });
+
+  public messages = {
+    'user_id.exists': 'O usuário informado não existe',
+    'description.required': 'A descrição é obrigatória',
+    'transaction_amount.unsigned': 'O valor da transação deve ser positivo',
+    'gross_value.unsigned': 'O valor bruto da transação deve ser positivo',
+    'net_value.unsigned': 'O valor líquido da transação deve ser positivo',
+    'payer.email.required': 'O e-mail do pagador é obrigatório',
+    'payer.email.email': 'O e-mail do pagador deve ser um e-mail válido',
+  };
+}
+
 class CreatePaymentValidator {
   constructor(protected context: HttpContextContract) {}
 
@@ -75,4 +159,4 @@ class UpdatePaymentValidator {
   };
 }
 
-export { CreatePaymentValidator, UpdatePaymentValidator };
+export { CardPaymentValidator, PixPaymentValidator, CreatePaymentValidator, UpdatePaymentValidator };
