@@ -20,6 +20,8 @@ class CardPaymentValidator {
     installments: schema.number.optional(),
     payer: schema.object().members({
       email: schema.string({}, [rules.email()]),
+      first_name: schema.string.optional(),
+      last_name: schema.string.optional(),
       identification: schema.object.optional().members({
         type: schema.string.optional(),
         number: schema.string.optional(),
