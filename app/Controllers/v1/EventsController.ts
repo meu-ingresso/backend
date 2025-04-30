@@ -125,6 +125,7 @@ export default class EventsController {
     query = {
       ...query,
       whereHas: {
+        ...query?.whereHas,
         status: {
           name: { v: 'Publicado' },
         },
