@@ -1,8 +1,9 @@
 import { DateTime } from 'luxon';
 import { v4 as uuidv4 } from 'uuid';
-import { BaseModel, column, beforeCreate, belongsTo, BelongsTo } from '@ioc:Adonis/Lucid/Orm';
+import { BaseModel, column, beforeCreate, belongsTo, BelongsTo, hasMany, HasMany } from '@ioc:Adonis/Lucid/Orm';
 import Events from './Events';
 import Status from './Statuses';
+import CouponsTickets from './CouponsTickets';
 
 export default class Coupons extends BaseModel {
   @column({ isPrimary: true })
@@ -53,6 +54,11 @@ export default class Coupons extends BaseModel {
     foreignKey: 'status_id',
   })
   public status: BelongsTo<typeof Status>;
+
+  @hasMany(() => CouponsTickets, {
+    foreignKey: 'coupon_id',
+  })
+  public tickets: HasMany<typeof CouponsTickets>;
 
   @beforeCreate()
   public static assignUuid(coupon: Coupons) {
