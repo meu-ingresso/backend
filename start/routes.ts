@@ -200,10 +200,12 @@ Route.group(() => {
     Route.post('/payment', 'v1/PaymentsController.create');
     Route.patch('/payment', 'v1/PaymentsController.update');
     Route.delete('/payment/:id', 'v1/PaymentsController.delete');
+  }).middleware(['auth']);
 
-    // MERCADO PAGO
+  // ROTAS SEM AUTENTICAÇÃO
+  Route.group(() => {
     Route.post('/payment/card', 'v1/MercadoPagoController.processCardPayment');
     Route.post('/payment/pix', 'v1/MercadoPagoController.processPixPayment');
     Route.get('/payment/:id', 'v1/MercadoPagoController.getPayment');
-  }).middleware(['auth']);
+  });
 }).prefix('v1');
