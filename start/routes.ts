@@ -66,12 +66,10 @@ Route.group(() => {
     Route.patch('/user-attachment', 'v1/UserAttachmentsController.update');
     Route.delete('/user-attachment/:id', 'v1/UserAttachmentsController.delete');
 
-    Route.get('/categories', 'v1/CategoriesController.search');
     Route.post('/category', 'v1/CategoriesController.create');
     Route.patch('/category', 'v1/CategoriesController.update');
     Route.delete('/category/:id', 'v1/CategoriesController.delete');
 
-    Route.get('/statuses', 'v1/StatusesController.search');
     Route.post('/status', 'v1/StatusesController.create');
     Route.patch('/status', 'v1/StatusesController.update');
     Route.delete('/status/:id', 'v1/StatusesController.delete');
@@ -207,5 +205,8 @@ Route.group(() => {
     Route.post('/payment/card', 'v1/MercadoPagoController.processCardPayment');
     Route.post('/payment/pix', 'v1/MercadoPagoController.processPixPayment');
     Route.get('/payment/:id', 'v1/MercadoPagoController.getPayment');
+
+    Route.get('/categories', 'v1/CategoriesController.search');
+    Route.get('/statuses', 'v1/StatusesController.search');
   });
 }).prefix('v1');
