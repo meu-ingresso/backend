@@ -1,7 +1,7 @@
 import Database from '@ioc:Adonis/Lucid/Database';
 import { DateTime } from 'luxon';
 import Event from 'App/Models/Access/Events';
-
+import Users from 'App/Models/Access/Users';
 interface AliasValidationResult {
   alias: string;
   is_valid: boolean;
@@ -84,9 +84,12 @@ export default class EventService {
 
   public async getByPromoterAlias(alias: string): Promise<any> {
 
-    const promoter = await Database.from('users')
+    const promoter = await Users.query()
       .where('alias', alias)
       .whereNull('deleted_at')
+      .preload('people')
+      .preload('attachments')
+      .preload('role')
       .first();
 
     if (!promoter) {
@@ -94,15 +97,12 @@ export default class EventService {
     }
 
     // Verifica se o papel do usuário é de promotor
-    const role = await Database.from('roles')
-      .where('id', promoter.role_id)
-      .first();
+    const role = promoter.role;
 
     if (!role || !['Produtor', 'Admin'].includes(role.name)) {
       return null;
     }
 
-    // Busca todos os eventos ativos (Publicados) do promoter
     const events = await Event.query()
       .where('promoter_id', promoter.id)
       .whereNull('deleted_at')
@@ -113,9 +113,6 @@ export default class EventService {
       .preload('category')
       .preload('rating')
       .preload('address')
-      .preload('promoter', (query) => {
-        query.preload('people');
-      })
       .preload('tickets', (query) => {
         query.whereNull('deleted_at')
       })
@@ -136,11 +133,20 @@ export default class EventService {
       }
     }
 
+    const profileImage = promoter.attachments?.find((attachment) => attachment.name === 'profile_image' && attachment.value) ?? '';
+    const biography = promoter.attachments?.find((attachment) => attachment.name === 'biography' && attachment.value) ?? '';
+
     return {
       promoter: {
         id: promoter.id,
         alias: promoter.alias,
-        name: await Database.from('people').where('id', promoter.people_id).first().then(p => p?.name),
+        first_name: promoter.people.first_name,
+        last_name: promoter.people.last_name,
+        social_name: promoter.people.social_name,
+        fantasy_name: promoter.people.fantasy_name,
+        email: promoter.email,
+        avatar: profileImage,
+        biography: biography,
       },
       events: events || [],
     };
