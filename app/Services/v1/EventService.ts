@@ -7,6 +7,10 @@ interface AliasValidationResult {
   is_valid: boolean;
 }
 
+interface EventWithTotalizers extends Event {
+  totalizers?: any;
+}
+
 export default class EventService {
   public async getTotalizers(event_id: string): Promise<any> {
     const totalizers = await Database.from('customer_tickets')
@@ -76,5 +80,71 @@ export default class EventService {
       .preload('checkoutFields')
       .preload('guestLists')
       .first();
+  }
+
+  public async getByPromoterAlias(alias: string): Promise<any> {
+    // Busca o usuário (promoter) pelo alias
+    const promoter = await Database.from('users')
+      .where('alias', alias)
+      .whereNull('deleted_at')
+      .first();
+
+    if (!promoter) {
+      return null;
+    }
+
+    // Verifica se o papel do usuário é de promotor
+    const role = await Database.from('roles')
+      .where('id', promoter.role_id)
+      .first();
+
+    if (!role || !['Promotor', 'Admin'].includes(role.name)) {
+      return null;
+    }
+
+    // Busca todos os eventos ativos (Publicados) do promoter
+    const events = await Event.query()
+      .where('promoter_id', promoter.id)
+      .whereNull('deleted_at')
+      .whereHas('status', (query) => {
+        query.where('name', 'Publicado');
+      })
+      .preload('status')
+      .preload('category')
+      .preload('rating')
+      .preload('address')
+      .preload('promoter', (query) => {
+        query.preload('people');
+      })
+      .preload('tickets', (query) => {
+        query.whereNull('deleted_at')
+          .where('is_active', true)
+          .orderBy('price', 'asc');
+      })
+      .preload('attachments', (query) => {
+        query.whereNull('deleted_at')
+          .orderBy('created_at', 'desc');
+      })
+      .preload('views')
+      .preload('fees')
+      .preload('groups')
+      .orderBy('start_date', 'desc');
+
+    // Adiciona os totalizadores para cada evento
+    if (events && events.length > 0) {
+      for (let i = 0; i < events.length; i++) {
+        const totalizer = await this.getTotalizers(events[i].id);
+        (events[i] as EventWithTotalizers).totalizers = totalizer;
+      }
+    }
+
+    return {
+      promoter: {
+        id: promoter.id,
+        alias: promoter.alias,
+        name: await Database.from('people').where('id', promoter.people_id).first().then(p => p?.name),
+      },
+      events: events || [],
+    };
   }
 }
