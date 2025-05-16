@@ -158,12 +158,94 @@ export default class EventsController {
 
   public async getByPromoterAlias(context: HttpContextContract) {
     const alias = context.request.params().alias;
+    const query = await context.request.validate(QueryModelValidator);
 
-    const result = await this.eventService.getByPromoterAlias(alias);
+    // Busca o promotor pelo alias
+    const promoterQuery = {
+      where: {
+        alias: { v: alias },
+      },
+      preloads: ['people', 'attachments', 'role'],
+    };
 
-    if (!result) {
+    const promoterResult = await this.dynamicService.search('User', promoterQuery);
+    
+    if (!promoterResult.data || !promoterResult.data.length) {
       return utils.handleError(context, 404, 'NOT_FOUND', 'PROMOTER_NOT_FOUND');
     }
+
+    const promoter = promoterResult.data[0];
+    
+    // Verifica se o papel do usuário é de promotor
+    if (!promoter.role || !['Produtor', 'Admin'].includes(promoter.role.name)) {
+      return utils.handleError(context, 404, 'NOT_FOUND', 'PROMOTER_NOT_FOUND');
+    }
+
+    // Busca eventos do promotor com os parâmetros de consulta fornecidos
+    const eventsQuery = {
+      ...(query || {}),
+      where: {
+        ...(query?.where || {}),
+        promoter_id: { v: promoter.id },
+        deleted_at: { v: null },
+      },
+      whereHas: {
+        ...(query?.whereHas || {}),
+        status: {
+          name: { v: 'Publicado' },
+        },
+      },
+      preloads: query?.preloads || [
+        'status',
+        'category',
+        'rating',
+        'address',
+        'tickets',
+        'attachments',
+        'views',
+        'fees',
+        'groups'
+      ],
+      orderBy: query?.orderBy || ['start_date:desc'],
+      page: query?.page || 1,
+      limit: query?.limit || 10,
+    };
+
+    const eventsResult = await this.dynamicService.search('Event', eventsQuery);
+    
+    // Adiciona totalizadores para cada evento
+    if (eventsResult.data && eventsResult.data.length > 0) {
+      for (let i = 0; i < eventsResult.data.length; i++) {
+        const totalizer = await this.eventService.getTotalizers(eventsResult.data[i].id);
+        eventsResult.data[i].totalizers = totalizer;
+      }
+    }
+
+    // Prepara informações do promotor
+    const profileImage = promoter.attachments?.find(
+      (attachment) => attachment.name === 'profile_image' && attachment.value
+    ) || '';
+    
+    const biography = promoter.attachments?.find(
+      (attachment) => attachment.name === 'biography' && attachment.value
+    ) || '';
+
+    // Monta a resposta
+    const result = {
+      promoter: {
+        id: promoter.id,
+        alias: promoter.alias,
+        name: promoter.people?.name,
+        email: promoter.email,
+        role: promoter.role?.name,
+        avatar: profileImage,
+        biography: biography,
+      },
+      events: {
+        data: eventsResult.data || [],
+        meta: eventsResult.meta || null,
+      },
+    };
 
     return utils.handleSuccess(context, result, 'SEARCH_SUCCESS', 200);
   }
