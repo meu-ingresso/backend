@@ -138,7 +138,7 @@ export default class EventService {
 
     return {
       promoter: {
-        ...promoter,
+        ...promoter.$attributes,
         avatar: profileImage,
         biography: biography,
       },
