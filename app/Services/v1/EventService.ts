@@ -83,7 +83,7 @@ export default class EventService {
   }
 
   public async getByPromoterAlias(alias: string): Promise<any> {
-    // Busca o usuário (promoter) pelo alias
+
     const promoter = await Database.from('users')
       .where('alias', alias)
       .whereNull('deleted_at')
@@ -98,7 +98,7 @@ export default class EventService {
       .where('id', promoter.role_id)
       .first();
 
-    if (!role || !['Promotor', 'Admin'].includes(role.name)) {
+    if (!role || !['Produtor', 'Admin'].includes(role.name)) {
       return null;
     }
 
