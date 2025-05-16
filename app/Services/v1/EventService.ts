@@ -138,13 +138,7 @@ export default class EventService {
 
     return {
       promoter: {
-        id: promoter.id,
-        alias: promoter.alias,
-        first_name: promoter.people.first_name,
-        last_name: promoter.people.last_name,
-        social_name: promoter.people.social_name,
-        fantasy_name: promoter.people.fantasy_name,
-        email: promoter.email,
+        ...promoter,
         avatar: profileImage,
         biography: biography,
       },
