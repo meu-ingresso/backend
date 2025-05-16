@@ -118,8 +118,6 @@ export default class EventService {
       })
       .preload('tickets', (query) => {
         query.whereNull('deleted_at')
-          .where('is_active', true)
-          .orderBy('price', 'asc');
       })
       .preload('attachments', (query) => {
         query.whereNull('deleted_at')
