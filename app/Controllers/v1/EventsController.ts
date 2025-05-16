@@ -155,4 +155,16 @@ export default class EventsController {
 
     return utils.handleSuccess(context, result, 'DELETE_SUCCESS', 200);
   }
+
+  public async getByPromoterAlias(context: HttpContextContract) {
+    const alias = context.request.params().alias;
+
+    const result = await this.eventService.getByPromoterAlias(alias);
+
+    if (!result) {
+      return utils.handleError(context, 404, 'NOT_FOUND', 'PROMOTER_NOT_FOUND');
+    }
+
+    return utils.handleSuccess(context, result, 'SEARCH_SUCCESS', 200);
+  }
 }
