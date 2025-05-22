@@ -4,6 +4,8 @@ import { CreateEventValidator, UpdateEventValidator } from 'App/Validators/v1/Ev
 import DynamicService from 'App/Services/v1/DynamicService';
 import EventService from 'App/Services/v1/EventService';
 import utils from 'Utils/utils';
+import { schema, rules } from '@ioc:Adonis/Core/Validator';
+import Database from '@ioc:Adonis/Lucid/Database';
 
 export default class EventsController {
   private dynamicService: DynamicService = new DynamicService();
@@ -248,5 +250,56 @@ export default class EventsController {
     };
 
     return utils.handleSuccess(context, result, 'SEARCH_SUCCESS', 200);
+  }
+
+  public async createSessions(context: HttpContextContract) {
+    // Validação dos dados recebidos
+    const { eventUuid, sessions } = await context.request.validate({
+      schema: schema.create({
+        eventUuid: schema.string({}, [rules.uuid()]),
+        sessions: schema.array().members(
+          schema.object().members({
+            start_date: schema.date(),
+            start_time: schema.string(),
+            end_date: schema.date(),
+            end_time: schema.string(),
+          })
+        ),
+      }),
+    });
+
+    try {
+      // Verificar permissões
+      const originalEventResult = await this.dynamicService.search('Event', {
+        where: { uuid: { v: eventUuid } },
+        limit: 1,
+      });
+      
+      if (!originalEventResult?.data?.[0]) {
+        return utils.handleError(context, 404, 'NOT_FOUND', 'EVENT_NOT_FOUND');
+      }
+      
+      const ableToCreate = await utils.checkHasEventPermission(context.auth.user!.id, originalEventResult.data[0].id);
+      if (!ableToCreate) {
+        return utils.handleError(context, 403, 'FORBIDDEN', 'ACCESS_DENIED');
+      }
+
+      // Delegar a lógica de criação de sessões para o EventService
+      const result = await this.eventService.createSessions(
+        eventUuid, 
+        sessions, 
+        context.auth.user!.id
+      );
+      
+      return utils.handleSuccess(context, result, 'SESSIONS_CREATED', 201);
+    } catch (error) {
+      if (error.message === 'EVENT_NOT_FOUND') {
+        return utils.handleError(context, 404, 'NOT_FOUND', 'EVENT_NOT_FOUND');
+      } else if (error.message === 'ORIGINAL_EVENT_HAS_NO_GROUP') {
+        return utils.handleError(context, 400, 'BAD_REQUEST', 'ORIGINAL_EVENT_HAS_NO_GROUP');
+      }
+      
+      return utils.handleError(context, 500, 'SERVER_ERROR', `${error.message}`);
+    }
   }
 }
