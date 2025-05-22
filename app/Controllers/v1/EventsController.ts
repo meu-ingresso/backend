@@ -5,7 +5,7 @@ import DynamicService from 'App/Services/v1/DynamicService';
 import EventService from 'App/Services/v1/EventService';
 import utils from 'Utils/utils';
 import { schema, rules } from '@ioc:Adonis/Core/Validator';
-import Database from '@ioc:Adonis/Lucid/Database';
+
 
 export default class EventsController {
   private dynamicService: DynamicService = new DynamicService();
@@ -287,8 +287,7 @@ export default class EventsController {
       // Delegar a lógica de criação de sessões para o EventService
       const result = await this.eventService.createSessions(
         eventUuid, 
-        sessions, 
-        context.auth.user!.id
+        sessions
       );
       
       return utils.handleSuccess(context, result, 'SESSIONS_CREATED', 201);

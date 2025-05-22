@@ -2,6 +2,7 @@ import Database from '@ioc:Adonis/Lucid/Database';
 import { DateTime } from 'luxon';
 import Event from 'App/Models/Access/Events';
 import Users from 'App/Models/Access/Users';
+
 interface AliasValidationResult {
   alias: string;
   is_valid: boolean;
@@ -153,7 +154,7 @@ export default class EventService {
     };
   }
 
-  public async createSessions(eventUuid: string, sessions: EventSession[], userId: string): Promise<any> {
+  public async createSessions(eventUuid: string, sessions: EventSession[]): Promise<any> {
     try {
       // Buscar evento original
       const originalEventResult = await Database.from('events')
@@ -176,7 +177,7 @@ export default class EventService {
       }
       
       // Iniciar transação para garantir consistência
-      const createdSessions = await Database.transaction(async (trx) => {
+      const createdSessions = await Database.transaction(async () => {
         const results: any[] = [];
         
         // Processar cada sessão
