@@ -254,35 +254,43 @@ export default class EventsController {
 
   public async createSessions(context: HttpContextContract) {
     // Validação dos dados recebidos
+
+    console.log("Validando dados recebidos");
+
     const { eventUuid, sessions } = await context.request.validate({
       schema: schema.create({
         eventUuid: schema.string({}, [rules.uuid()]),
         sessions: schema.array().members(
           schema.object().members({
             start_date: schema.date(),
-            start_time: schema.string(),
             end_date: schema.date(),
-            end_time: schema.string(),
           })
         ),
       }),
     });
 
+    console.log("Dados validados com sucesso");
+
     try {
+
       // Verificar permissões
       const originalEventResult = await this.dynamicService.search('Event', {
-        where: { uuid: { v: eventUuid } },
+        where: { id: { v: eventUuid } },
         limit: 1,
       });
       
       if (!originalEventResult?.data?.[0]) {
         return utils.handleError(context, 404, 'NOT_FOUND', 'EVENT_NOT_FOUND');
       }
+
+      console.log("Verificando permissões");
       
       const ableToCreate = await utils.checkHasEventPermission(context.auth.user!.id, originalEventResult.data[0].id);
       if (!ableToCreate) {
         return utils.handleError(context, 403, 'FORBIDDEN', 'ACCESS_DENIED');
       }
+
+      console.log("Criando sessões");
 
       // Delegar a lógica de criação de sessões para o EventService
       const result = await this.eventService.createSessions(
@@ -290,6 +298,8 @@ export default class EventsController {
         sessions
       );
       
+      console.log("Sessões criadas com sucesso");
+
       return utils.handleSuccess(context, result, 'SESSIONS_CREATED', 201);
     } catch (error) {
       if (error.message === 'EVENT_NOT_FOUND') {

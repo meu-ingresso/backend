@@ -14,9 +14,7 @@ interface EventWithTotalizers extends Event {
 
 interface EventSession {
   start_date: any;
-  start_time: string;
-  end_date: any;
-  end_time: string;
+    end_date: any;
 }
 
 export default class EventService {
@@ -158,7 +156,7 @@ export default class EventService {
     try {
       // Buscar evento original
       const originalEventResult = await Database.from('events')
-        .where('uuid', eventUuid)
+        .where('id', eventUuid)
         .whereNull('deleted_at')
         .first();
       
@@ -168,10 +166,9 @@ export default class EventService {
       
       // Buscar o grupo do evento original
       const groupRelation = await Database.from('event_group_relations')
-        .where('event_id', originalEventResult.id)
-        .first();
+        .where('event_id', originalEventResult.id);
       
-      const group_id = groupRelation?.group_id;
+      const group_id = groupRelation[0]?.group_id;
       if (!group_id) {
         throw new Error('ORIGINAL_EVENT_HAS_NO_GROUP');
       }
@@ -182,23 +179,6 @@ export default class EventService {
         
         // Processar cada sessão
         for (const session of sessions) {
-          // Verificar se já existe um evento do mesmo promoter com a mesma data/hora
-          const existingEvent = await Database.from('events')
-            .where('promoter_id', originalEventResult.promoter_id)
-            .where('start_date', session.start_date.toFormat('yyyy-MM-dd'))
-            .where('start_time', session.start_time)
-            .where('end_date', session.end_date.toFormat('yyyy-MM-dd'))
-            .where('end_time', session.end_time)
-            .whereNull('deleted_at')
-            .first();
-            
-          if (existingEvent) {
-            results.push({
-              error: `Já existe um evento com as mesmas datas e horários (ID: ${existingEvent.id})`,
-              session,
-            });
-            continue;
-          }
           
           // Obter todos os dados do evento original com todos os relacionamentos
           const dynamicService = new (await import('App/Services/v1/DynamicService')).default();
@@ -207,42 +187,70 @@ export default class EventService {
           const eventData = {
             ...originalEventResult,
             id: undefined,
-            uuid: undefined,
-            start_date: session.start_date,
-            start_time: session.start_time,
-            end_date: session.end_date,
-            end_time: session.end_time,
             created_at: undefined,
             updated_at: undefined,
+            alias: `${originalEventResult.alias}-${groupRelation.length + 1}`,
+            start_date: session.start_date,
+            end_date: session.end_date,
           };
+
+          console.log("Criando novo evento...");
           
           // Criar novo evento
           const newEvent = await dynamicService.create('Event', eventData);
           
+          console.log("Adicionando a relação com o grupo...");
           // Adicionar a relação com o grupo
           await dynamicService.create('EventGroupRelation', {
             group_id,
             event_id: newEvent.id,
           });
           
+          console.log("Criando taxas do evento...");
           // Criar taxas do evento
           await dynamicService.create('EventFee', {
             event_id: newEvent.id,
             platform_fee: 10, // Usando o mesmo valor padrão do método create
           });
           
+          console.log("Copiando ingressos (tickets)...");
           // Copiar ingressos (tickets)
           const originalTickets = await dynamicService.search('Ticket', {
             where: { event_id: { v: originalEventResult.id } },
+            preloads: ['category'],
           });
+
+          // Copiar as categorias dos ingressos
+          const originalCategories = await dynamicService.search('TicketEventCategory', {
+            where: { event_id: { v: originalEventResult.id } },
+          });
+
+          const newCategories: any[] = [];
+
+          if (originalCategories?.data?.length) { 
+
+            for (const category of originalCategories.data) {
+              const categoryData = {
+                ...category,
+                id: undefined,
+                event_id: newEvent.id,
+              };
+
+              const newCategory = await dynamicService.create('TicketEventCategory', categoryData);
+              newCategories.push({id: newCategory.id, name: category.name});
+            } 
+          }
           
           if (originalTickets?.data?.length) {
             for (const ticket of originalTickets.data) {
+
+              const category = newCategories.find((c) => c.name === ticket.category.name);
+
               const ticketData = {
                 ...ticket,
                 id: undefined,
-                uuid: undefined,
                 event_id: newEvent.id,
+                ticket_event_category_id: category?.id,
                 created_at: undefined,
                 updated_at: undefined,
               };
@@ -251,6 +259,7 @@ export default class EventService {
             }
           }
           
+          console.log("Copiando cupons...");
           // Copiar cupons
           const originalCoupons = await dynamicService.search('Coupon', {
             where: { event_id: { v: originalEventResult.id } },
@@ -261,7 +270,6 @@ export default class EventService {
               const couponData = {
                 ...coupon,
                 id: undefined,
-                uuid: undefined,
                 event_id: newEvent.id,
                 created_at: undefined,
                 updated_at: undefined,
@@ -276,6 +284,7 @@ export default class EventService {
               
               if (originalCouponTickets?.data?.length) {
                 for (const couponTicket of originalCouponTickets.data) {
+                  console.log("Copiando relação entre cupon e ticket...");
                   // Buscar o ticket correspondente no novo evento
                   const ticketRelation = await dynamicService.search('Ticket', {
                     where: { 
@@ -289,7 +298,6 @@ export default class EventService {
                     const couponTicketData = {
                       coupon_id: newCoupon.id,
                       ticket_id: ticketRelation.data[0].id,
-                      ticket_name: couponTicket.ticket_name,
                     };
                     
                     await dynamicService.create('CouponTicket', couponTicketData);
@@ -299,6 +307,7 @@ export default class EventService {
             }
           }
           
+          console.log("Copiando campos de checkout (EventCheckoutFields)...");
           // Copiar campos de checkout (EventCheckoutFields)
           const originalCheckoutFields = await dynamicService.search('EventCheckoutField', {
             where: { event_id: { v: originalEventResult.id } },
@@ -309,7 +318,6 @@ export default class EventService {
               const checkoutFieldData = {
                 ...checkoutField,
                 id: undefined,
-                uuid: undefined,
                 event_id: newEvent.id,
                 created_at: undefined,
                 updated_at: undefined,
@@ -319,7 +327,7 @@ export default class EventService {
               
               // Copiar opções dos campos de checkout
               const originalOptions = await dynamicService.search('EventCheckoutFieldOption', {
-                where: { field_id: { v: checkoutField.id } },
+                where: { event_checkout_field_id: { v: checkoutField.id } },
               });
               
               if (originalOptions?.data?.length) {
@@ -327,8 +335,7 @@ export default class EventService {
                   const optionData = {
                     ...option,
                     id: undefined,
-                    uuid: undefined,
-                    field_id: newCheckoutField.id,
+                    event_checkout_field_id: newCheckoutField.id,
                     created_at: undefined,
                     updated_at: undefined,
                   };
@@ -338,8 +345,8 @@ export default class EventService {
               }
               
               // Copiar relações de campos com tickets
-              const originalFieldsTickets = await dynamicService.search('EventCheckoutFieldsTicket', {
-                where: { field_id: { v: checkoutField.id } },
+              const originalFieldsTickets = await dynamicService.search('EventCheckoutFieldTicket', {
+                where: { event_checkout_field_id: { v: checkoutField.id } },
               });
               
               if (originalFieldsTickets?.data?.length) {
@@ -355,18 +362,18 @@ export default class EventService {
                   
                   if (ticketRelation?.data?.[0]) {
                     const fieldTicketData = {
-                      field_id: newCheckoutField.id,
+                      event_checkout_field_id: newCheckoutField.id,
                       ticket_id: ticketRelation.data[0].id,
-                      ticket_name: fieldTicket.ticket_name,
                     };
                     
-                    await dynamicService.create('EventCheckoutFieldsTicket', fieldTicketData);
+                    await dynamicService.create('EventCheckoutFieldTicket', fieldTicketData);
                   }
                 }
               }
             }
           }
           
+          console.log("Adicionando à lista de sessões criadas...");
           // Adicionar à lista de sessões criadas
           results.push({
             success: true,
