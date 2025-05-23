@@ -3,6 +3,7 @@ import { DateTime } from 'luxon';
 import Events from './Events';
 import { v4 as uuidv4 } from 'uuid';
 import EventCheckoutFieldsTickets from './EventCheckoutFieldsTickets';
+import EventCheckoutFieldOptions from './EventCheckoutFieldOptions';
 
 export default class EventCheckoutFields extends BaseModel {
   @column({ isPrimary: true })
@@ -53,6 +54,11 @@ export default class EventCheckoutFields extends BaseModel {
     foreignKey: 'event_checkout_field_id',
   })
   public eventCheckoutFieldsTickets: HasMany<typeof EventCheckoutFieldsTickets>;
+
+  @hasMany(() => EventCheckoutFieldOptions, {
+    foreignKey: 'event_checkout_field_id',
+  })
+  public eventCheckoutFieldOptions: HasMany<typeof EventCheckoutFieldOptions>;
 
   @beforeCreate()
   public static assignUuid(eventCheckoutField: EventCheckoutFields) {
