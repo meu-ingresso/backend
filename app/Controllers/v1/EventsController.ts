@@ -4,6 +4,8 @@ import { CreateEventValidator, UpdateEventValidator } from 'App/Validators/v1/Ev
 import DynamicService from 'App/Services/v1/DynamicService';
 import EventService from 'App/Services/v1/EventService';
 import utils from 'Utils/utils';
+import { schema, rules } from '@ioc:Adonis/Core/Validator';
+
 
 export default class EventsController {
   private dynamicService: DynamicService = new DynamicService();
@@ -154,5 +156,175 @@ export default class EventsController {
     });
 
     return utils.handleSuccess(context, result, 'DELETE_SUCCESS', 200);
+  }
+
+  public async getByPromoterAlias(context: HttpContextContract) {
+    const alias = context.request.params().alias;
+    const query = await context.request.validate(QueryModelValidator);
+
+    // Busca o promotor pelo alias
+    const promoterQuery = {
+      where: {
+        alias: { v: alias },
+      },
+      preloads: ['people', 'attachments', 'role'],
+    };
+
+    const promoterResult = await this.dynamicService.search('User', promoterQuery);
+    
+    if (!promoterResult.data || !promoterResult.data.length) {
+      return utils.handleError(context, 404, 'NOT_FOUND', 'PROMOTER_NOT_FOUND');
+    }
+
+    const promoter = promoterResult.data[0];
+    
+    // Verifica se o papel do usuário é de promotor
+    if (!promoter.role || !['Produtor', 'Admin'].includes(promoter.role.name)) {
+      return utils.handleError(context, 404, 'NOT_FOUND', 'PROMOTER_NOT_FOUND');
+    }
+
+    // Busca eventos do promotor com os parâmetros de consulta fornecidos
+    const eventsQuery = {
+      ...(query || {}),
+      where: {
+        ...(query?.where || {}),
+        promoter_id: { v: promoter.id },
+        deleted_at: { v: null },
+      },
+      whereHas: {
+        ...(query?.whereHas || {}),
+        status: {
+          name: { v: 'Publicado' },
+        },
+      },
+      preloads: query?.preloads || [
+        'status',
+        'category',
+        'rating',
+        'address',
+        'tickets',
+        'attachments',
+        'views',
+        'fees',
+        'groups'
+      ],
+      orderBy: query?.orderBy || ['start_date:desc'],
+      page: query?.page || 1,
+      limit: query?.limit || 10,
+    };
+
+    const eventsResult = await this.dynamicService.search('Event', eventsQuery);
+    
+    // Adiciona totalizadores para cada evento
+    if (eventsResult.data && eventsResult.data.length > 0) {
+      for (let i = 0; i < eventsResult.data.length; i++) {
+        const totalizer = await this.eventService.getTotalizers(eventsResult.data[i].id);
+        eventsResult.data[i].totalizers = totalizer;
+      }
+    }
+
+    // Prepara informações do promotor
+    const profileImage = promoter.attachments?.find(
+      (attachment) => attachment.name === 'profile_image' && attachment.value
+    ) || '';
+    
+    const biography = promoter.attachments?.find(
+      (attachment) => attachment.name === 'biography' && attachment.value
+    ) || '';
+
+    // Monta a resposta
+    const result = {
+      promoter: {
+        id: promoter.id,
+        alias: promoter.alias,
+        name: promoter.people?.name,
+        email: promoter.email,
+        role: promoter.role?.name,
+        avatar: profileImage,
+        biography: biography,
+      },
+      events: {
+        data: eventsResult.data || [],
+        meta: eventsResult.meta || null,
+      },
+    };
+
+    return utils.handleSuccess(context, result, 'SEARCH_SUCCESS', 200);
+  }
+
+  public async createSessions(context: HttpContextContract) {
+    // Validação dos dados recebidos
+
+    console.log("Validando dados recebidos");
+
+    const { eventUuid, sessions } = await context.request.validate({
+      schema: schema.create({
+        eventUuid: schema.string({}, [rules.uuid()]),
+        sessions: schema.array().members(
+          schema.object().members({
+            start_date: schema.date(),
+            end_date: schema.date(),
+          })
+        ),
+      }),
+    });
+
+    console.log("Dados validados com sucesso");
+
+    try {
+
+      // Verificar permissões
+      const originalEventResult = await this.dynamicService.search('Event', {
+        where: { id: { v: eventUuid } },
+        limit: 1,
+      });
+      
+      if (!originalEventResult?.data?.[0]) {
+        return utils.handleError(context, 404, 'NOT_FOUND', 'EVENT_NOT_FOUND');
+      }
+
+      console.log("Verificando permissões");
+      
+      const ableToCreate = await utils.checkHasEventPermission(context.auth.user!.id, originalEventResult.data[0].id);
+      if (!ableToCreate) {
+        return utils.handleError(context, 403, 'FORBIDDEN', 'ACCESS_DENIED');
+      }
+
+      console.log("Criando sessões");
+
+      // Delegar a lógica de criação de sessões para o EventService
+      const result = await this.eventService.createSessions(
+        eventUuid, 
+        sessions
+      );
+      
+      console.log("Sessões criadas com sucesso");
+
+      return utils.handleSuccess(context, result, 'SESSIONS_CREATED', 201);
+    } catch (error) {
+      if (error.message === 'EVENT_NOT_FOUND') {
+        return utils.handleError(context, 404, 'NOT_FOUND', 'EVENT_NOT_FOUND');
+      } else if (error.message === 'ORIGINAL_EVENT_HAS_NO_GROUP') {
+        return utils.handleError(context, 400, 'BAD_REQUEST', 'ORIGINAL_EVENT_HAS_NO_GROUP');
+      }
+      
+      return utils.handleError(context, 500, 'SERVER_ERROR', `${error.message}`);
+    }
+  }
+
+  public async duplicateEvent(context: HttpContextContract) {
+    try {
+      const { eventId } = await context.request.validate({
+        schema: schema.create({
+          eventId: schema.string({}, [rules.uuid()]),
+        }),
+      });
+
+      const result = await this.eventService.duplicateEvent(eventId);
+
+      return utils.handleSuccess(context, result, 'DUPLICATE_SUCCESS', 201);
+    } catch (error) {
+      return utils.handleError(context, 500, 'SERVER_ERROR', `${error.message}`);
+    }
   }
 }

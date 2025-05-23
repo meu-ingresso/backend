@@ -19,7 +19,7 @@ class CreateUserAttachmentValidator {
         ]),
         name: schema.string({ trim: true }, [rules.maxLength(255)]),
         type: schema.string.optional({ trim: true }, [rules.maxLength(50)]),
-        value: schema.string.optional({ trim: true }, [rules.maxLength(255)]),
+        value: schema.string.optional({ trim: true }, [rules.maxLength(2048)]),
       })
     ),
   });
@@ -32,7 +32,7 @@ class CreateUserAttachmentValidator {
     'data.*.name.required': 'O campo "name" é obrigatório.',
     'data.*.name.maxLength': 'O campo "name" deve ter no máximo 255 caracteres.',
     'data.*.type.maxLength': 'O campo "type" deve ter no máximo 50 caracteres.',
-    'data.*.value.maxLength': 'O campo "value" deve ter no máximo 255 caracteres.',
+    'data.*.value.maxLength': 'O campo "value" deve ter no máximo 2048 caracteres.',
   };
 }
 
@@ -60,7 +60,7 @@ class UpdateUserAttachmentValidator {
         ]),
         name: schema.string.optional({ trim: true }, [rules.maxLength(255)]),
         type: schema.string.optional({ trim: true }, [rules.maxLength(50)]),
-        value: schema.string.optional({ trim: true }, [rules.maxLength(255)]),
+        value: schema.string.optional({ trim: true }, [rules.maxLength(2048)]),
       })
     ),
   });
@@ -73,7 +73,7 @@ class UpdateUserAttachmentValidator {
     'data.*.user_id.exists': 'O "user_id" fornecido não existe na tabela de usuários.',
     'data.*.name.maxLength': 'O campo "name" deve ter no máximo 255 caracteres.',
     'data.*.type.maxLength': 'O campo "type" deve ter no máximo 50 caracteres.',
-    'data.*.value.maxLength': 'O campo "value" deve ter no máximo 255 caracteres.',
+    'data.*.value.maxLength': 'O campo "value" deve ter no máximo 2048 caracteres.',
   };
 }
 
