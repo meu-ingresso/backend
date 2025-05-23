@@ -311,4 +311,20 @@ export default class EventsController {
       return utils.handleError(context, 500, 'SERVER_ERROR', `${error.message}`);
     }
   }
+
+  public async duplicateEvent(context: HttpContextContract) {
+    try {
+      const { eventId } = await context.request.validate({
+        schema: schema.create({
+          eventId: schema.string({}, [rules.uuid()]),
+        }),
+      });
+
+      const result = await this.eventService.duplicateEvent(eventId);
+
+      return utils.handleSuccess(context, result, 'DUPLICATE_SUCCESS', 201);
+    } catch (error) {
+      return utils.handleError(context, 500, 'SERVER_ERROR', `${error.message}`);
+    }
+  }
 }
