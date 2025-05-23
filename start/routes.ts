@@ -82,6 +82,7 @@ Route.group(() => {
     Route.get('/events', 'v1/EventsController.search');
     Route.post('/event', 'v1/EventsController.create');
     Route.post('/event/sessions', 'v1/EventsController.createSessions');
+    Route.post('/event/duplicate', 'v1/EventsController.duplicateEvent');
     Route.get('/event/validate-alias/:alias', 'v1/EventsController.validateAlias');
     Route.patch('/event', 'v1/EventsController.update');
     Route.delete('/event/:id', 'v1/EventsController.delete');

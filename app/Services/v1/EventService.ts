@@ -14,7 +14,14 @@ interface EventWithTotalizers extends Event {
 
 interface EventSession {
   start_date: any;
-    end_date: any;
+  end_date: any;
+}
+
+interface DuplicateOptions {
+  start_date?: any;
+  end_date?: any;
+  alias?: string;
+  addToGroup?: boolean;
 }
 
 export default class EventService {
@@ -152,6 +159,66 @@ export default class EventService {
     };
   }
 
+  public async duplicateEvent(eventId: string, options: DuplicateOptions = {}): Promise<any> {
+    try {
+      // Buscar evento original
+      const originalEventResult = await Database.from('events')
+        .where('id', eventId)
+        .whereNull('deleted_at')
+        .first();
+      
+      if (!originalEventResult) {
+        throw new Error('EVENT_NOT_FOUND');
+      }
+      
+      // Iniciar transação para garantir consistência
+      return await Database.transaction(async () => {
+        const dynamicService = new (await import('App/Services/v1/DynamicService')).default();
+        
+        // Obter dados do grupo se necessário
+        let group_id = null;
+        if (options.addToGroup) {
+          const groupRelation = await Database.from('event_group_relations')
+            .where('event_id', originalEventResult.id)
+            .first();
+          
+          group_id = groupRelation?.group_id;
+        }
+
+        // Criar cópia do evento com novos dados
+        const customAlias = options.alias || `${originalEventResult.alias}-copy-${DateTime.now().toFormat('yyyyMMddHHmmss')}`;
+        
+        const eventData = {
+          ...originalEventResult,
+          id: undefined,
+          created_at: undefined,
+          updated_at: undefined,
+          alias: customAlias,
+          start_date: options.start_date || originalEventResult.start_date,
+          end_date: options.end_date || originalEventResult.end_date,
+        };
+        
+        // Criar novo evento
+        const newEvent = await dynamicService.create('Event', eventData);
+        
+        // Adicionar a relação com o grupo se necessário
+        if (group_id) {
+          await dynamicService.create('EventGroupRelation', {
+            group_id,
+            event_id: newEvent.id,
+          });
+        }
+        
+        // Duplicar todas as entidades relacionadas
+        await this._duplicateEventRelatedEntities(originalEventResult.id, newEvent.id, dynamicService);
+        
+        return newEvent;
+      });
+    } catch (error) {
+      throw error;
+    }
+  }
+
   public async createSessions(eventUuid: string, sessions: EventSession[]): Promise<any> {
     try {
       // Buscar evento original
@@ -180,204 +247,34 @@ export default class EventService {
       // Iniciar transação para garantir consistência
       const createdSessions = await Database.transaction(async () => {
         const results: any[] = [];
+        const dynamicService = new (await import('App/Services/v1/DynamicService')).default();
         
         // Processar cada sessão
-        for (const session of sessions) {
-          
-          // Obter todos os dados do evento original com todos os relacionamentos
-          const dynamicService = new (await import('App/Services/v1/DynamicService')).default();
-          
+        for (const [index, session] of sessions.entries()) {
           // Criar cópia do evento com novos dados
+          const sessionNum = groupsOfGroup.length + index + 1;
           const eventData = {
             ...originalEventResult,
             id: undefined,
             created_at: undefined,
             updated_at: undefined,
-            alias: `${originalEventResult.alias}-${groupsOfGroup.length + 1}`,
+            alias: `${originalEventResult.alias}-${sessionNum}`,
             start_date: session.start_date,
             end_date: session.end_date,
           };
-
-          console.log("Criando novo evento...");
           
           // Criar novo evento
           const newEvent = await dynamicService.create('Event', eventData);
           
-          console.log("Adicionando a relação com o grupo...");
           // Adicionar a relação com o grupo
           await dynamicService.create('EventGroupRelation', {
             group_id,
             event_id: newEvent.id,
           });
           
-          console.log("Criando taxas do evento...");
-          // Criar taxas do evento
-          await dynamicService.create('EventFee', {
-            event_id: newEvent.id,
-            platform_fee: 10, // Usando o mesmo valor padrão do método create
-          });
+          // Duplicar todas as entidades relacionadas
+          await this._duplicateEventRelatedEntities(originalEventResult.id, newEvent.id, dynamicService);
           
-          console.log("Copiando ingressos (tickets)...");
-          // Copiar ingressos (tickets)
-          const originalTickets = await dynamicService.search('Ticket', {
-            where: { event_id: { v: originalEventResult.id } },
-            preloads: ['category'],
-          });
-
-          // Copiar as categorias dos ingressos
-          const originalCategories = await dynamicService.search('TicketEventCategory', {
-            where: { event_id: { v: originalEventResult.id } },
-          });
-
-          const newCategories: any[] = [];
-
-          if (originalCategories?.data?.length) { 
-
-            for (const category of originalCategories.data) {
-              const categoryData = {
-                ...category,
-                id: undefined,
-                event_id: newEvent.id,
-              };
-
-              const newCategory = await dynamicService.create('TicketEventCategory', categoryData);
-              newCategories.push({id: newCategory.id, name: category.name});
-            } 
-          }
-          
-          if (originalTickets?.data?.length) {
-            for (const ticket of originalTickets.data) {
-
-              const category = newCategories.find((c) => c.name === ticket.category.name);
-
-              const ticketData = {
-                ...ticket,
-                id: undefined,
-                event_id: newEvent.id,
-                ticket_event_category_id: category?.id,
-                created_at: undefined,
-                updated_at: undefined,
-              };
-              
-              await dynamicService.create('Ticket', ticketData);
-            }
-          }
-          
-          console.log("Copiando cupons...");
-          // Copiar cupons
-          const originalCoupons = await dynamicService.search('Coupon', {
-            where: { event_id: { v: originalEventResult.id } },
-          });
-          
-          if (originalCoupons?.data?.length) {
-            for (const coupon of originalCoupons.data) {
-              const couponData = {
-                ...coupon,
-                id: undefined,
-                event_id: newEvent.id,
-                created_at: undefined,
-                updated_at: undefined,
-              };
-              
-              const newCoupon = await dynamicService.create('Coupon', couponData);
-              
-              // Copiar relações entre cupons e tickets
-              const originalCouponTickets = await dynamicService.search('CouponTicket', {
-                where: { coupon_id: { v: coupon.id } },
-              });
-              
-              if (originalCouponTickets?.data?.length) {
-                for (const couponTicket of originalCouponTickets.data) {
-                  console.log("Copiando relação entre cupon e ticket...");
-                  // Buscar o ticket correspondente no novo evento
-                  const ticketRelation = await dynamicService.search('Ticket', {
-                    where: { 
-                      event_id: { v: newEvent.id },
-                      name: { v: couponTicket.ticket_name }, 
-                    },
-                    limit: 1,
-                  });
-                  
-                  if (ticketRelation?.data?.[0]) {
-                    const couponTicketData = {
-                      coupon_id: newCoupon.id,
-                      ticket_id: ticketRelation.data[0].id,
-                    };
-                    
-                    await dynamicService.create('CouponTicket', couponTicketData);
-                  }
-                }
-              }
-            }
-          }
-          
-          console.log("Copiando campos de checkout (EventCheckoutFields)...");
-          // Copiar campos de checkout (EventCheckoutFields)
-          const originalCheckoutFields = await dynamicService.search('EventCheckoutField', {
-            where: { event_id: { v: originalEventResult.id } },
-          });
-          
-          if (originalCheckoutFields?.data?.length) {
-            for (const checkoutField of originalCheckoutFields.data) {
-              const checkoutFieldData = {
-                ...checkoutField,
-                id: undefined,
-                event_id: newEvent.id,
-                created_at: undefined,
-                updated_at: undefined,
-              };
-              
-              const newCheckoutField = await dynamicService.create('EventCheckoutField', checkoutFieldData);
-              
-              // Copiar opções dos campos de checkout
-              const originalOptions = await dynamicService.search('EventCheckoutFieldOption', {
-                where: { event_checkout_field_id: { v: checkoutField.id } },
-              });
-              
-              if (originalOptions?.data?.length) {
-                for (const option of originalOptions.data) {
-                  const optionData = {
-                    ...option,
-                    id: undefined,
-                    event_checkout_field_id: newCheckoutField.id,
-                    created_at: undefined,
-                    updated_at: undefined,
-                  };
-                  
-                  await dynamicService.create('EventCheckoutFieldOption', optionData);
-                }
-              }
-              
-              // Copiar relações de campos com tickets
-              const originalFieldsTickets = await dynamicService.search('EventCheckoutFieldTicket', {
-                where: { event_checkout_field_id: { v: checkoutField.id } },
-              });
-              
-              if (originalFieldsTickets?.data?.length) {
-                for (const fieldTicket of originalFieldsTickets.data) {
-                  // Buscar o ticket correspondente no novo evento
-                  const ticketRelation = await dynamicService.search('Ticket', {
-                    where: { 
-                      event_id: { v: newEvent.id },
-                      name: { v: fieldTicket.ticket_name },
-                    },
-                    limit: 1,
-                  });
-                  
-                  if (ticketRelation?.data?.[0]) {
-                    const fieldTicketData = {
-                      event_checkout_field_id: newCheckoutField.id,
-                      ticket_id: ticketRelation.data[0].id,
-                    };
-                    
-                    await dynamicService.create('EventCheckoutFieldTicket', fieldTicketData);
-                  }
-                }
-              }
-            }
-          }
-          
-          console.log("Adicionando à lista de sessões criadas...");
           // Adicionar à lista de sessões criadas
           results.push({
             success: true,
@@ -392,6 +289,232 @@ export default class EventService {
       return createdSessions;
     } catch (error) {
       throw error;
+    }
+  }
+
+  // Método privado para duplicar todas as entidades relacionadas a um evento
+  private async _duplicateEventRelatedEntities(sourceEventId: string, targetEventId: string, dynamicService: any): Promise<void> {
+    // 1. Criar taxas do evento
+    await this._duplicateEventFees(sourceEventId, targetEventId, dynamicService);
+    
+    // 2. Duplicar categorias de ingressos
+    const newCategories = await this._duplicateTicketCategories(sourceEventId, targetEventId, dynamicService);
+    
+    // 3. Duplicar ingressos
+    await this._duplicateTickets(sourceEventId, targetEventId, newCategories, dynamicService);
+    
+    // 4. Duplicar cupons
+    await this._duplicateCoupons(sourceEventId, targetEventId, dynamicService);
+    
+    // 5. Duplicar campos de checkout
+    await this._duplicateCheckoutFields(sourceEventId, targetEventId, dynamicService);
+  }
+
+  private async _duplicateEventFees(sourceEventId: string, targetEventId: string, dynamicService: any): Promise<void> {
+    // Buscar as taxas do evento original
+    const originalFees = await dynamicService.search('EventFee', {
+      where: { event_id: { v: sourceEventId } },
+    });
+
+    if (originalFees?.data?.length) {
+      for (const fee of originalFees.data) {
+        await dynamicService.create('EventFee', {
+          ...fee,
+          id: undefined,
+          event_id: targetEventId,
+          created_at: undefined,
+          updated_at: undefined,
+        });
+      }
+    } else {
+      // Criar taxa padrão se não existir
+      await dynamicService.create('EventFee', {
+        event_id: targetEventId,
+        platform_fee: 10,
+      });
+    }
+  }
+
+  private async _duplicateTicketCategories(sourceEventId: string, targetEventId: string, dynamicService: any): Promise<any[]> {
+    const newCategories: any[] = [];
+    
+    // Buscar as categorias do evento original
+    const originalCategories = await dynamicService.search('TicketEventCategory', {
+      where: { event_id: { v: sourceEventId } },
+    });
+
+    if (originalCategories?.data?.length) {
+      for (const category of originalCategories.data) {
+        const categoryData = {
+          ...category,
+          id: undefined,
+          event_id: targetEventId,
+          created_at: undefined,
+          updated_at: undefined,
+        };
+
+        const newCategory = await dynamicService.create('TicketEventCategory', categoryData);
+        newCategories.push({
+          id: newCategory.id,
+          name: category.name,
+          originalId: category.id
+        });
+      }
+    }
+    
+    return newCategories;
+  }
+
+  private async _duplicateTickets(sourceEventId: string, targetEventId: string, newCategories: any[], dynamicService: any): Promise<void> {
+    // Buscar os ingressos do evento original
+    const originalTickets = await dynamicService.search('Ticket', {
+      where: { event_id: { v: sourceEventId } },
+      preloads: ['category'],
+    });
+
+    if (originalTickets?.data?.length) {
+      for (const ticket of originalTickets.data) {
+        // Encontrar a categoria correspondente no novo evento
+        const category = newCategories.find((c) => c.name === ticket.category?.name);
+
+        const ticketData = {
+          ...ticket,
+          id: undefined,
+          event_id: targetEventId,
+          ticket_event_category_id: category?.id,
+          created_at: undefined,
+          updated_at: undefined,
+        };
+        
+        await dynamicService.create('Ticket', ticketData);
+      }
+    }
+  }
+
+  private async _duplicateCoupons(sourceEventId: string, targetEventId: string, dynamicService: any): Promise<void> {
+    // Buscar os cupons do evento original
+    const originalCoupons = await dynamicService.search('Coupon', {
+      where: { event_id: { v: sourceEventId } },
+    });
+    
+    if (originalCoupons?.data?.length) {
+      for (const coupon of originalCoupons.data) {
+        const couponData = {
+          ...coupon,
+          id: undefined,
+          event_id: targetEventId,
+          created_at: undefined,
+          updated_at: undefined,
+        };
+        
+        const newCoupon = await dynamicService.create('Coupon', couponData);
+        
+        // Copiar relações entre cupons e tickets
+        await this._duplicateCouponTicketRelations(coupon.id, newCoupon.id, targetEventId, dynamicService);
+      }
+    }
+  }
+
+  private async _duplicateCouponTicketRelations(sourceCouponId: string, targetCouponId: string, targetEventId: string, dynamicService: any): Promise<void> {
+    const originalCouponTickets = await dynamicService.search('CouponTicket', {
+      where: { coupon_id: { v: sourceCouponId } },
+    });
+    
+    if (originalCouponTickets?.data?.length) {
+      for (const couponTicket of originalCouponTickets.data) {
+        // Buscar o ticket correspondente no novo evento
+        const ticketRelation = await dynamicService.search('Ticket', {
+          where: { 
+            event_id: { v: targetEventId },
+            id: { v: couponTicket.ticket_id }, 
+          },
+          limit: 1,
+        });
+        
+        if (ticketRelation?.data?.[0]) {
+          const couponTicketData = {
+            coupon_id: targetCouponId,
+            ticket_id: ticketRelation.data[0].id,
+          };
+          
+          await dynamicService.create('CouponTicket', couponTicketData);
+        }
+      }
+    }
+  }
+
+  private async _duplicateCheckoutFields(sourceEventId: string, targetEventId: string, dynamicService: any): Promise<void> {
+    // Buscar os campos de checkout do evento original
+    const originalCheckoutFields = await dynamicService.search('EventCheckoutField', {
+      where: { event_id: { v: sourceEventId } },
+    });
+    
+    if (originalCheckoutFields?.data?.length) {
+      for (const checkoutField of originalCheckoutFields.data) {
+        const checkoutFieldData = {
+          ...checkoutField,
+          id: undefined,
+          event_id: targetEventId,
+          created_at: undefined,
+          updated_at: undefined,
+        };
+        
+        const newCheckoutField = await dynamicService.create('EventCheckoutField', checkoutFieldData);
+        
+        // Copiar opções dos campos de checkout
+        await this._duplicateCheckoutFieldOptions(checkoutField.id, newCheckoutField.id, dynamicService);
+        
+        // Copiar relações de campos com tickets
+        await this._duplicateCheckoutFieldTicketRelations(checkoutField.id, newCheckoutField.id, targetEventId, dynamicService);
+      }
+    }
+  }
+
+  private async _duplicateCheckoutFieldOptions(sourceFieldId: string, targetFieldId: string, dynamicService: any): Promise<void> {
+    const originalOptions = await dynamicService.search('EventCheckoutFieldOption', {
+      where: { event_checkout_field_id: { v: sourceFieldId } },
+    });
+    
+    if (originalOptions?.data?.length) {
+      for (const option of originalOptions.data) {
+        const optionData = {
+          ...option,
+          id: undefined,
+          event_checkout_field_id: targetFieldId,
+          created_at: undefined,
+          updated_at: undefined,
+        };
+        
+        await dynamicService.create('EventCheckoutFieldOption', optionData);
+      }
+    }
+  }
+
+  private async _duplicateCheckoutFieldTicketRelations(sourceFieldId: string, targetFieldId: string, targetEventId: string, dynamicService: any): Promise<void> {
+    const originalFieldsTickets = await dynamicService.search('EventCheckoutFieldTicket', {
+      where: { event_checkout_field_id: { v: sourceFieldId } },
+    });
+    
+    if (originalFieldsTickets?.data?.length) {
+      for (const fieldTicket of originalFieldsTickets.data) {
+        // Buscar o ticket correspondente no novo evento
+        const ticketRelation = await dynamicService.search('Ticket', {
+          where: { 
+            event_id: { v: targetEventId },
+            id: { v: fieldTicket.ticket_id },
+          },
+          limit: 1,
+        });
+        
+        if (ticketRelation?.data?.[0]) {
+          const fieldTicketData = {
+            event_checkout_field_id: targetFieldId,
+            ticket_id: ticketRelation.data[0].id,
+          };
+          
+          await dynamicService.create('EventCheckoutFieldTicket', fieldTicketData);
+        }
+      }
     }
   }
 }
