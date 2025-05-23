@@ -166,12 +166,16 @@ export default class EventService {
       
       // Buscar o grupo do evento original
       const groupRelation = await Database.from('event_group_relations')
-        .where('event_id', originalEventResult.id);
+        .where('event_id', originalEventResult.id)
+        .first();
       
-      const group_id = groupRelation[0]?.group_id;
+      const group_id = groupRelation?.group_id;
       if (!group_id) {
         throw new Error('ORIGINAL_EVENT_HAS_NO_GROUP');
       }
+
+      const groupsOfGroup = await Database.from('event_group_relations')
+        .where('group_id', group_id);
       
       // Iniciar transação para garantir consistência
       const createdSessions = await Database.transaction(async () => {
@@ -189,7 +193,7 @@ export default class EventService {
             id: undefined,
             created_at: undefined,
             updated_at: undefined,
-            alias: `${originalEventResult.alias}-${groupRelation.length + 1}`,
+            alias: `${originalEventResult.alias}-${groupsOfGroup.length + 1}`,
             start_date: session.start_date,
             end_date: session.end_date,
           };
