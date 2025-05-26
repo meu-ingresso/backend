@@ -230,7 +230,12 @@ export default class EventsController {
     
     const biography = promoter.attachments?.find(
       (attachment) => attachment.name === 'biography' && attachment.value
-    ) || '';
+    ) || ''
+
+    
+    const socialLinks = promoter.attachments?.filter(
+      (attachment) => attachment.name === 'social_links' && attachment.value
+    ) || []
 
     // Monta a resposta
     const result = {
@@ -242,6 +247,7 @@ export default class EventsController {
         role: promoter.role?.name,
         avatar: profileImage,
         biography: biography,
+        social_links: socialLinks,
       },
       events: {
         data: eventsResult.data || [],
