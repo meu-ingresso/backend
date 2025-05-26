@@ -232,8 +232,8 @@ export default class EventsController {
       (attachment) => attachment.name === 'biography' && attachment.value
     ) || ''
 
-    
-    const socialLinks = promoter.attachments?.filter(
+
+    const socialLinks = promoter.attachments?.find(
       (attachment) => attachment.name === 'social_links' && attachment.value
     ) || []
 
