@@ -211,5 +211,6 @@ Route.group(() => {
     Route.get('/categories', 'v1/CategoriesController.search');
     Route.get('/statuses', 'v1/StatusesController.search');
     Route.get('/promoter/:alias/events', 'v1/EventsController.getByPromoterAlias');
+    Route.get('/events/top-active-by-category', 'v1/EventsController.topActiveByCategory');
   });
 }).prefix('v1');
