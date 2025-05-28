@@ -2,6 +2,7 @@ import Database from '@ioc:Adonis/Lucid/Database';
 import { DateTime } from 'luxon';
 import Event from 'App/Models/Access/Events';
 import Users from 'App/Models/Access/Users';
+import EventGroupingService from 'App/Services/v1/EventGroupingService';
 
 interface AliasValidationResult {
   alias: string;
@@ -491,30 +492,111 @@ export default class EventService {
   }
 
   private async _duplicateCheckoutFieldTicketRelations(sourceFieldId: string, targetFieldId: string, targetEventId: string, dynamicService: any): Promise<void> {
-    const originalFieldsTickets = await dynamicService.search('EventCheckoutFieldTicket', {
-      where: { event_checkout_field_id: { v: sourceFieldId } },
-    });
-    
-    if (originalFieldsTickets?.data?.length) {
-      for (const fieldTicket of originalFieldsTickets.data) {
-        // Buscar o ticket correspondente no novo evento
-        const ticketRelation = await dynamicService.search('Ticket', {
-          where: { 
-            event_id: { v: targetEventId },
-            id: { v: fieldTicket.ticket_id },
-          },
-          limit: 1,
-        });
-        
-        if (ticketRelation?.data?.[0]) {
-          const fieldTicketData = {
-            event_checkout_field_id: targetFieldId,
-            ticket_id: ticketRelation.data[0].id,
-          };
-          
-          await dynamicService.create('EventCheckoutFieldTicket', fieldTicketData);
-        }
-      }
+    // Buscar relações originais
+    const originalRelations = await Database.from('event_checkout_fields_tickets')
+      .where('event_checkout_field_id', sourceFieldId);
+
+    if (originalRelations && originalRelations.length > 0) {
+      // Buscar tickets do novo evento
+      const newEventTickets = await Database.from('tickets')
+        .where('event_id', targetEventId);
+
+      const relations = originalRelations.map((relation) => {
+        // Encontrar o ticket correspondente no novo evento
+        const correspondingTicket = newEventTickets.find(
+          (ticket) => ticket.name === relation.ticket_name || ticket.value === relation.ticket_value
+        );
+
+        return {
+          event_checkout_field_id: targetFieldId,
+          ticket_id: correspondingTicket ? correspondingTicket.id : relation.ticket_id,
+        };
+      });
+
+      await dynamicService.bulkCreate({
+        modelName: 'EventCheckoutFieldTicket',
+        records: relations,
+      });
     }
+  }
+
+  public async getTopActiveEventsByCategory(limit: number = 10): Promise<any> {
+    const now = DateTime.now();
+    
+    // Buscar todos os eventos ativos usando o Lucid ORM com preloads
+    const whereConditions = {
+      start_date_gt: now.toSQL(),
+    };
+    
+    const preloads = [
+      'attachments',
+      'address', 
+      'category',
+      'status'
+    ];
+    
+    // Buscar eventos com preloads e aplicar agrupamento
+    const groupedEvents = await EventGroupingService.applyEventGroupingWithPreloads(whereConditions, preloads);
+    
+    // Agrupar eventos por categoria
+    const categoriesMap = new Map<string, any>();
+    
+    for (const event of groupedEvents) {
+      // Verificar se o evento tem categoria
+      if (!event.category) continue;
+      
+      const categoryId = event.category.id;
+      const categoryName = event.category.name;
+      
+      if (!categoriesMap.has(categoryId)) {
+        categoriesMap.set(categoryId, {
+          category_id: categoryId,
+          category_name: categoryName,
+          events_count: 0,
+          events: []
+        });
+      }
+      
+      const category = categoriesMap.get(categoryId);
+      category.events.push(event);
+      category.events_count++;
+    }
+
+    // Converter para array e ordenar por número de eventos
+    const result = Array.from(categoriesMap.values())
+      .sort((a, b) => b.events_count - a.events_count);
+
+    // Limitar o número total de eventos distribuindo entre as categorias
+    let totalEventsAdded = 0;
+    const finalResult: any[] = [];
+    
+    for (const category of result) {
+      if (totalEventsAdded >= limit) break;
+      
+      const eventsToAdd = Math.min(
+        category.events.length,
+        limit - totalEventsAdded,
+        Math.max(1, Math.floor(limit / 5))
+      );
+      
+      finalResult.push({
+        category_id: category.category_id,
+        category_name: category.category_name,
+        events_count: eventsToAdd,
+        events: category.events.slice(0, eventsToAdd)
+      });
+      
+      totalEventsAdded += eventsToAdd;
+    }
+
+    return finalResult;
+  }
+
+  /**
+   * Método utilitário para aplicar agrupamento de eventos em qualquer consulta
+   * Útil para manter consistência em todas as buscas de eventos da API
+   */
+  public async getEventsWithSessionGrouping(baseQuery: any): Promise<any[]> {
+    return await EventGroupingService.applyEventGrouping(baseQuery);
   }
 }

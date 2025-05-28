@@ -260,9 +260,6 @@ export default class EventsController {
 
   public async createSessions(context: HttpContextContract) {
     // Validação dos dados recebidos
-
-    console.log("Validando dados recebidos");
-
     const { eventUuid, sessions } = await context.request.validate({
       schema: schema.create({
         eventUuid: schema.string({}, [rules.uuid()]),
@@ -274,8 +271,6 @@ export default class EventsController {
         ),
       }),
     });
-
-    console.log("Dados validados com sucesso");
 
     try {
 
@@ -289,14 +284,10 @@ export default class EventsController {
         return utils.handleError(context, 404, 'NOT_FOUND', 'EVENT_NOT_FOUND');
       }
 
-      console.log("Verificando permissões");
-      
       const ableToCreate = await utils.checkHasEventPermission(context.auth.user!.id, originalEventResult.data[0].id);
       if (!ableToCreate) {
         return utils.handleError(context, 403, 'FORBIDDEN', 'ACCESS_DENIED');
       }
-
-      console.log("Criando sessões");
 
       // Delegar a lógica de criação de sessões para o EventService
       const result = await this.eventService.createSessions(
@@ -304,8 +295,6 @@ export default class EventsController {
         sessions
       );
       
-      console.log("Sessões criadas com sucesso");
-
       return utils.handleSuccess(context, result, 'SESSIONS_CREATED', 201);
     } catch (error) {
       if (error.message === 'EVENT_NOT_FOUND') {
@@ -329,6 +318,23 @@ export default class EventsController {
       const result = await this.eventService.duplicateEvent(eventId);
 
       return utils.handleSuccess(context, result, 'DUPLICATE_SUCCESS', 201);
+    } catch (error) {
+      return utils.handleError(context, 500, 'SERVER_ERROR', `${error.message}`);
+    }
+  }
+
+  public async topActiveByCategory(context: HttpContextContract) {
+    try {
+      const limit = context.request.input('limit', 10);
+
+      const parsedLimit = parseInt(limit);
+      if (isNaN(parsedLimit) || parsedLimit <= 0) {
+        return utils.handleError(context, 400, 'BAD_REQUEST', 'INVALID_LIMIT');
+      }
+
+      const result = await this.eventService.getTopActiveEventsByCategory(parsedLimit);
+
+      return utils.handleSuccess(context, result, 'SEARCH_SUCCESS', 200);
     } catch (error) {
       return utils.handleError(context, 500, 'SERVER_ERROR', `${error.message}`);
     }
