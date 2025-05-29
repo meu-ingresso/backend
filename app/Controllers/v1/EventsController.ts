@@ -139,6 +139,32 @@ export default class EventsController {
     return utils.handleSuccess(context, result, 'SEARCH_SUCCESS', 200);
   }
 
+  public async showcaseGroups(context: HttpContextContract) {
+    let query = await context.request.validate(QueryModelValidator);
+
+    query = {
+      ...query,
+      where: {
+        ...query?.where,
+        events: {
+          deleted_at: { v: null },
+        }
+      },
+      whereHas: {
+        ...query?.whereHas,
+        events: {
+          status: {
+            name: { v: 'Publicado' },
+          },
+        },
+      },
+    };
+
+    const result = await this.dynamicService.search('EventGroup', query);
+
+    return utils.handleSuccess(context, result, 'SEARCH_SUCCESS', 200);
+  }
+
   public async delete(context: HttpContextContract) {
     const id = context.request.params().id;
 
