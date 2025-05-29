@@ -15,6 +15,7 @@ Route.group(() => {
   Route.post('/people', 'v1/PeopleController.create');
   Route.post('/user', 'v1/UsersController.create');
   Route.get('/showcase/events', 'v1/EventsController.showcase');
+  Route.get('/showcase/event-groups', 'v1/EventsController.showcaseGroups');
 
   Route.post('/event/view', 'v1/EventViewsController.create');
 
