@@ -147,12 +147,14 @@ export default class EventsController {
       where: {
         ...query?.where,
         events: {
+          ...query?.where?.events,
           deleted_at: { v: null },
         }
       },
       whereHas: {
         ...query?.whereHas,
         events: {
+          ...query?.whereHas?.events,
           status: {
             name: { v: 'Publicado' },
           },
