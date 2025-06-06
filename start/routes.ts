@@ -25,6 +25,7 @@ Route.group(() => {
   // ROTAS COM AUTENTICAÇÃO
   Route.group(() => {
     Route.get('/logout', 'v1/AuthController.logout');
+    Route.get('/auth/me', 'v1/AuthController.me');
 
     Route.get('/addresses', 'v1/AddressesController.search');
     Route.post('/address', 'v1/AddressesController.create');
