@@ -1,5 +1,5 @@
 import LoginRequest from 'App/Models/Transfer/LoginRequest';
-import { GoogleLoginRequest } from 'App/Models/Transfer/LoginRequest';
+import { GoogleLoginRequest, AuthProvider } from 'App/Models/Transfer/LoginRequest';
 import User from 'App/Models/Access/Users';
 import People from 'App/Models/Access/People';
 import UserAttachments from 'App/Models/Access/UserAttachments';
@@ -49,7 +49,7 @@ export default class AuthService {
     if (user) {
       // Se encontrou usuário com o email, atualiza com dados do Google
       user.google_id = payload.google_id;
-      user.provider = payload.provider;
+      user.provider = AuthProvider.GOOGLE;
       user.account_verified = payload.email_verified;
       await user.save();
       
@@ -94,7 +94,7 @@ export default class AuthService {
       role_id: defaultRole?.id || null,
       account_verified: payload.email_verified,
       google_id: payload.google_id,
-      provider: payload.provider,
+      provider: AuthProvider.GOOGLE,
     });
 
     // Salva o avatar como attachment
@@ -183,5 +183,15 @@ export default class AuthService {
     );
     
     return avatar?.value || null;
+  }
+
+  // Método helper para verificar se é usuário social
+  public static isSocialUser(user: User): boolean {
+    return user.provider !== AuthProvider.DEFAULT;
+  }
+
+  // Método helper para verificar se usuário pode alterar senha
+  public static canChangePassword(user: User): boolean {
+    return user.provider === AuthProvider.DEFAULT;
   }
 }

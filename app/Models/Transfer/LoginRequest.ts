@@ -14,5 +14,11 @@ type GoogleLoginRequest = {
   provider: string;
 };
 
+enum AuthProvider {
+  DEFAULT = 'DEFAULT',
+  GOOGLE = 'google',
+  FACEBOOK = 'facebook', // Para implementação futura
+}
+
 export default LoginRequest;
-export { GoogleLoginRequest };
+export { GoogleLoginRequest, AuthProvider };

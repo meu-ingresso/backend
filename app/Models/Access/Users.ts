@@ -45,7 +45,7 @@ export default class Users extends BaseModel {
   public google_id: string | null;
 
   @column()
-  public provider: string | null;
+  public provider: string;
 
   @column.dateTime({ autoCreate: true })
   public created_at: DateTime | null;

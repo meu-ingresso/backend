@@ -6,7 +6,7 @@ export default class AddSocialAuthToUsersSchema extends BaseSchema {
   public async up() {
     this.schema.alterTable(this.tableName, (table) => {
       table.string('google_id', 100).nullable().unique();
-      table.string('provider', 50).nullable();
+      table.string('provider', 50).notNullable().defaultTo('DEFAULT');
     });
   }
 
