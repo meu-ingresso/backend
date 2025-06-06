@@ -12,6 +12,7 @@ Route.group(() => {
 
 Route.group(() => {
   Route.post('/login', 'v1/AuthController.login');
+  Route.post('/google-login', 'v1/AuthController.googleLogin');
   Route.post('/people', 'v1/PeopleController.create');
   Route.post('/user', 'v1/UsersController.create');
   Route.get('/showcase/events', 'v1/EventsController.showcase');

@@ -41,6 +41,12 @@ export default class Users extends BaseModel {
   @column()
   public account_verified: boolean;
 
+  @column()
+  public google_id: string | null;
+
+  @column()
+  public provider: string;
+
   @column.dateTime({ autoCreate: true })
   public created_at: DateTime | null;
 
