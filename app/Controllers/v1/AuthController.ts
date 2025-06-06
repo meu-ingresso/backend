@@ -55,6 +55,40 @@ export default class AuthController {
     return utils.handleSuccess(context, { auth: authWithAvatar, token }, 'GOOGLE_LOGIN_SUCCESS', 200);
   }
 
+  public async me(context: HttpContextContract) {
+    try {
+      const userId = context.auth.user?.$attributes.id;
+
+      if (!userId) {
+        return utils.handleError(context, 401, 'UNAUTHORIZED', 'Token inválido ou expirado');
+      }
+
+      // Busca o usuário completo com relacionamentos
+      const User = (await import('App/Models/Access/Users')).default;
+      const user = await User.query()
+        .where('id', userId)
+        .whereNull('deleted_at')
+        .preload('role')
+        .preload('people')
+        .preload('attachments')
+        .first();
+
+      if (!user) {
+        return utils.handleError(context, 404, 'USER_NOT_FOUND', 'Usuário não encontrado');
+      }
+
+      // Formata a resposta igual ao login
+      const authWithAvatar = {
+        ...user.toJSON(),
+        avatar_url: LoginService.getUserAvatar(user),
+      };
+
+      return utils.handleSuccess(context, { auth: authWithAvatar }, 'USER_DATA_SUCCESS', 200);
+    } catch (error) {
+      return utils.handleError(context, 500, 'SERVER_ERROR', 'Erro interno do servidor');
+    }
+  }
+
   public async logout(context: HttpContextContract) {
     const userId = context.auth.user?.$attributes.id;
 
