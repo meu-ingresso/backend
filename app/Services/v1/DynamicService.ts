@@ -43,6 +43,7 @@ import GuestListMember from 'App/Models/Access/GuestListMembers';
 import GuestListMemberValidated from 'App/Models/Access/GuestListMembersValidated';
 import EventGroup from 'App/Models/Access/EventGroups';
 import EventGroupRelation from 'App/Models/Access/EventGroupRelations';
+import TicketReservations from 'App/Models/Access/TicketReservations';
 
 interface DynamicParams {
   modelName: string;
@@ -96,6 +97,7 @@ export default class DynamicService {
     GuestListMemberValidated,
     EventGroup,
     EventGroupRelation,
+    TicketReservations,
   };
 
   private auditService: AuditService = new AuditService();
