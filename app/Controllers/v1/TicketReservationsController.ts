@@ -14,17 +14,14 @@ export default class TicketReservationsController {
     try {
       const payload = await context.request.validate(CreateTicketReservationValidator);
 
-      const expiresAt =
-        typeof payload.expires_time === 'string' ? DateTime.fromISO(payload.expires_time) : payload.expires_time;
-
-      if (expiresAt <= DateTime.now()) {
+      if (payload.expires_time <= DateTime.now()) {
         return utils.handleError(context, 400, 'INVALID_EXPIRATION', 'O tempo de expiração deve ser no futuro');
       }
 
       const reservation = await this.reservationService.createReservation({
         ticket_id: payload.ticket_id,
         quantity: payload.quantity,
-        expires_time: expiresAt,
+        expires_time: payload.expires_time,
       });
 
       return utils.handleSuccess(context, reservation, 'RESERVATION_CREATED', 201);
