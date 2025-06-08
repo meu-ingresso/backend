@@ -7,14 +7,11 @@ import { DateTime } from 'luxon';
 export default class TicketReservationsController {
   private reservationService: TicketReservationService = new TicketReservationService();
 
-  /**
-   * Cria uma nova reserva
-   */
   public async create(context: HttpContextContract) {
     try {
       const payload = await context.request.validate(CreateTicketReservationValidator);
 
-      if (payload.expires_time <= DateTime.now()) {
+      if (payload.expires_time.toMillis() <= DateTime.now().toMillis()) {
         return utils.handleError(context, 400, 'INVALID_EXPIRATION', 'O tempo de expiração deve ser no futuro');
       }
 
