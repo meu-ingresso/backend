@@ -162,6 +162,8 @@ Route.group(() => {
     Route.patch('/ticket', 'v1/TicketsController.update');
     Route.delete('/ticket/:id', 'v1/TicketsController.delete');
 
+    Route.post('/ticket-reservation', 'v1/TicketReservationsController.create');
+
     Route.get('/ticket-fields', 'v1/TicketFieldsController.search');
     Route.post('/ticket-field', 'v1/TicketFieldsController.create');
     Route.patch('/ticket-field', 'v1/TicketFieldsController.update');
