@@ -3,28 +3,14 @@ import Database from '@ioc:Adonis/Lucid/Database';
 import TicketReservations from 'App/Models/Access/TicketReservations';
 import Tickets from 'App/Models/Access/Tickets';
 
-interface ReservationData {
-  ticket_id: string;
-  quantity: number;
-  expires_time: DateTime;
-}
-
 export default class TicketReservationService {
-  /**
-   * Cria uma nova reserva de ingressos
-   */
-  public async createReservation(data: ReservationData): Promise<TicketReservations | null> {
+  public async createReservation(data: any): Promise<TicketReservations | null> {
     await this.cleanupExpiredReservations();
 
     const trx = await Database.transaction();
 
     try {
-      // Verifica disponibilidade dentro da transação
-      const ticket = await Tickets.query()
-        .where('id', data.ticket_id)
-        .forUpdate() // Bloqueia o registro para evitar condição de corrida
-        .useTransaction(trx)
-        .first();
+      const ticket = await Tickets.query().where('id', data.ticket_id).forUpdate().useTransaction(trx).first();
 
       if (!ticket) {
         await trx.rollback();
