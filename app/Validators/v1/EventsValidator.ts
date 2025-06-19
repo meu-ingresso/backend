@@ -117,6 +117,11 @@ class UpdateEventValidator {
         group_id: schema.string.optional({ trim: true }, [rules.exists({ table: 'event_groups', column: 'id' })]),
         is_featured: schema.boolean.optional(),
         promoter_id: schema.string.optional({ trim: true }, [rules.exists({ table: 'users', column: 'id' })]),
+        id_pixel: schema.string.optional({ trim: true }),
+        id_tag_manager: schema.string.optional({ trim: true }),
+        id_analytics: schema.string.optional({ trim: true }),
+        id_google_ads: schema.string.optional({ trim: true }),
+        ads_conversion_label: schema.string.optional({ trim: true }),
       })
     ),
   });
