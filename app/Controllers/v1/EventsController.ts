@@ -198,8 +198,24 @@ export default class EventsController {
       preloads: ['people', 'attachments', 'role'],
     };
 
-    const promoterResult = await this.dynamicService.search('User', promoterQuery);
+    let promoterResult = await this.dynamicService.search('User', promoterQuery);
     
+    // Fallback para buscar custom_alias nos attachments
+    if (!promoterResult.data || !promoterResult.data.length) {
+      const promoterCustomAliasQuery = {
+        whereHas: {
+          attachments: {
+            name: { v: 'custom_alias' },
+            value: { v: alias },
+          },
+        },
+        preloads: ['people', 'attachments', 'role'],
+        limit: 1,
+      };
+
+      promoterResult = await this.dynamicService.search('User', promoterCustomAliasQuery);
+    }
+
     if (!promoterResult.data || !promoterResult.data.length) {
       return utils.handleError(context, 404, 'NOT_FOUND', 'PROMOTER_NOT_FOUND');
     }
