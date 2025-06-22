@@ -7,6 +7,7 @@ import Statuses from './Statuses';
 import CustomerTickets from './CustomerTickets';
 import EventCheckoutFieldsTickets from './EventCheckoutFieldsTickets';
 import PdvTickets from './PdvTickets';
+import TicketReservations from './TicketReservations';
 
 export default class Tickets extends BaseModel {
   @column({ isPrimary: true })
@@ -92,6 +93,11 @@ export default class Tickets extends BaseModel {
     foreignKey: 'ticket_id',
   })
   public pdvTickets: HasMany<typeof PdvTickets>;
+
+  @hasMany(() => TicketReservations, {
+    foreignKey: 'ticket_id',
+  })
+  public reservations: HasMany<typeof TicketReservations>;
 
   @beforeCreate()
   public static assignUuid(ticket: Tickets) {
