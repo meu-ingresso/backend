@@ -3,8 +3,13 @@ import { CardPaymentValidator, PixPaymentValidator } from 'App/Validators/v1/Pay
 import MercadoPagoService from 'App/Services/v1/MercadoPagoService';
 import utils from 'Utils/utils';
 import Payments from 'App/Models/Access/Payments';
+import CustomerTickets from 'App/Models/Access/CustomerTickets';
+import TicketFields from 'App/Models/Access/TicketFields';
+import Tickets from 'App/Models/Access/Tickets';
+import People from 'App/Models/Access/People';
 import StatusService from 'App/Services/v1/StatusService';
 import DynamicService from 'App/Services/v1/DynamicService';
+import Database from '@ioc:Adonis/Lucid/Database';
 import { DateTime } from 'luxon';
 
 export default class MercadoPagoController {
@@ -12,22 +17,22 @@ export default class MercadoPagoController {
   private statusesService: StatusService = new StatusService();
   private dynamicService: DynamicService = new DynamicService();
 
-  /**
-   * Processar pagamento com cartão de crédito
-   */
   public async processCardPayment(context: HttpContextContract) {
     try {
       const paymentData = await context.request.validate(CardPaymentValidator);
 
-      // Obtém o status pendente
+      const resolvedPeopleId = await this.resolvePeopleId(paymentData);
+
       const pendingStatus = await this.statusesService.searchStatusByName('Pendente', 'payment');
 
-      // Cria um registro de pagamento pendente
+      if (!pendingStatus) {
+        return utils.handleError(context, 500, 'STATUS_NOT_FOUND', 'Status "Pendente" não encontrado');
+      }
+
       const payment = await Payments.create({
-        user_id: paymentData.user_id,
+        people_id: resolvedPeopleId,
         coupon_id: paymentData.coupon_id,
         pdv_id: paymentData.pdv_id,
-        // @ts-ignore
         status_id: pendingStatus.id,
         payment_method: 'credit_card',
         payment_method_details: paymentData.payment_method_id,
@@ -36,16 +41,17 @@ export default class MercadoPagoController {
         installments: paymentData.installments || 1,
       });
 
-      // Processa o pagamento no Mercado Pago
       const result = await this.mercadoPagoService.processCardPayment(paymentData);
 
       if (!result.success) {
-        // Em caso de erro, atualiza o status para erro
         const errorStatus = await this.statusesService.searchStatusByName('Erro', 'payment');
+
+        if (!errorStatus) {
+          return utils.handleError(context, 500, 'STATUS_NOT_FOUND', 'Status "Erro" não encontrado');
+        }
 
         await payment
           .merge({
-            // @ts-ignore
             status_id: errorStatus.id,
             response_data: JSON.stringify(result),
           })
@@ -54,22 +60,28 @@ export default class MercadoPagoController {
         return utils.handleError(context, 400, 'CARD_PAYMENT_ERROR', `${result?.error}`);
       }
 
-      // Determina o status com base no retorno do Mercado Pago
-      let newStatus = pendingStatus;
+      let newStatus: any = pendingStatus;
+
       if (result.status === 'approved') {
         newStatus = await this.statusesService.searchStatusByName('Aprovado', 'payment');
+
+        // Para cartão de crédito, salvamos os dados dos tickets para uso posterior
+        // Os customer_tickets serão criados via webhook ou consulta posterior
       } else if (result.status === 'rejected') {
         newStatus = await this.statusesService.searchStatusByName('Rejeitado', 'payment');
       }
 
-      // Atualiza o registro de pagamento
+      const responseData = {
+        ...result.data,
+        tickets_data: paymentData.tickets,
+      };
+
       await payment
         .merge({
           external_id: result.external_id,
           external_status: result.status,
-          // @ts-ignore
           status_id: newStatus.id,
-          response_data: result.data,
+          response_data: responseData,
           paid_at: result.status === 'approved' ? DateTime.local() : null,
           last_four_digits: result.data?.card?.last_four_digits || null,
         })
@@ -90,20 +102,20 @@ export default class MercadoPagoController {
     }
   }
 
-  /**
-   * Processar pagamento com PIX
-   */
   public async processPixPayment(context: HttpContextContract) {
     try {
       const paymentData = await context.request.validate(PixPaymentValidator);
 
-      // Obtém o status pendente
+      const resolvedPeopleId = await this.resolvePeopleId(paymentData);
+
       const pendingStatus = await this.statusesService.searchStatusByName('Pendente', 'payment');
 
-      // Cria um registro de pagamento pendente
+      if (!pendingStatus) {
+        return utils.handleError(context, 500, 'STATUS_NOT_FOUND', 'Status "Pendente" não encontrado');
+      }
+
       const payment = await Payments.create({
-        user_id: paymentData.user_id,
-        // @ts-ignore
+        people_id: resolvedPeopleId,
         status_id: pendingStatus.id,
         payment_method: 'pix',
         payment_method_details: 'pix',
@@ -111,16 +123,17 @@ export default class MercadoPagoController {
         net_value: paymentData.net_value,
       });
 
-      // Processa o pagamento no Mercado Pago
       const result = await this.mercadoPagoService.processPixPayment(paymentData);
 
       if (!result.success) {
-        // Em caso de erro, atualiza o status para erro
         const errorStatus = await this.statusesService.searchStatusByName('Erro', 'payment');
+
+        if (!errorStatus) {
+          return utils.handleError(context, 500, 'STATUS_NOT_FOUND', 'Status "Erro" não encontrado');
+        }
 
         await payment
           .merge({
-            // @ts-ignore
             status_id: errorStatus.id,
             response_data: result.error,
           })
@@ -129,14 +142,18 @@ export default class MercadoPagoController {
         return utils.handleError(context, 400, 'PIX_PAYMENT_ERROR', `${result[0].error}`);
       }
 
-      // Atualiza o registro de pagamento
+      const paymentMetadata = {
+        ...result.data,
+        tickets_data: paymentData.tickets,
+      };
+
       await payment
         .merge({
           external_id: result.external_id,
           external_status: result.status,
           pix_qr_code: result.qr_code,
           pix_qr_code_base64: result.qr_code_base64,
-          response_data: result.data,
+          response_data: paymentMetadata,
         })
         .save();
 
@@ -157,36 +174,44 @@ export default class MercadoPagoController {
     }
   }
 
-  /**
-   * Webhook para receber notificações do Mercado Pago
-   */
   public async handleWebhook(context: HttpContextContract) {
     try {
       const payload = context.request.body();
 
-      // Verifica se é uma notificação de pagamento
-      if (payload.type !== 'payment') {
-        return utils.handleSuccess(context, { received: true }, 'WEBHOOK_RECEIVED', 200);
-      }
-
-      // Consulta o status do pagamento no Mercado Pago
       const result = await this.mercadoPagoService.getPaymentStatus(payload.data.id);
 
       if (!result.success) {
         return utils.handleError(context, 400, 'PAYMENT_CHECK_ERROR', `${result.error}`);
       }
 
-      // Busca o pagamento pelo external_id
       const payment = await Payments.query().where('external_id', payload.data.id).first();
 
       if (!payment) {
         return utils.handleError(context, 404, 'PAYMENT_NOT_FOUND', 'Pagamento não encontrado');
       }
 
-      // Determina o status com base no retorno do Mercado Pago
       let statusName = 'Pendente';
+
       if (result.status === 'approved') {
         statusName = 'Aprovado';
+
+        if (payment.response_data && payment.response_data.tickets_data) {
+          try {
+            // Verifica se já existem customer_tickets para este pagamento
+            const existingTickets = await CustomerTickets.query().where('payment_id', payment.id);
+
+            if (existingTickets.length === 0) {
+              await this.createCustomerTickets(payment, payment.response_data.tickets_data);
+            }
+          } catch (error) {
+            return utils.handleError(
+              context,
+              500,
+              'CUSTOMER_TICKETS_ERROR',
+              'Erro ao criar customer_tickets via webhook'
+            );
+          }
+        }
       } else if (result.status === 'rejected') {
         statusName = 'Rejeitado';
       } else if (result.status === 'refunded') {
@@ -195,26 +220,33 @@ export default class MercadoPagoController {
 
       const newStatus = await this.statusesService.searchStatusByName(statusName, 'payment');
 
-      // Atualiza o registro de pagamento
+      if (!newStatus) {
+        return utils.handleError(context, 500, 'STATUS_NOT_FOUND', `Status "${statusName}" não encontrado`);
+      }
+
       await payment
         .merge({
           external_status: result.status,
-          // @ts-ignore
           status_id: newStatus.id,
           paid_at: result.status === 'approved' ? DateTime.local() : payment.paid_at,
           response_data: result.data,
         })
         .save();
 
-      return utils.handleSuccess(context, { updated: true }, 'WEBHOOK_PROCESSED', 200);
+      return utils.handleSuccess(
+        context,
+        {
+          payment_id: payment.id,
+          updated: true,
+        },
+        'WEBHOOK_PROCESSED',
+        200
+      );
     } catch (error) {
       return utils.handleError(context, 400, 'WEBHOOK_ERROR', `${error}`);
     }
   }
 
-  /**
-   * Consulta um pagamento
-   */
   public async getPayment(context: HttpContextContract) {
     try {
       const payment = await this.dynamicService.getById('Payment', context.params.id);
@@ -223,12 +255,10 @@ export default class MercadoPagoController {
         return utils.handleError(context, 404, 'PAYMENT_NOT_FOUND', 'Pagamento não encontrado');
       }
 
-      // Se tiver ID externo e status ainda for pendente, consulta o status atualizado
       if (payment.external_id && payment.status.name === 'Pendente') {
         const result = await this.mercadoPagoService.getPaymentStatus(payment.external_id);
 
         if (result.success && result.status !== payment.external_status) {
-          // Determina o novo status
           let statusName = 'Pendente';
           if (result.status === 'approved') {
             statusName = 'Aprovado';
@@ -240,26 +270,137 @@ export default class MercadoPagoController {
 
           const newStatus = await this.statusesService.searchStatusByName(statusName, 'payment');
 
-          // Atualiza o registro de pagamento
+          if (!newStatus) {
+            return utils.handleError(context, 500, 'STATUS_NOT_FOUND', `Status "${statusName}" não encontrado`);
+          }
+
+          if (result.status === 'approved') {
+            try {
+              const existingTickets = await CustomerTickets.query().where('payment_id', payment.id);
+
+              if (existingTickets.length === 0) {
+                if (payment.response_data && payment.response_data.tickets_data) {
+                  await this.createCustomerTickets(payment as Payments, payment.response_data.tickets_data);
+                }
+              }
+            } catch (error) {
+              return utils.handleError(
+                context,
+                500,
+                'CUSTOMER_TICKETS_ERROR',
+                'Erro ao criar customer_tickets no getPayment'
+              );
+            }
+          }
+
           await payment
             .merge({
               external_status: result.status,
-              // @ts-ignore
               status_id: newStatus.id,
               paid_at: result.status === 'approved' ? DateTime.local() : payment.paid_at,
               response_data: result.data,
             })
             .save();
-
-          // Recarrega o pagamento
-          await payment.refresh();
-          await payment.load('status');
         }
       }
 
-      return utils.handleSuccess(context, payment, 'PAYMENT_FOUND', 200);
+      return utils.handleSuccess(
+        context,
+        {
+          payment,
+        },
+        'PAYMENT_FOUND',
+        200
+      );
     } catch (error) {
       return utils.handleError(context, 400, 'PAYMENT_ERROR', `${error}`);
     }
+  }
+
+  private async createCustomerTickets(payment: Payments, ticketsData: any[]): Promise<void> {
+    const trx = await Database.transaction();
+
+    try {
+      const activeStatus = await this.statusesService.searchStatusByName('Ativo', 'customer_ticket');
+
+      if (!activeStatus) {
+        throw new Error('Status "Ativo" não encontrado para customer_ticket');
+      }
+
+      for (const ticketData of ticketsData) {
+        const ticket = await Tickets.findOrFail(ticketData.ticket_id);
+
+        if (ticket.total_sold + ticketData.quantity > ticket.total_quantity) {
+          throw new Error(`Estoque insuficiente para o ticket ${ticket.name}`);
+        }
+
+        for (let i = 0; i < ticketData.quantity; i++) {
+          const customerTicket = await CustomerTickets.create(
+            {
+              ticket_id: ticketData.ticket_id,
+              current_owner_id: ticketData.current_owner_id,
+              status_id: activeStatus.id,
+              payment_id: payment.id,
+              validated: false,
+            },
+            { client: trx }
+          );
+
+          if (ticketData.ticket_fields && ticketData.ticket_fields.length > 0) {
+            for (const fieldData of ticketData.ticket_fields) {
+              await TicketFields.create(
+                {
+                  customer_ticket_id: customerTicket.id,
+                  field_id: fieldData.field_id,
+                  value: fieldData.value,
+                  display_order: 1,
+                },
+                { client: trx }
+              );
+            }
+          }
+        }
+
+        await Tickets.query({ client: trx })
+          .where('id', ticketData.ticket_id)
+          .increment('total_sold', ticketData.quantity);
+      }
+
+      await trx.commit();
+    } catch (error) {
+      await trx.rollback();
+      throw error;
+    }
+  }
+
+  private async resolvePeopleId(paymentData: any): Promise<string> {
+    if (paymentData.people.id) {
+      return paymentData.people.id;
+    }
+
+    const email = paymentData.people.email;
+
+    if (email) {
+      const existingPeople = await People.query().where('email', email).first();
+
+      if (existingPeople) {
+        return existingPeople.id;
+      }
+    }
+
+    const newPeople = await People.create({
+      first_name: paymentData.people.first_name,
+      last_name: paymentData.people.last_name,
+      email: paymentData.people.email,
+      tax: paymentData.people.tax || null,
+      phone: paymentData.people.phone || null,
+      person_type: paymentData.people.person_type || 'PF',
+      birth_date: paymentData.people.birth_date || null,
+      social_name: paymentData.people.social_name || null,
+      fantasy_name: paymentData.people.fantasy_name || null,
+      address_id: paymentData.people.address_id || null,
+    });
+
+    return newPeople.id;
   }
 }

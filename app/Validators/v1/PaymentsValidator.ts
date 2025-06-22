@@ -8,7 +8,15 @@ class CardPaymentValidator {
   public reporter = ReportHandler;
 
   public schema = schema.create({
-    user_id: schema.string.optional({}, [rules.exists({ table: 'users', column: 'id' })]),
+    people: schema.object().members({
+      id: schema.string.optional({}, [rules.exists({ table: 'people', column: 'id' })]),
+      first_name: schema.string.optional(),
+      last_name: schema.string.optional(),
+      email: schema.string.optional({}, [rules.email()]),
+      tax: schema.string.optional(),
+      phone: schema.string.optional(),
+      person_type: schema.string.optional(),
+    }),
     coupon_id: schema.string.optional({}, [rules.exists({ table: 'coupons', column: 'id' })]),
     pdv_id: schema.string.optional({}, [rules.exists({ table: 'pdvs', column: 'id' })]),
     description: schema.string(),
@@ -27,11 +35,32 @@ class CardPaymentValidator {
         number: schema.string.optional(),
       }),
     }),
+    // Informações dos tickets para compra
+    tickets: schema.array().members(
+      schema.object().members({
+        ticket_id: schema.string({}, [rules.exists({ table: 'tickets', column: 'id' })]),
+        quantity: schema.number([rules.unsigned(), rules.range(1, 100)]),
+        current_owner_id: schema.string({}, [rules.exists({ table: 'people', column: 'id' })]),
+        ticket_fields: schema.array.optional().members(
+          schema.object().members({
+            field_id: schema.string({}, [rules.exists({ table: 'event_checkout_fields', column: 'id' })]),
+            value: schema.string(),
+          })
+        ),
+      })
+    ),
   });
 
   public messages = {
-    'user_id.exists': 'O usuário informado não existe',
-    'user_id.string': 'O usuário informado deve ser uma string',
+    'people.id.exists': 'A pessoa informada não existe',
+    'people.first_name.string': 'O primeiro nome deve ser uma string',
+    'people.last_name.string': 'O último nome deve ser uma string',
+    'people.email.email': 'O email deve ser um email válido',
+    'people.tax.string': 'O documento deve ser uma string',
+    'people.phone.string': 'O telefone deve ser uma string',
+    'people.person_type.string': 'O tipo de pessoa deve ser uma string',
+    'people.birth_date.string': 'A data de nascimento deve ser uma string',
+    'people.address_id.exists': 'O endereço informado não existe',
     'coupon_id.exists': 'O cupom informado não existe',
     'coupon_id.string': 'O cupom informado deve ser uma string',
     'pdv_id.exists': 'O pdv informado não existe',
@@ -52,6 +81,19 @@ class CardPaymentValidator {
     'payer.email.email': 'O e-mail do pagador deve ser um e-mail válido',
     'installments.unsigned': 'O número de parcelas deve ser um número positivo',
     'installments.range': 'O número de parcelas deve estar entre 1 e 12',
+    'tickets.required': 'Os tickets são obrigatórios',
+    'tickets.array': 'Os tickets devem ser um array',
+    'tickets.*.ticket_id.required': 'O ID do ticket é obrigatório',
+    'tickets.*.ticket_id.exists': 'O ticket informado não existe',
+    'tickets.*.quantity.required': 'A quantidade é obrigatória',
+    'tickets.*.quantity.unsigned': 'A quantidade deve ser um número positivo',
+    'tickets.*.quantity.range': 'A quantidade deve estar entre 1 e 100',
+    'tickets.*.current_owner_id.required': 'O proprietário do ticket é obrigatório',
+    'tickets.*.current_owner_id.exists': 'A pessoa informada não existe',
+    'tickets.*.ticket_fields.array': 'Os campos do ticket devem ser um array',
+    'tickets.*.ticket_fields.*.field_id.required': 'O ID do campo é obrigatório',
+    'tickets.*.ticket_fields.*.field_id.exists': 'O campo informado não existe',
+    'tickets.*.ticket_fields.*.value.required': 'O valor do campo é obrigatório',
   };
 }
 
@@ -61,7 +103,19 @@ class PixPaymentValidator {
   public reporter = ReportHandler;
 
   public schema = schema.create({
-    user_id: schema.string.optional({}, [rules.exists({ table: 'users', column: 'id' })]),
+    people: schema.object.optional().members({
+      id: schema.string.optional({}, [rules.exists({ table: 'people', column: 'id' })]),
+      first_name: schema.string.optional(),
+      last_name: schema.string.optional(),
+      email: schema.string.optional({}, [rules.email()]),
+      tax: schema.string.optional(),
+      phone: schema.string.optional(),
+      person_type: schema.string.optional(),
+      birth_date: schema.string.optional(),
+      social_name: schema.string.optional(),
+      fantasy_name: schema.string.optional(),
+      address_id: schema.string.optional({}, [rules.exists({ table: 'addresses', column: 'id' })]),
+    }),
     description: schema.string(),
     transaction_amount: schema.number([rules.unsigned()]),
     gross_value: schema.number([rules.unsigned()]),
@@ -75,16 +129,51 @@ class PixPaymentValidator {
         number: schema.string.optional(),
       }),
     }),
+    // Informações dos tickets para compra
+    tickets: schema.array().members(
+      schema.object().members({
+        ticket_id: schema.string({}, [rules.exists({ table: 'tickets', column: 'id' })]),
+        quantity: schema.number([rules.unsigned(), rules.range(1, 100)]),
+        current_owner_id: schema.string({}, [rules.exists({ table: 'people', column: 'id' })]),
+        ticket_fields: schema.array.optional().members(
+          schema.object().members({
+            field_id: schema.string({}, [rules.exists({ table: 'event_checkout_fields', column: 'id' })]),
+            value: schema.string(),
+          })
+        ),
+      })
+    ),
   });
 
   public messages = {
-    'user_id.exists': 'O usuário informado não existe',
+    'people.id.exists': 'A pessoa informada não existe',
+    'people.first_name.string': 'O primeiro nome deve ser uma string',
+    'people.last_name.string': 'O último nome deve ser uma string',
+    'people.email.email': 'O email deve ser um email válido',
+    'people.tax.string': 'O documento deve ser uma string',
+    'people.phone.string': 'O telefone deve ser uma string',
+    'people.person_type.string': 'O tipo de pessoa deve ser uma string',
+    'people.birth_date.string': 'A data de nascimento deve ser uma string',
+    'people.address_id.exists': 'O endereço informado não existe',
     'description.required': 'A descrição é obrigatória',
     'transaction_amount.unsigned': 'O valor da transação deve ser positivo',
     'gross_value.unsigned': 'O valor bruto da transação deve ser positivo',
     'net_value.unsigned': 'O valor líquido da transação deve ser positivo',
     'payer.email.required': 'O e-mail do pagador é obrigatório',
     'payer.email.email': 'O e-mail do pagador deve ser um e-mail válido',
+    'tickets.required': 'Os tickets são obrigatórios',
+    'tickets.array': 'Os tickets devem ser um array',
+    'tickets.*.ticket_id.required': 'O ID do ticket é obrigatório',
+    'tickets.*.ticket_id.exists': 'O ticket informado não existe',
+    'tickets.*.quantity.required': 'A quantidade é obrigatória',
+    'tickets.*.quantity.unsigned': 'A quantidade deve ser um número positivo',
+    'tickets.*.quantity.range': 'A quantidade deve estar entre 1 e 100',
+    'tickets.*.current_owner_id.required': 'O proprietário do ticket é obrigatório',
+    'tickets.*.current_owner_id.exists': 'A pessoa informada não existe',
+    'tickets.*.ticket_fields.array': 'Os campos do ticket devem ser um array',
+    'tickets.*.ticket_fields.*.field_id.required': 'O ID do campo é obrigatório',
+    'tickets.*.ticket_fields.*.field_id.exists': 'O campo informado não existe',
+    'tickets.*.ticket_fields.*.value.required': 'O valor do campo é obrigatório',
   };
 }
 
@@ -96,7 +185,7 @@ class CreatePaymentValidator {
   public schema = schema.create({
     data: schema.array().members(
       schema.object().members({
-        user_id: schema.string({}, [rules.exists({ table: 'users', column: 'id' })]),
+        people_id: schema.string({}, [rules.exists({ table: 'people', column: 'id' })]),
         status_id: schema.string({}, [rules.exists({ table: 'statuses', column: 'id' })]),
         payment_method: schema.string({ trim: true }),
         gross_value: schema.number(),
@@ -111,8 +200,8 @@ class CreatePaymentValidator {
   public messages = {
     'data.required': 'O campo "data" é obrigatório.',
     'data.array': 'O campo data deve ser um array.',
-    'data.*.user_id.required': 'O campo "user_id" é obrigatório.',
-    'data.*.user_id.exists': 'O usuário especificado não existe.',
+    'data.*.people_id.required': 'O campo "people_id" é obrigatório.',
+    'data.*.people_id.exists': 'O usuário especificado não existe.',
     'data.*.status_id.required': 'O campo "status_id" é obrigatório.',
     'data.*.status_id.exists': 'O status especificado não existe.',
     'data.*.payment_method.required': 'O campo "payment_method" é obrigatório.',
@@ -134,7 +223,7 @@ class UpdatePaymentValidator {
     data: schema.array().members(
       schema.object().members({
         id: schema.string({ trim: true }, [rules.exists({ table: 'payments', column: 'id' })]),
-        user_id: schema.string.optional({}, [rules.exists({ table: 'users', column: 'id' })]),
+        people_id: schema.string.optional({}, [rules.exists({ table: 'people', column: 'id' })]),
         status_id: schema.string.optional({}, [rules.exists({ table: 'statuses', column: 'id' })]),
         payment_method: schema.string.optional({ trim: true }),
         gross_value: schema.number.optional(),
@@ -151,7 +240,7 @@ class UpdatePaymentValidator {
     'data.array': 'O campo data deve ser um array.',
     'data.*.id.required': 'O campo "id" é obrigatório.',
     'data.*.id.exists': 'O pagamento especificado não existe.',
-    'data.*.user_id.exists': 'O usuário especificado não existe.',
+    'data.*.people_id.exists': 'O usuário especificado não existe.',
     'data.*.status_id.exists': 'O status especificado não existe.',
     'data.*.payment_method.string': 'O campo "payment_method" deve ser uma string válida.',
     'data.*.gross_value.number': 'O campo "gross_value" deve ser um número válido.',

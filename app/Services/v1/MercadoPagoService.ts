@@ -100,6 +100,9 @@ export default class MercadoPagoService {
       notification_url,
     } = paymentData;
 
+    // Gera external_reference se não fornecido
+    const finalExternalReference = external_reference || `payment-${new Date().getTime()}`;
+
     const body = {
       transaction_amount,
       description,
@@ -107,7 +110,7 @@ export default class MercadoPagoService {
       token,
       installments,
       payer,
-      external_reference,
+      external_reference: finalExternalReference,
       notification_url: notification_url || Env.get('MERCADOPAGO_WEBHOOK_URL'),
       additional_info: {
         items: paymentData.items || [],
@@ -117,7 +120,7 @@ export default class MercadoPagoService {
     return {
       body,
       requestOptions: {
-        idempotencyKey: `payment-${external_reference}-${new Date().getTime()}`,
+        idempotencyKey: `payment-${finalExternalReference}-${new Date().getTime()}`,
       },
     };
   }
@@ -128,12 +131,15 @@ export default class MercadoPagoService {
   private buildPixPaymentRequest(paymentData) {
     const { transaction_amount, description, payer, external_reference, notification_url } = paymentData;
 
+    // Gera external_reference se não fornecido
+    const finalExternalReference = external_reference || `auto-pix-${new Date().getTime()}`;
+
     const body = {
       transaction_amount,
       description,
       payment_method_id: 'pix',
       payer,
-      external_reference,
+      external_reference: finalExternalReference,
       notification_url: notification_url || Env.get('MERCADOPAGO_WEBHOOK_URL'),
       additional_info: {
         items: paymentData.items || [],
@@ -143,7 +149,7 @@ export default class MercadoPagoService {
     return {
       body,
       requestOptions: {
-        idempotencyKey: `payment-${external_reference}-${new Date().getTime()}`,
+        idempotencyKey: `payment-${finalExternalReference}-${new Date().getTime()}`,
       },
     };
   }
