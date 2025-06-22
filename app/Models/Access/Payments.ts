@@ -1,7 +1,7 @@
 import { DateTime } from 'luxon';
 import { v4 as uuidv4 } from 'uuid';
 import { BaseModel, column, beforeCreate, belongsTo, BelongsTo } from '@ioc:Adonis/Lucid/Orm';
-import Users from './Users';
+import People from './People';
 import Statuses from './Statuses';
 import Coupons from './Coupons';
 import Pdv from './Pdvs';
@@ -10,7 +10,7 @@ export default class Payments extends BaseModel {
   public id: string;
 
   @column()
-  public user_id: string | null;
+  public people_id: string | null;
 
   @column()
   public status_id: string;
@@ -64,10 +64,10 @@ export default class Payments extends BaseModel {
   @column()
   public response_data: any;
 
-  @belongsTo(() => Users, {
-    foreignKey: 'user_id',
+  @belongsTo(() => People, {
+    foreignKey: 'people_id',
   })
-  public user: BelongsTo<typeof Users>;
+  public people: BelongsTo<typeof People>;
 
   @belongsTo(() => Statuses, {
     foreignKey: 'status_id',

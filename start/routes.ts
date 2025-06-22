@@ -217,5 +217,7 @@ Route.group(() => {
     Route.get('/statuses', 'v1/StatusesController.search');
     Route.get('/promoter/:alias/events', 'v1/EventsController.getByPromoterAlias');
     Route.get('/events/top-active-by-category', 'v1/EventsController.topActiveByCategory');
+
+    Route.post('/send-mail', 'v1/SendMailController.sendMail');
   });
 }).prefix('v1');
