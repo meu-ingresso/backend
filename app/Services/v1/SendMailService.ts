@@ -2,18 +2,21 @@ import nodemailer from 'nodemailer';
 
 export default class SendMailService {
   private host = 'smtp.gmail.com';
-  private port = 587;
+  private port = 465;
   private user = 'nao-responda@meuingresso.com.br';
-  private pass = 'FfWTR6s1lzbVU1H4';
+  private pass = 'rkoduvctmcbvmzhk';
 
   public async sendMail() {
     const transporter = nodemailer.createTransport({
       host: this.host,
       port: this.port,
-      secure: false,
       auth: {
         user: this.user,
         pass: this.pass,
+      },
+      secure: true,
+      tls: {
+        rejectUnauthorized: false,
       },
     });
 
