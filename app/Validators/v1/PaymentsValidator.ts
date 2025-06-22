@@ -40,7 +40,6 @@ class CardPaymentValidator {
       schema.object().members({
         ticket_id: schema.string({}, [rules.exists({ table: 'tickets', column: 'id' })]),
         quantity: schema.number([rules.unsigned(), rules.range(1, 100)]),
-        current_owner_id: schema.string({}, [rules.exists({ table: 'people', column: 'id' })]),
         ticket_fields: schema.array.optional().members(
           schema.object().members({
             field_id: schema.string({}, [rules.exists({ table: 'event_checkout_fields', column: 'id' })]),
@@ -88,8 +87,6 @@ class CardPaymentValidator {
     'tickets.*.quantity.required': 'A quantidade é obrigatória',
     'tickets.*.quantity.unsigned': 'A quantidade deve ser um número positivo',
     'tickets.*.quantity.range': 'A quantidade deve estar entre 1 e 100',
-    'tickets.*.current_owner_id.required': 'O proprietário do ticket é obrigatório',
-    'tickets.*.current_owner_id.exists': 'A pessoa informada não existe',
     'tickets.*.ticket_fields.array': 'Os campos do ticket devem ser um array',
     'tickets.*.ticket_fields.*.field_id.required': 'O ID do campo é obrigatório',
     'tickets.*.ticket_fields.*.field_id.exists': 'O campo informado não existe',
@@ -129,12 +126,10 @@ class PixPaymentValidator {
         number: schema.string.optional(),
       }),
     }),
-    // Informações dos tickets para compra
     tickets: schema.array().members(
       schema.object().members({
         ticket_id: schema.string({}, [rules.exists({ table: 'tickets', column: 'id' })]),
         quantity: schema.number([rules.unsigned(), rules.range(1, 100)]),
-        current_owner_id: schema.string({}, [rules.exists({ table: 'people', column: 'id' })]),
         ticket_fields: schema.array.optional().members(
           schema.object().members({
             field_id: schema.string({}, [rules.exists({ table: 'event_checkout_fields', column: 'id' })]),
@@ -168,8 +163,6 @@ class PixPaymentValidator {
     'tickets.*.quantity.required': 'A quantidade é obrigatória',
     'tickets.*.quantity.unsigned': 'A quantidade deve ser um número positivo',
     'tickets.*.quantity.range': 'A quantidade deve estar entre 1 e 100',
-    'tickets.*.current_owner_id.required': 'O proprietário do ticket é obrigatório',
-    'tickets.*.current_owner_id.exists': 'A pessoa informada não existe',
     'tickets.*.ticket_fields.array': 'Os campos do ticket devem ser um array',
     'tickets.*.ticket_fields.*.field_id.required': 'O ID do campo é obrigatório',
     'tickets.*.ticket_fields.*.field_id.exists': 'O campo informado não existe',

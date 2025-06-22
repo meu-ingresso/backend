@@ -321,6 +321,11 @@ export default class MercadoPagoController {
     const trx = await Database.transaction();
 
     try {
+      // Garantimos que o payment tem um people_id válido
+      if (!payment.people_id) {
+        throw new Error('Payment não possui people_id válido');
+      }
+
       const activeStatus = await this.statusesService.searchStatusByName('Ativo', 'customer_ticket');
 
       if (!activeStatus) {
@@ -338,7 +343,7 @@ export default class MercadoPagoController {
           const customerTicket = await CustomerTickets.create(
             {
               ticket_id: ticketData.ticket_id,
-              current_owner_id: ticketData.current_owner_id,
+              current_owner_id: payment.people_id,
               status_id: activeStatus.id,
               payment_id: payment.id,
               validated: false,
