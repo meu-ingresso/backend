@@ -100,7 +100,7 @@ class PixPaymentValidator {
   public reporter = ReportHandler;
 
   public schema = schema.create({
-    people: schema.object.optional().members({
+    people: schema.object().members({
       id: schema.string.optional({}, [rules.exists({ table: 'people', column: 'id' })]),
       first_name: schema.string.optional(),
       last_name: schema.string.optional(),
