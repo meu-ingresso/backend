@@ -8,6 +8,7 @@ class CardPaymentValidator {
   public reporter = ReportHandler;
 
   public schema = schema.create({
+    event_id: schema.string({}, [rules.exists({ table: 'events', column: 'id' })]),
     people: schema.object().members({
       id: schema.string.optional({}, [rules.exists({ table: 'people', column: 'id' })]),
       first_name: schema.string.optional(),
@@ -51,6 +52,7 @@ class CardPaymentValidator {
   });
 
   public messages = {
+    'event_id.exists': 'O evento informado não existe',
     'people.id.exists': 'A pessoa informada não existe',
     'people.first_name.string': 'O primeiro nome deve ser uma string',
     'people.last_name.string': 'O último nome deve ser uma string',
@@ -100,6 +102,7 @@ class PixPaymentValidator {
   public reporter = ReportHandler;
 
   public schema = schema.create({
+    event_id: schema.string({}, [rules.exists({ table: 'events', column: 'id' })]),
     people: schema.object().members({
       id: schema.string.optional({}, [rules.exists({ table: 'people', column: 'id' })]),
       first_name: schema.string.optional(),
@@ -141,6 +144,7 @@ class PixPaymentValidator {
   });
 
   public messages = {
+    'event_id.exists': 'O evento informado não existe',
     'people.id.exists': 'A pessoa informada não existe',
     'people.first_name.string': 'O primeiro nome deve ser uma string',
     'people.last_name.string': 'O último nome deve ser uma string',
@@ -178,6 +182,7 @@ class CreatePaymentValidator {
   public schema = schema.create({
     data: schema.array().members(
       schema.object().members({
+        event_id: schema.string({}, [rules.exists({ table: 'events', column: 'id' })]),
         people_id: schema.string({}, [rules.exists({ table: 'people', column: 'id' })]),
         status_id: schema.string({}, [rules.exists({ table: 'statuses', column: 'id' })]),
         payment_method: schema.string({ trim: true }),
@@ -191,6 +196,7 @@ class CreatePaymentValidator {
   });
 
   public messages = {
+    'event_id.exists': 'O evento informado não existe',
     'data.required': 'O campo "data" é obrigatório.',
     'data.array': 'O campo data deve ser um array.',
     'data.*.people_id.required': 'O campo "people_id" é obrigatório.',
@@ -216,6 +222,7 @@ class UpdatePaymentValidator {
     data: schema.array().members(
       schema.object().members({
         id: schema.string({ trim: true }, [rules.exists({ table: 'payments', column: 'id' })]),
+        event_id: schema.string.optional({}, [rules.exists({ table: 'events', column: 'id' })]),
         people_id: schema.string.optional({}, [rules.exists({ table: 'people', column: 'id' })]),
         status_id: schema.string.optional({}, [rules.exists({ table: 'statuses', column: 'id' })]),
         payment_method: schema.string.optional({ trim: true }),
@@ -229,6 +236,7 @@ class UpdatePaymentValidator {
   });
 
   public messages = {
+    'event_id.exists': 'O evento informado não existe',
     'data.required': 'O campo "data" é obrigatório.',
     'data.array': 'O campo data deve ser um array.',
     'data.*.id.required': 'O campo "id" é obrigatório.',

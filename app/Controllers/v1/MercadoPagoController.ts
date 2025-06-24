@@ -28,6 +28,7 @@ export default class MercadoPagoController {
       }
 
       const payment = await Payments.create({
+        event_id: paymentData.event_id,
         people_id: resolvedPeopleId,
         coupon_id: paymentData.coupon_id,
         pdv_id: paymentData.pdv_id,
@@ -121,6 +122,7 @@ export default class MercadoPagoController {
       }
 
       const payment = await Payments.create({
+        event_id: paymentData.event_id,
         people_id: resolvedPeopleId,
         status_id: pendingStatus.id,
         payment_method: 'pix',
