@@ -299,7 +299,10 @@ export default class MercadoPagoController {
         return utils.handleSuccess(
           context,
           {
-            payment: payment.$attributes,
+            payment: {
+              ...payment.$attributes,
+              status: result.status,
+            },
           },
           'PAYMENT_FOUND',
           200
