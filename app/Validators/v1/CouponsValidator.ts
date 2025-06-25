@@ -80,4 +80,33 @@ class UpdateCouponValidator {
   };
 }
 
-export { CreateCouponValidator, UpdateCouponValidator };
+class ValidateCouponValidator {
+  constructor(protected context: HttpContextContract) {}
+
+  public reporter = ReportHandler;
+
+  public schema = schema.create({
+    event_id: schema.string({}, [
+      rules.exists({ table: 'events', column: 'id' }),
+      rules.uuid({ version: 4 })
+    ]),
+    code: schema.string({}, [
+      rules.trim(),
+      rules.minLength(2),
+      rules.maxLength(50),
+      rules.regex(/^[A-Za-z0-9_-]+$/)
+    ]),
+  });
+
+  public messages = {
+    'event_id.required': 'O campo "event_id" é obrigatório.',
+    'event_id.exists': 'O evento especificado não existe.',
+    'event_id.uuid': 'O "event_id" deve ser um UUID válido.',
+    'code.required': 'O campo "code" é obrigatório.',
+    'code.minLength': 'O código deve ter pelo menos 2 caracteres.',
+    'code.maxLength': 'O código pode ter no máximo 50 caracteres.',
+    'code.regex': 'O código pode conter apenas letras, números, hífen e underscore.',
+  };
+}
+
+export { CreateCouponValidator, UpdateCouponValidator, ValidateCouponValidator };
