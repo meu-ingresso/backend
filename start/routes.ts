@@ -220,5 +220,8 @@ Route.group(() => {
     Route.get('/events/top-active-by-category', 'v1/EventsController.topActiveByCategory');
 
     Route.post('/send-mail', 'v1/SendMailController.sendMail');
+
+    // Validação de cupom sem autenticação
+    Route.post('/coupon/validate', 'v1/CouponsController.validateCoupon').middleware(['rateLimit']);
   });
 }).prefix('v1');

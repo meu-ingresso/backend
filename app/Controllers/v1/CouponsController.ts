@@ -1,13 +1,85 @@
 import { HttpContextContract } from '@ioc:Adonis/Core/HttpContext';
 import QueryModelValidator from 'App/Validators/v1/QueryModelValidator';
-import { CreateCouponValidator, UpdateCouponValidator } from 'App/Validators/v1/CouponsValidator';
+import { CreateCouponValidator, UpdateCouponValidator, ValidateCouponValidator } from 'App/Validators/v1/CouponsValidator';
 import DynamicService from 'App/Services/v1/DynamicService';
 import StatusService from 'App/Services/v1/StatusService';
 import utils from 'Utils/utils';
+import { DateTime } from 'luxon';
+import Coupons from 'App/Models/Access/Coupons';
 
 export default class CouponsController {
   private dynamicService: DynamicService = new DynamicService();
   private statusService: StatusService = new StatusService();
+
+  public async validateCoupon(context: HttpContextContract) {
+    try {
+      // Validar a requisição
+      const payload = await context.request.validate(ValidateCouponValidator);
+      
+      // Buscar o cupom
+      const coupon = await Coupons.query()
+        .where('event_id', payload.event_id)
+        .where('code', payload.code.toUpperCase())
+        .whereNull('deleted_at')
+        .preload('status')
+        .first();
+
+      if (!coupon) {
+        return utils.handleError(context, 404, 'COUPON_NOT_FOUND', 'Cupom não encontrado para este evento');
+      }
+
+      // Verificar se o status do cupom é ativo
+      if (coupon.status.name !== 'Disponível') {
+        return context.response.status(200).json({
+          valid: false,
+          reason: 'COUPON_INACTIVE',
+          message: 'Cupom não está ativo'
+        });
+      }
+
+      // Verificar se ainda não atingiu o limite de usos
+      if (coupon.uses >= coupon.max_uses) {
+        return context.response.status(200).json({
+          valid: false,
+          reason: 'COUPON_EXHAUSTED',
+          message: 'Cupom esgotado'
+        });
+      }
+
+      // Verificar se está dentro do período de validade
+      const now = DateTime.now();
+      
+      if (coupon.start_date && now < coupon.start_date) {
+        return context.response.status(200).json({
+          valid: false,
+          reason: 'COUPON_NOT_STARTED',
+          message: 'Cupom ainda não está válido'
+        });
+      }
+
+      if (coupon.end_date && now > coupon.end_date) {
+        return context.response.status(200).json({
+          valid: false,
+          reason: 'COUPON_EXPIRED',
+          message: 'Cupom expirado'
+        });
+      }
+
+      // Cupom válido
+      return context.response.status(200).json({
+        valid: true,
+        discountType: coupon.discount_type.toLowerCase(),
+        discountValue: coupon.discount_value,
+        remainingUses: coupon.max_uses - coupon.uses
+      });
+
+    } catch (error) {
+      // Log do erro para monitoramento
+      console.error('Erro na validação do cupom:', error);
+      
+      return utils.handleError(context, 500, 'VALIDATION_ERROR', 'Erro interno do servidor');
+    }
+  }
 
   public async create(context: HttpContextContract) {
     const payload = await context.request.validate(CreateCouponValidator);
