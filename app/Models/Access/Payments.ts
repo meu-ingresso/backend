@@ -5,9 +5,13 @@ import People from './People';
 import Statuses from './Statuses';
 import Coupons from './Coupons';
 import Pdv from './Pdvs';
+import Events from './Events';
 export default class Payments extends BaseModel {
   @column({ isPrimary: true })
   public id: string;
+
+  @column()
+  public event_id: string;
 
   @column()
   public people_id: string | null;
@@ -63,6 +67,11 @@ export default class Payments extends BaseModel {
 
   @column()
   public response_data: any;
+
+  @belongsTo(() => Events, {
+    foreignKey: 'event_id',
+  })
+  public event: BelongsTo<typeof Events>;
 
   @belongsTo(() => People, {
     foreignKey: 'people_id',

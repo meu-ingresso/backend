@@ -162,8 +162,6 @@ Route.group(() => {
     Route.patch('/ticket', 'v1/TicketsController.update');
     Route.delete('/ticket/:id', 'v1/TicketsController.delete');
 
-    Route.post('/ticket-reservation', 'v1/TicketReservationsController.create');
-
     Route.get('/ticket-fields', 'v1/TicketFieldsController.search');
     Route.post('/ticket-field', 'v1/TicketFieldsController.create');
     Route.patch('/ticket-field', 'v1/TicketFieldsController.update');
@@ -209,6 +207,9 @@ Route.group(() => {
 
   // ROTAS SEM AUTENTICAÇÃO
   Route.group(() => {
+
+    Route.post('/ticket-reservation', 'v1/TicketReservationsController.create');
+
     Route.post('/payment/card', 'v1/MercadoPagoController.processCardPayment');
     Route.post('/payment/pix', 'v1/MercadoPagoController.processPixPayment');
     Route.get('/payment/:id', 'v1/MercadoPagoController.getPayment');

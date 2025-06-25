@@ -8,14 +8,12 @@ import TicketFields from 'App/Models/Access/TicketFields';
 import Tickets from 'App/Models/Access/Tickets';
 import People from 'App/Models/Access/People';
 import StatusService from 'App/Services/v1/StatusService';
-import DynamicService from 'App/Services/v1/DynamicService';
 import Database from '@ioc:Adonis/Lucid/Database';
 import { DateTime } from 'luxon';
 
 export default class MercadoPagoController {
   private mercadoPagoService: MercadoPagoService = new MercadoPagoService();
   private statusesService: StatusService = new StatusService();
-  private dynamicService: DynamicService = new DynamicService();
 
   public async processCardPayment(context: HttpContextContract) {
     try {
@@ -30,6 +28,7 @@ export default class MercadoPagoController {
       }
 
       const payment = await Payments.create({
+        event_id: paymentData.event_id,
         people_id: resolvedPeopleId,
         coupon_id: paymentData.coupon_id,
         pdv_id: paymentData.pdv_id,
@@ -65,8 +64,16 @@ export default class MercadoPagoController {
       if (result.status === 'approved') {
         newStatus = await this.statusesService.searchStatusByName('Aprovado', 'payment');
 
-        // Para cartão de crédito, salvamos os dados dos tickets para uso posterior
-        // Os customer_tickets serão criados via webhook ou consulta posterior
+        try {
+          await this.processApprovedPayment(payment, paymentData.tickets);
+        } catch (error) {
+          return utils.handleError(
+            context,
+            500,
+            'CUSTOMER_TICKETS_ERROR',
+            'Erro ao criar customer_tickets para pagamento aprovado'
+          );
+        }
       } else if (result.status === 'rejected') {
         newStatus = await this.statusesService.searchStatusByName('Rejeitado', 'payment');
       }
@@ -115,6 +122,7 @@ export default class MercadoPagoController {
       }
 
       const payment = await Payments.create({
+        event_id: paymentData.event_id,
         people_id: resolvedPeopleId,
         status_id: pendingStatus.id,
         payment_method: 'pix',
@@ -195,14 +203,9 @@ export default class MercadoPagoController {
       if (result.status === 'approved') {
         statusName = 'Aprovado';
 
-        if (payment.response_data && payment.response_data.tickets_data) {
+        if (payment.external_status !== 'approved' && payment.response_data && payment.response_data.tickets_data) {
           try {
-            // Verifica se já existem customer_tickets para este pagamento
-            const existingTickets = await CustomerTickets.query().where('payment_id', payment.id);
-
-            if (existingTickets.length === 0) {
-              await this.createCustomerTickets(payment, payment.response_data.tickets_data);
-            }
+            await this.processApprovedPayment(payment, payment.response_data.tickets_data);
           } catch (error) {
             return utils.handleError(
               context,
@@ -249,14 +252,15 @@ export default class MercadoPagoController {
 
   public async getPayment(context: HttpContextContract) {
     try {
-      const payment = await this.dynamicService.getById('Payment', context.params.id);
+      const payment = await Payments.find(context.params.id);
 
       if (!payment) {
         return utils.handleError(context, 404, 'PAYMENT_NOT_FOUND', 'Pagamento não encontrado');
       }
 
-      if (payment.external_id && payment.status.name === 'Pendente') {
+      if (payment.external_id) {
         const result = await this.mercadoPagoService.getPaymentStatus(payment.external_id);
+        // console.log('RESULTADO DO GET PAYMENT:', result);
 
         if (result.success && result.status !== payment.external_status) {
           let statusName = 'Pendente';
@@ -274,22 +278,13 @@ export default class MercadoPagoController {
             return utils.handleError(context, 500, 'STATUS_NOT_FOUND', `Status "${statusName}" não encontrado`);
           }
 
-          if (result.status === 'approved') {
+          if (payment.external_status !== 'approved') {
             try {
-              const existingTickets = await CustomerTickets.query().where('payment_id', payment.id);
-
-              if (existingTickets.length === 0) {
-                if (payment.response_data && payment.response_data.tickets_data) {
-                  await this.createCustomerTickets(payment as Payments, payment.response_data.tickets_data);
-                }
+              if (payment.response_data && payment.response_data.tickets_data) {
+                await this.processApprovedPayment(payment, payment.response_data.tickets_data);
               }
             } catch (error) {
-              return utils.handleError(
-                context,
-                500,
-                'CUSTOMER_TICKETS_ERROR',
-                'Erro ao criar customer_tickets no getPayment'
-              );
+              return utils.handleError(context, 500, 'CUSTOMER_TICKETS_ERROR', error);
             }
           }
 
@@ -302,16 +297,19 @@ export default class MercadoPagoController {
             })
             .save();
         }
-      }
 
-      return utils.handleSuccess(
-        context,
-        {
-          payment,
-        },
-        'PAYMENT_FOUND',
-        200
-      );
+        return utils.handleSuccess(
+          context,
+          {
+            payment: {
+              ...payment.$attributes,
+              status: result.status,
+            },
+          },
+          'PAYMENT_FOUND',
+          200
+        );
+      }
     } catch (error) {
       return utils.handleError(context, 400, 'PAYMENT_ERROR', `${error}`);
     }
@@ -321,15 +319,14 @@ export default class MercadoPagoController {
     const trx = await Database.transaction();
 
     try {
-      // Garantimos que o payment tem um people_id válido
       if (!payment.people_id) {
         throw new Error('Payment não possui people_id válido');
       }
 
-      const activeStatus = await this.statusesService.searchStatusByName('Ativo', 'customer_ticket');
+      const activeStatus = await this.statusesService.searchStatusByName('Disponível', 'customer_ticket');
 
       if (!activeStatus) {
-        throw new Error('Status "Ativo" não encontrado para customer_ticket');
+        throw new Error('Status "Disponível" não encontrado para customer_ticket');
       }
 
       for (const ticketData of ticketsData) {
@@ -358,7 +355,6 @@ export default class MercadoPagoController {
                   customer_ticket_id: customerTicket.id,
                   field_id: fieldData.field_id,
                   value: fieldData.value,
-                  display_order: 1,
                 },
                 { client: trx }
               );
@@ -407,5 +403,13 @@ export default class MercadoPagoController {
     });
 
     return newPeople.id;
+  }
+
+  private async processApprovedPayment(payment: Payments, ticketsData: any[]): Promise<void> {
+    const existingTickets = await CustomerTickets.query().where('payment_id', payment.id);
+
+    if (existingTickets.length === 0 && ticketsData && ticketsData.length > 0) {
+      await this.createCustomerTickets(payment, ticketsData);
+    }
   }
 }
