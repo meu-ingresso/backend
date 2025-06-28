@@ -10,19 +10,15 @@ import {
   hasMany,
   HasMany,
 } from '@ioc:Adonis/Lucid/Orm';
-import Tickets from './Tickets';
 import People from './People';
 import Users from './Users';
 import Statuses from './Statuses';
-import Payments from './Payments';
 import TicketFields from './TicketFields';
+import PaymentTickets from './PaymentTickets';
 
 export default class CustomerTickets extends BaseModel {
   @column({ isPrimary: true })
   public id: string;
-
-  @column()
-  public ticket_id: string;
 
   @column()
   public current_owner_id: string;
@@ -34,7 +30,7 @@ export default class CustomerTickets extends BaseModel {
   public status_id: string;
 
   @column()
-  public payment_id: string;
+  public payment_ticket_id: string;
 
   @column()
   public ticket_identifier: string | null;
@@ -57,10 +53,10 @@ export default class CustomerTickets extends BaseModel {
   @column.dateTime()
   public deleted_at: DateTime | null;
 
-  @belongsTo(() => Tickets, {
-    foreignKey: 'ticket_id',
+  @belongsTo(() => PaymentTickets, {
+    foreignKey: 'payment_ticket_id',
   })
-  public ticket: BelongsTo<typeof Tickets>;
+  public paymentTickets: BelongsTo<typeof PaymentTickets>;
 
   @belongsTo(() => People, {
     foreignKey: 'current_owner_id',
@@ -81,11 +77,6 @@ export default class CustomerTickets extends BaseModel {
     foreignKey: 'status_id',
   })
   public status: BelongsTo<typeof Statuses>;
-
-  @belongsTo(() => Payments, {
-    foreignKey: 'payment_id',
-  })
-  public payment: BelongsTo<typeof Payments>;
 
   @hasMany(() => TicketFields, {
     foreignKey: 'customer_ticket_id',
