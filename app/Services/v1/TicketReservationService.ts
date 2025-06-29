@@ -17,6 +17,20 @@ export default class TicketReservationService {
         throw new Error('Ingresso não encontrado');
       }
 
+      const event = await ticket.related('event').query().useTransaction(trx).first();
+
+      if (!event) {
+        await trx.rollback();
+        throw new Error('Evento não encontrado');
+      }
+
+      const eventFess = await event.related('fees').query().useTransaction(trx).first();
+
+      if (!eventFess) {
+        await trx.rollback();
+        throw new Error('Taxas do evento não encontradas');
+      }
+
       const activeReservations = await TicketReservations.query()
         .where('ticket_id', data.ticket_id)
         .where('expires_time', '>', DateTime.now().toSQL())
@@ -36,6 +50,9 @@ export default class TicketReservationService {
           ticket_id: data.ticket_id,
           quantity: data.quantity,
           expires_time: data.expires_time,
+          current_ticket_price: ticket.price,
+          event_absorb_service_fee: event.absorb_service_fee || false,
+          event_platform_fee: eventFess.platform_fee || 0,
         },
         { client: trx }
       );
