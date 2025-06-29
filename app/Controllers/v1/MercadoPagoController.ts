@@ -356,7 +356,7 @@ export default class MercadoPagoController {
               current_owner_id: payment.people_id,
               status_id: activeStatus.id,
               validated: false,
-              payment_ticket_id: paymentTicket.id,s
+              payment_ticket_id: paymentTicket.id,
             },
             { client: trx }
           );
