@@ -6,10 +6,12 @@ import EventFees from 'App/Models/Access/EventFees';
 import Payments from 'App/Models/Access/Payments';
 import PaymentTickets from 'App/Models/Access/PaymentTickets';
 import People from 'App/Models/Access/People';
+import TicketReservations from 'App/Models/Access/TicketReservations';
 
 interface TicketItem {
   ticket_id: string;
   quantity: number;
+  reservation_id?: string; // Opcional, usado para reservas
   ticket_fields?: {
     field_id: string;
     value: string;
@@ -144,12 +146,35 @@ export default class PaymentCalculationService {
 
     // Calcular para cada tipo de ticket
     for (const ticketItem of paymentData.tickets) {
+      
       const ticket = tickets.find(t => t.id === ticketItem.ticket_id);
+      
       if (!ticket) {
         throw new Error(`Ticket ${ticketItem.ticket_id} não encontrado`);
       }
 
-      const originalPrice = ticket.price;
+      let originalPrice = ticket.price;
+      let ticketQuantity = ticketItem.quantity;
+
+      // Busca a reserva se existir
+      if (ticketItem.reservation_id) {
+        const reservation = await TicketReservations.query()
+          .where('id', ticketItem.reservation_id)
+          .where('ticket_id', ticket.id)
+          .firstOrFail();
+
+        // Verifica se a reserva está ativa
+        if (!reservation) {
+          throw new Error(`Reserva ${ticketItem.reservation_id} não está ativa ou não encontrada para o ticket ${ticket.id}`);
+        }
+
+        // Se a reserva existir, usa o preço da reserva
+        originalPrice = reservation.current_ticket_price;
+
+        // Usa a quantidade da reserva
+        ticketQuantity = reservation.quantity; 
+      }
+
       let couponDiscountPerTicket = 0;
 
       // 1. Aplicar desconto do cupom SOBRE o valor original
@@ -181,15 +206,15 @@ export default class PaymentCalculationService {
       const finalPrice = priceAfterCoupon + serviceFeeApplied;
 
       // Calcular totais para esta linha
-      const totalOriginalValue = originalPrice * ticketItem.quantity;
-      const totalCouponDiscountValue = couponDiscountPerTicket * ticketItem.quantity;
-      const totalServiceFeeValue = serviceFeeApplied * ticketItem.quantity;
-      const totalFinalValue = finalPrice * ticketItem.quantity;
+      const totalOriginalValue = originalPrice * ticketQuantity;
+      const totalCouponDiscountValue = couponDiscountPerTicket * ticketQuantity;
+      const totalServiceFeeValue = serviceFeeApplied * ticketQuantity;
+      const totalFinalValue = finalPrice * ticketQuantity;
 
       ticketCalculations.push({
         ticket_id: ticketItem.ticket_id,
         ticket_name: ticket.name,
-        quantity: ticketItem.quantity,
+        quantity: ticketQuantity,
         original_price: originalPrice,
         coupon_discount_per_ticket: couponDiscountPerTicket,
         price_after_coupon: priceAfterCoupon,

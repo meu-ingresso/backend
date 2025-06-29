@@ -40,6 +40,7 @@ class CardPaymentValidator {
     tickets: schema.array().members(
       schema.object().members({
         ticket_id: schema.string({}, [rules.exists({ table: 'tickets', column: 'id' })]),
+        reservation_id: schema.string.optional({}, [rules.exists({ table: 'ticket_reservations', column: 'id' })]),
         quantity: schema.number([rules.unsigned(), rules.range(1, 100)]),
         ticket_fields: schema.array.optional().members(
           schema.object().members({
