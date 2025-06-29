@@ -11,6 +11,15 @@ export default class TicketReservations extends BaseModel {
   public ticket_id: string;
 
   @column()
+  public current_ticket_price: number;
+
+  @column()
+  public event_absorb_service_fee: boolean;
+
+  @column()
+  public event_platform_fee: number;
+
+  @column()
   public quantity: number;
 
   @column.dateTime()
