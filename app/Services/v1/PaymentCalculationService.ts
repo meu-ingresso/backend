@@ -128,7 +128,7 @@ export default class PaymentCalculationService {
    */
   private async calculatePayment(paymentData: PaymentRequest): Promise<PaymentCalculation> {
     // Buscar dados necessários
-    const [event, eventFee, tickets, coupon] = await Promise.all([
+    const [, eventFee, tickets, coupon] = await Promise.all([
       Events.findOrFail(paymentData.event_id),
       EventFees.query().where('event_id', paymentData.event_id).first(),
       this.getTicketsData(paymentData.tickets),
