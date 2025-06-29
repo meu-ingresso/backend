@@ -28,9 +28,9 @@ interface DuplicateOptions {
 export default class EventService {
   public async getTotalizers(event_id: string): Promise<any> {
     const totalizers = await Database.from('customer_tickets')
-      .join('tickets', 'customer_tickets.ticket_id', 'tickets.id')
-      .join('payments', 'customer_tickets.payment_id', 'payments.id')
-      .where('tickets.event_id', event_id)
+      .join('payment_tickets', 'customer_tickets.payment_ticket_id', 'payment_tickets.id')
+      .join('payments', 'payment_tickets.payment_id', 'payments.id')
+      .where('payments.event_id', event_id)
       .select('payments.net_value as net_value', 'customer_tickets.created_at as created_at');
 
     const today = DateTime.now().startOf('day');

@@ -8,18 +8,19 @@ import TicketFields from 'App/Models/Access/TicketFields';
 import Tickets from 'App/Models/Access/Tickets';
 import People from 'App/Models/Access/People';
 import StatusService from 'App/Services/v1/StatusService';
+import PaymentCalculationService from 'App/Services/v1/PaymentCalculationService';
 import Database from '@ioc:Adonis/Lucid/Database';
 import { DateTime } from 'luxon';
+import PaymentTickets from 'App/Models/Access/PaymentTickets';
 
 export default class MercadoPagoController {
   private mercadoPagoService: MercadoPagoService = new MercadoPagoService();
   private statusesService: StatusService = new StatusService();
+  private paymentCalculationService: PaymentCalculationService = new PaymentCalculationService();
 
   public async processCardPayment(context: HttpContextContract) {
     try {
       const paymentData = await context.request.validate(CardPaymentValidator);
-
-      const resolvedPeopleId = await this.resolvePeopleId(paymentData);
 
       const pendingStatus = await this.statusesService.searchStatusByName('Pendente', 'payment');
 
@@ -27,45 +28,46 @@ export default class MercadoPagoController {
         return utils.handleError(context, 500, 'STATUS_NOT_FOUND', 'Status "Pendente" não encontrado');
       }
 
-      const payment = await Payments.create({
+      const resultProcessPayment = await this.paymentCalculationService.processPayment({
         event_id: paymentData.event_id,
-        people_id: resolvedPeopleId,
+        people: paymentData.people,
         coupon_id: paymentData.coupon_id,
         pdv_id: paymentData.pdv_id,
-        status_id: pendingStatus.id,
-        payment_method: 'credit_card',
-        payment_method_details: paymentData.payment_method_id,
+        description: paymentData.description,
+        transaction_amount: paymentData.transaction_amount,
         gross_value: paymentData.gross_value,
         net_value: paymentData.net_value,
-        installments: paymentData.installments || 1,
+        tickets: paymentData.tickets,
+        payment_method: 'card',
+        status_id: pendingStatus.id,
       });
 
-      const result = await this.mercadoPagoService.processCardPayment(paymentData);
+      const resultMercadoPago = await this.mercadoPagoService.processCardPayment(paymentData);
 
-      if (!result.success) {
+      if (!resultMercadoPago.success) {
         const errorStatus = await this.statusesService.searchStatusByName('Erro', 'payment');
 
         if (!errorStatus) {
           return utils.handleError(context, 500, 'STATUS_NOT_FOUND', 'Status "Erro" não encontrado');
         }
 
-        await payment
+        await resultProcessPayment.payment
           .merge({
             status_id: errorStatus.id,
-            response_data: JSON.stringify(result),
+            response_data: JSON.stringify(resultMercadoPago),
           })
           .save();
 
-        return utils.handleError(context, 400, 'CARD_PAYMENT_ERROR', `${result?.error}`);
+        return utils.handleError(context, 400, 'CARD_PAYMENT_ERROR', `${resultMercadoPago?.error}`);
       }
 
       let newStatus: any = pendingStatus;
 
-      if (result.status === 'approved') {
+      if (resultMercadoPago.status === 'approved') {
         newStatus = await this.statusesService.searchStatusByName('Aprovado', 'payment');
 
         try {
-          await this.processApprovedPayment(payment, paymentData.tickets);
+          await this.processApprovedPayment(resultProcessPayment.payment, paymentData.tickets);
         } catch (error) {
           return utils.handleError(
             context,
@@ -74,32 +76,32 @@ export default class MercadoPagoController {
             'Erro ao criar customer_tickets para pagamento aprovado'
           );
         }
-      } else if (result.status === 'rejected') {
+      } else if (resultMercadoPago.status === 'rejected') {
         newStatus = await this.statusesService.searchStatusByName('Rejeitado', 'payment');
       }
 
       const responseData = {
-        ...result.data,
+        ...resultProcessPayment,
         tickets_data: paymentData.tickets,
       };
 
-      await payment
+      await resultProcessPayment.payment
         .merge({
-          external_id: result.external_id,
-          external_status: result.status,
+          external_id: resultMercadoPago.external_id,
+          external_status: resultMercadoPago.status,
           status_id: newStatus.id,
           response_data: responseData,
-          paid_at: result.status === 'approved' ? DateTime.local() : null,
-          last_four_digits: result.data?.card?.last_four_digits || null,
+          paid_at: resultMercadoPago.status === 'approved' ? DateTime.local() : null,
+          last_four_digits: resultMercadoPago.data?.card?.last_four_digits || null,
         })
         .save();
 
       return utils.handleSuccess(
         context,
         {
-          payment_id: payment.id,
-          status: result.status,
-          external_id: result.external_id,
+          payment_id: resultProcessPayment.payment.id,
+          status: resultMercadoPago.status,
+          external_id: resultMercadoPago.external_id,
         },
         'CARD_PAYMENT_SUCCESS',
         200
@@ -332,21 +334,35 @@ export default class MercadoPagoController {
       for (const ticketData of ticketsData) {
         const ticket = await Tickets.findOrFail(ticketData.ticket_id);
 
+        if (!ticket) {
+          throw new Error(`Ticket com ID ${ticketData.ticket_id} não encontrado`);
+        }
+
         if (ticket.total_sold + ticketData.quantity > ticket.total_quantity) {
           throw new Error(`Estoque insuficiente para o ticket ${ticket.name}`);
+        }
+
+        const paymentTicket = await PaymentTickets.query({ client: trx }).where('payment_id', payment.id)
+          .where('ticket_id', ticketData.ticket_id)
+          .first();
+
+        if (!paymentTicket) {
+          throw new Error(`PaymentTicket não encontrado para o pagamento ${payment.id} e ticket ${ticketData.ticket_id}`);
         }
 
         for (let i = 0; i < ticketData.quantity; i++) {
           const customerTicket = await CustomerTickets.create(
             {
-              ticket_id: ticketData.ticket_id,
               current_owner_id: payment.people_id,
               status_id: activeStatus.id,
-              payment_id: payment.id,
               validated: false,
+              payment_ticket_id: paymentTicket.id,s
             },
             { client: trx }
           );
+
+          // TODO Verificar se existem mais campos de fields para serem criados sem valor (-)
+
 
           if (ticketData.ticket_fields && ticketData.ticket_fields.length > 0) {
             for (const fieldData of ticketData.ticket_fields) {

@@ -7,6 +7,7 @@ export default class PaymentsSchema extends BaseSchema {
     this.schema.createTable(this.tableName, (table) => {
       table.uuid('id').primary();
       table.uuid('people_id').nullable().references('id').inTable('people').onDelete('CASCADE');
+      table.uuid('event_id').nullable().references('id').inTable('events').onDelete('CASCADE')
       table.uuid('status_id').notNullable().references('id').inTable('statuses').onDelete('SET NULL');
       table.string('payment_method', 50).notNullable();
       table.decimal('gross_value', 10, 2).notNullable();

@@ -4,7 +4,6 @@ import { BaseModel, column, beforeCreate, belongsTo, BelongsTo, hasMany, HasMany
 import Events from './Events';
 import TicketEventCategories from './TicketEventCategories';
 import Statuses from './Statuses';
-import CustomerTickets from './CustomerTickets';
 import EventCheckoutFieldsTickets from './EventCheckoutFieldsTickets';
 import PdvTickets from './PdvTickets';
 import TicketReservations from './TicketReservations';
@@ -78,11 +77,6 @@ export default class Tickets extends BaseModel {
     foreignKey: 'status_id',
   })
   public status: BelongsTo<typeof Statuses>;
-
-  @hasMany(() => CustomerTickets, {
-    foreignKey: 'ticket_id',
-  })
-  public customerTickets: HasMany<typeof CustomerTickets>;
 
   @hasMany(() => EventCheckoutFieldsTickets, {
     foreignKey: 'ticket_id',
