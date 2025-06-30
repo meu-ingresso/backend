@@ -353,6 +353,7 @@ export default class PaymentCalculationService {
         ticket_id: ticketCalc.ticket_id,
         quantity: ticketCalc.quantity,
         ticket_original_price: ticketCalc.original_price,
+        ticket_original_name: ticketCalc.ticket_name,
         coupon_discount_value: ticketCalc.coupon_discount_per_ticket,
         ticket_price_after_coupon: ticketCalc.price_after_coupon,
         service_fee_percentage: ticketCalc.service_fee_percentage,
