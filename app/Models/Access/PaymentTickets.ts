@@ -20,6 +20,9 @@ export default class PaymentTickets extends BaseModel {
   @column()
   public ticket_original_price: number;
 
+    @column()
+  public ticket_original_name: string;
+
   @column()
   public coupon_discount_value: number;
 

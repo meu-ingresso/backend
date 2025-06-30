@@ -2,10 +2,12 @@ import { HttpContextContract } from '@ioc:Adonis/Core/HttpContext';
 import QueryModelValidator from 'App/Validators/v1/QueryModelValidator';
 import { CreateEventGroupValidator } from 'App/Validators/v1/EventGroupsValidator';
 import DynamicService from 'App/Services/v1/DynamicService';
+import EventTotalizersService from 'App/Services/v1/EventTotalizersService';
 import utils from 'Utils/utils';
 
 export default class EventGroupsController {
   private dynamicService: DynamicService = new DynamicService();
+  private eventTotalizersService: EventTotalizersService = new EventTotalizersService();
 
   public async create(context: HttpContextContract) {
     const payload = await context.request.validate(CreateEventGroupValidator);
@@ -27,6 +29,12 @@ export default class EventGroupsController {
     const query = await context.request.validate(QueryModelValidator);
 
     const result = await this.dynamicService.search('EventGroup', query);
+
+    // Verifica se há preload de eventos e adiciona totalizadores se necessário
+    if (this.eventTotalizersService.hasEventsPreload(query) && result.data) {
+      const dataWithTotalizers = await this.eventTotalizersService.addTotalizersToEvents(result.data);
+      result.data = dataWithTotalizers;
+    }
 
     return utils.handleSuccess(context, result, 'SEARCH_SUCCESS', 200);
   }
