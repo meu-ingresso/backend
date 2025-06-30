@@ -374,33 +374,43 @@ export default class PaymentCalculationService {
    * Chamado após confirmação do pagamento
    */
   public async createCustomerTicketsFromPayment(paymentId: string, statusId: string): Promise<any> {
-    return await Database.transaction(async (trx) => {
-      // Buscar os PaymentTickets
-      const paymentTickets = await PaymentTickets.query()
-        .where('payment_id', paymentId)
-        .preload('ticket');
 
-      const customerTicketsData: any[] = [];
+    try {
 
-      // Criar CustomerTickets individuais baseados nos PaymentTickets
-      for (const paymentTicket of paymentTickets) {
-        for (let i = 0; i < paymentTicket.quantity; i++) {
-          customerTicketsData.push({
-            ticket_id: paymentTicket.ticket_id,
-            current_owner_id: null, // Será definido posteriormente
-            status_id: statusId,
-            payment_id: paymentId,
-            ticket_original_value: paymentTicket.ticket_original_price,
-            ticket_discount_value: paymentTicket.coupon_discount_value,
-            ticket_total_paid: paymentTicket.ticket_final_price,
-            validated: false
-          });
+      return await Database.transaction(async (trx) => {
+        // Buscar os PaymentTickets
+        const paymentTickets = await PaymentTickets.query({ client: trx })
+          .where('payment_id', paymentId)
+          .preload('ticket');
+
+        const customerTicketsData: any[] = [];
+
+        // Criar CustomerTickets individuais baseados nos PaymentTickets
+        for (const paymentTicket of paymentTickets) {
+          for (let i = 0; i < paymentTicket.quantity; i++) {
+            customerTicketsData.push({
+              payment_ticket_id: paymentTicket.id,
+              current_owner_id: null, // Será definido posteriormente
+              status_id: statusId,
+              validated: false
+            });
+          }
+
+          // Atualizar o total_sold do ticket
+          const Tickets = (await import('App/Models/Access/Tickets')).default;
+          await Tickets.query({ client: trx })
+            .where('id', paymentTicket.ticket_id)
+            .increment('total_sold', paymentTicket.quantity);
         }
-      }
 
-      // Criar os CustomerTickets
-      const CustomerTickets = (await import('App/Models/Access/CustomerTickets')).default;
-      return await CustomerTickets.createMany(customerTicketsData, { client: trx });
-    });
+        // Criar os CustomerTickets
+        const CustomerTickets = (await import('App/Models/Access/CustomerTickets')).default;
+        return await CustomerTickets.createMany(customerTicketsData, { client: trx });
+      });
+
+    } catch (error) {
+      console.error('Erro ao criar CustomerTickets:', error);
+      throw new Error(`Erro ao criar CustomerTickets: ${error.message}`);
+    }
   }
 } 
