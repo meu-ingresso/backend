@@ -86,6 +86,39 @@ export default class MercadoPagoService {
   }
 
   /**
+   * Processa o reembolso total de um pagamento
+   */
+  public async refundPayment(paymentId: string) {
+    try {
+      const paymentInfo = await this.payment.get({ id: paymentId });
+
+      if (paymentInfo.status !== 'approved') {
+        return {
+          success: false,
+          error: 'Pagamento não está aprovado para reembolso',
+        };
+      }
+
+      const refundResult = await this.payment.refund({
+        id: paymentId,
+      });
+
+      return {
+        success: true,
+        data: refundResult,
+        external_id: refundResult.id,
+        status: refundResult.status,
+      };
+    } catch (error) {
+      Logger.error('Erro ao processar reembolso do pagamento: %o', error);
+      return {
+        success: false,
+        error: error.message,
+      };
+    }
+  }
+
+  /**
    * Constrói o payload para pagamento com cartão
    */
   private buildCardPaymentRequest(paymentData) {

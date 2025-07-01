@@ -218,6 +218,7 @@ export default class DatabaseSeeder extends BaseSeeder {
       { id: uuidv4(), name: 'Cancelado', description: 'Pagamento Cancelado', module: 'payment' },
       { id: uuidv4(), name: 'Estornado', description: 'Pagamento Estornado', module: 'payment' },
       { id: uuidv4(), name: 'Disponível', description: 'Disponível para check-in', module: 'customer_ticket' },
+      { id: uuidv4(), name: 'Cancelado', description: 'Cancelado', module: 'customer_ticket' },
       {
         id: uuidv4(),
         name: 'Validado',
