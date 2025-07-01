@@ -207,12 +207,12 @@ Route.group(() => {
 
   // ROTAS SEM AUTENTICAÇÃO
   Route.group(() => {
-
     Route.post('/ticket-reservation', 'v1/TicketReservationsController.create');
 
     Route.post('/payment/card', 'v1/MercadoPagoController.processCardPayment');
     Route.post('/payment/pix', 'v1/MercadoPagoController.processPixPayment');
     Route.get('/payment/:id', 'v1/MercadoPagoController.getPayment');
+    Route.post('/payment/refund/:id', 'v1/MercadoPagoController.refundPayment');
 
     Route.get('/categories', 'v1/CategoriesController.search');
     Route.get('/statuses', 'v1/StatusesController.search');
