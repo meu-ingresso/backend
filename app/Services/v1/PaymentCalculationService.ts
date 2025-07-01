@@ -128,7 +128,7 @@ export default class PaymentCalculationService {
    */
   private async calculatePayment(paymentData: PaymentRequest): Promise<PaymentCalculation> {
     // Buscar dados necessários
-    const [, eventFee, tickets, coupon] = await Promise.all([
+    const [event, eventFee, tickets, coupon] = await Promise.all([
       Events.findOrFail(paymentData.event_id),
       EventFees.query().where('event_id', paymentData.event_id).first(),
       this.getTicketsData(paymentData.tickets),
@@ -137,6 +137,7 @@ export default class PaymentCalculationService {
 
     const serviceFeePercentage = eventFee?.platform_fee || 0;
     const ticketCalculations: TicketCalculation[] = [];
+    const absorveServiceFee = event.absorb_service_fee;
     
     let totalOriginal = 0;
     let totalCouponDiscount = 0;
@@ -195,12 +196,14 @@ export default class PaymentCalculationService {
 
       if (priceAfterCoupon < 30) {
         // Taxa fixa de R$ 3 para ingressos abaixo de R$ 30
-        serviceFeeApplied = 3;
-        serviceFeeFixedUsed = 3;
+        // Se o evento absorve a taxa de serviço, não aplica a taxa
+        serviceFeeApplied = absorveServiceFee ? 0 : 3;
+        serviceFeeFixedUsed = absorveServiceFee ? 0 : 3;
       } else {
         // Taxa percentual do evento para ingressos >= R$ 30
-        serviceFeeApplied = (priceAfterCoupon * serviceFeePercentage) / 100;
-        serviceFeePercentageUsed = serviceFeePercentage;
+        // Se o evento absorve a taxa de serviço, não aplica a taxa
+        serviceFeeApplied = absorveServiceFee ? 0 : (priceAfterCoupon * serviceFeePercentage) / 100;
+        serviceFeePercentageUsed = absorveServiceFee ? 0 : serviceFeePercentage;
       }
 
       const finalPrice = priceAfterCoupon + serviceFeeApplied;

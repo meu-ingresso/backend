@@ -129,7 +129,9 @@ export default class PaymentsController {
         .update({ current_owner_id: paymentData.people_id });
 
       // Criar os TicketFields se fornecidos
-      await this.createTicketFieldsFromTicketsData(paymentTicketIds, paymentData.tickets);
+      if (paymentData.tickets.some(ticket => ticket.ticket_fields && ticket.ticket_fields.length > 0)) {
+        await this.createTicketFieldsFromTicketsData(paymentTicketIds, paymentData.tickets);
+      }
 
       return utils.handleSuccess(
         context,
@@ -152,32 +154,38 @@ export default class PaymentsController {
     const trx = await Database.transaction();
 
     try {
-      // Buscar os CustomerTickets criados para estes PaymentTickets
+      // Buscar os CustomerTickets criados para estes PaymentTickets ordenados por criação
       const customerTickets = await CustomerTickets.query({ client: trx })
         .whereIn('payment_ticket_id', paymentTicketIds)
         .preload('paymentTickets', (query) => {
           query.select('id', 'ticket_id');
-        });
-
-      // Criar um mapeamento de ticket_id para CustomerTickets
-      const ticketToCustomerTicketsMap = new Map<string, CustomerTickets[]>();
-      
-      customerTickets.forEach(ct => {
-        const ticketId = ct.paymentTickets.ticket_id;
-        if (!ticketToCustomerTicketsMap.has(ticketId)) {
-          ticketToCustomerTicketsMap.set(ticketId, []);
-        }
-        ticketToCustomerTicketsMap.get(ticketId)!.push(ct);
-      });
+        })
+        .orderBy('created_at', 'asc');
 
       // Processar os ticket_fields para cada tipo de ticket
       for (const ticketData of ticketsData) {
-        if (ticketData.ticket_fields && ticketData.ticket_fields.length > 0) {
-          const customerTicketsForThisTicket = ticketToCustomerTicketsMap.get(ticketData.ticket_id) || [];
+        if (ticketData.ticket_fields && ticketData.ticket_fields.length > 0 && ticketData.quantity > 0) {
           
-          // Para cada CustomerTicket deste tipo de ticket, criar os fields
-          for (const customerTicket of customerTicketsForThisTicket) {
-            for (const fieldData of ticketData.ticket_fields) {
+          // Buscar customer_tickets deste tipo de ticket
+          const customerTicketsForThisTicket = customerTickets.filter(ct => 
+            ct.paymentTickets.ticket_id === ticketData.ticket_id
+          );
+
+          // Calcular quantos campos por ingresso
+          const fieldsPerTicket = ticketData.ticket_fields.length / ticketData.quantity;
+
+          // Para cada customer_ticket, aplicar seus campos correspondentes
+          for (let i = 0; i < customerTicketsForThisTicket.length; i++) {
+            const customerTicket = customerTicketsForThisTicket[i];
+            
+            // Calcular o índice inicial dos campos para este ingresso
+            const startIndex = i * fieldsPerTicket;
+            const endIndex = startIndex + fieldsPerTicket;
+
+            // Aplicar os campos específicos deste ingresso
+            for (let fieldIndex = startIndex; fieldIndex < endIndex && fieldIndex < ticketData.ticket_fields.length; fieldIndex++) {
+              const fieldData = ticketData.ticket_fields[fieldIndex];
+              
               await TicketFields.create(
                 {
                   customer_ticket_id: customerTicket.id,
