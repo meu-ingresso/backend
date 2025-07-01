@@ -252,4 +252,64 @@ class UpdatePaymentValidator {
   };
 }
 
-export { CardPaymentValidator, PixPaymentValidator, CreatePaymentValidator, UpdatePaymentValidator };
+class PdvPaymentValidator {
+  constructor(protected context: HttpContextContract) {}
+
+  public reporter = ReportHandler;
+
+  public schema = schema.create({
+    event_id: schema.string({}, [rules.exists({ table: 'events', column: 'id' })]),
+    people_id: schema.string({}, [rules.exists({ table: 'people', column: 'id' })]),
+    coupon_id: schema.string.optional({}, [rules.exists({ table: 'coupons', column: 'id' })]),
+    pdv_id: schema.string({}, [rules.exists({ table: 'pdvs', column: 'id' })]),
+    description: schema.string(),
+    transaction_amount: schema.number([rules.unsigned()]),
+    gross_value: schema.number([rules.unsigned()]),
+    net_value: schema.number([rules.unsigned()]),
+    // Informações dos tickets para compra
+    tickets: schema.array().members(
+      schema.object().members({
+        ticket_id: schema.string({}, [rules.exists({ table: 'tickets', column: 'id' })]),
+        quantity: schema.number([rules.unsigned(), rules.range(1, 100)]),
+        ticket_fields: schema.array.optional().members(
+          schema.object().members({
+            field_id: schema.string({}, [rules.exists({ table: 'event_checkout_fields', column: 'id' })]),
+            value: schema.string(),
+          })
+        ),
+      })
+    )
+  });
+
+  public messages = {
+    'event_id.exists': 'O evento informado não existe',
+    'people_id.exists': 'A pessoa informada não existe',
+    'coupon_id.exists': 'O cupom informado não existe',
+    'coupon_id.string': 'O cupom informado deve ser uma string',
+    'pdv_id.required': 'O PDV é obrigatório para este tipo de compra',
+    'pdv_id.exists': 'O PDV informado não existe',
+    'pdv_id.string': 'O PDV informado deve ser uma string',
+    'description.required': 'A descrição é obrigatória',
+    'description.string': 'A descrição deve ser uma string',
+    'transaction_amount.unsigned': 'O valor da transação deve ser positivo',
+    'transaction_amount.number': 'O valor da transação deve ser um número',
+    'gross_value.unsigned': 'O valor bruto da transação deve ser positivo',
+    'gross_value.number': 'O valor bruto da transação deve ser um número',
+    'net_value.unsigned': 'O valor líquido da transação deve ser positivo',
+    'net_value.number': 'O valor líquido da transação deve ser um número',
+    'tickets.required': 'Os ingressos são obrigatórios',
+    'tickets.array': 'Os ingressos devem ser um array',
+    'tickets.*.ticket_id.required': 'O ID do ingresso é obrigatório',
+    'tickets.*.ticket_id.exists': 'O ingresso informado não existe',
+    'tickets.*.quantity.required': 'A quantidade é obrigatória',
+    'tickets.*.quantity.unsigned': 'A quantidade deve ser um número positivo',
+    'tickets.*.quantity.range': 'A quantidade deve estar entre 1 e 100',
+    'tickets.*.ticket_fields.array': 'Os campos do ingresso devem ser um array',
+    'tickets.*.ticket_fields.*.field_id.required': 'O ID do campo é obrigatório',
+    'tickets.*.ticket_fields.*.field_id.exists': 'O campo informado não existe',
+    'tickets.*.ticket_fields.*.value.required': 'O valor do campo é obrigatório',
+    'tickets.*.ticket_fields.*.value.string': 'O valor do campo deve ser uma string',
+  };
+}
+
+export { CardPaymentValidator, PixPaymentValidator, CreatePaymentValidator, UpdatePaymentValidator, PdvPaymentValidator };

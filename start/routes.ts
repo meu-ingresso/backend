@@ -212,6 +212,7 @@ Route.group(() => {
 
     Route.post('/payment/card', 'v1/MercadoPagoController.processCardPayment');
     Route.post('/payment/pix', 'v1/MercadoPagoController.processPixPayment');
+    Route.post('/payment/pdv', 'v1/PaymentsController.processPdvPayment');
     Route.get('/payment/:id', 'v1/MercadoPagoController.getPayment');
 
     Route.get('/categories', 'v1/CategoriesController.search');
