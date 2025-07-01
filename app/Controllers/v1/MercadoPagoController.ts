@@ -439,32 +439,48 @@ export default class MercadoPagoController {
     const trx = await Database.transaction();
 
     try {
-      // Buscar os CustomerTickets criados para estes PaymentTickets
+      // Buscar os CustomerTickets criados para estes PaymentTickets ordenados por criação
       const customerTickets = await CustomerTickets.query({ client: trx })
         .whereIn('payment_ticket_id', paymentTicketIds)
         .preload('paymentTickets', (query) => {
           query.select('id', 'ticket_id');
-        });
+        })
+        .orderBy('created_at', 'asc');
 
-      // Criar um mapeamento de ticket_id para CustomerTickets
-      const ticketToCustomerTicketsMap = new Map<string, CustomerTickets[]>();
-
-      customerTickets.forEach((ct) => {
-        const ticketId = ct.paymentTickets.ticket_id;
-        if (!ticketToCustomerTicketsMap.has(ticketId)) {
-          ticketToCustomerTicketsMap.set(ticketId, []);
-        }
-        ticketToCustomerTicketsMap.get(ticketId)!.push(ct);
-      });
+      console.log('CUSTOMER TICKETS:', customerTickets);
 
       // Processar os ticket_fields para cada tipo de ticket
       for (const ticketData of ticketsData) {
-        if (ticketData.ticket_fields && ticketData.ticket_fields.length > 0) {
-          const customerTicketsForThisTicket = ticketToCustomerTicketsMap.get(ticketData.ticket_id) || [];
+        if (ticketData.ticket_fields && ticketData.ticket_fields.length > 0 && ticketData.quantity > 0) {
+          
+          // Buscar customer_tickets deste tipo de ticket
+          const customerTicketsForThisTicket = customerTickets.filter(ct => 
+            ct.paymentTickets.ticket_id === ticketData.ticket_id
+          );
 
-          // Para cada CustomerTicket deste tipo de ticket, criar os fields
-          for (const customerTicket of customerTicketsForThisTicket) {
-            for (const fieldData of ticketData.ticket_fields) {
+          console.log('CUSTOMER TICKETS FOR THIS TICKET:', customerTicketsForThisTicket);
+
+          // Calcular quantos campos por ingresso
+          const fieldsPerTicket = ticketData.ticket_fields.length / ticketData.quantity;
+          
+          console.log(`FIELDS PER TICKET: ${fieldsPerTicket} (total: ${ticketData.ticket_fields.length}, quantity: ${ticketData.quantity})`);
+
+          // Para cada customer_ticket, aplicar seus campos correspondentes
+          for (let i = 0; i < customerTicketsForThisTicket.length; i++) {
+            const customerTicket = customerTicketsForThisTicket[i];
+            
+            // Calcular o índice inicial dos campos para este ingresso
+            const startIndex = i * fieldsPerTicket;
+            const endIndex = startIndex + fieldsPerTicket;
+            
+            console.log(`CUSTOMER TICKET ${i}: ${customerTicket.id}, campos [${startIndex}-${endIndex-1}]`);
+
+            // Aplicar os campos específicos deste ingresso
+            for (let fieldIndex = startIndex; fieldIndex < endIndex && fieldIndex < ticketData.ticket_fields.length; fieldIndex++) {
+              const fieldData = ticketData.ticket_fields[fieldIndex];
+              
+              console.log(`CREATING FIELD [${fieldIndex}] FOR CUSTOMER TICKET ${customerTicket.id}:`, fieldData);
+              
               await TicketFields.create(
                 {
                   customer_ticket_id: customerTicket.id,
@@ -480,6 +496,7 @@ export default class MercadoPagoController {
 
       await trx.commit();
     } catch (error) {
+      console.log('ERRO AO CRIAR TICKET FIELDS:', error);
       await trx.rollback();
       throw error;
     }
@@ -494,16 +511,25 @@ export default class MercadoPagoController {
       // Buscar PaymentTickets associados ao pagamento
       const paymentTickets = await PaymentTickets.query().where('payment_id', payment.id);
 
+      console.log('PAYMENT TICKETS:', paymentTickets);
+
       if (paymentTickets.length === 0) {
         throw new Error('Nenhum PaymentTicket encontrado para este pagamento');
       }
 
       // Verificar se já existem CustomerTickets para este pagamento
-      const paymentTicketIds = paymentTickets.map((pt) => pt.id);
-      const existingCustomerTickets = await CustomerTickets.query().whereIn('payment_ticket_id', paymentTicketIds);
+      const paymentTicketIds = paymentTickets.map(pt => pt.id);
+
+      console.log('PAYMENT TICKET IDS:', paymentTicketIds);
+
+      const existingCustomerTickets = await CustomerTickets.query()
+        .whereIn('payment_ticket_id', paymentTicketIds);
+
+      console.log('EXISTING CUSTOMER TICKETS:', existingCustomerTickets);
 
       // Se não existem CustomerTickets, criar usando o PaymentCalculationService
       if (existingCustomerTickets.length === 0 && ticketsData && ticketsData.length > 0) {
+        console.log('Criando CustomerTickets...');
         const availableStatus = await this.statusesService.searchStatusByName('Disponível', 'customer_ticket');
 
         if (!availableStatus) {
@@ -513,16 +539,25 @@ export default class MercadoPagoController {
         // Usar o método do PaymentCalculationService que já está adaptado para a nova estrutura
         await this.paymentCalculationService.createCustomerTicketsFromPayment(payment.id, availableStatus.id);
 
+        console.log('CUSTOMER TICKETS CRIADOS:');
+
         // Atualizar o current_owner_id dos CustomerTickets criados
         if (payment.people_id) {
+
+          console.log('ATUALIZANDO CURRENT OWNER ID...');
+
           await CustomerTickets.query()
             .whereIn('payment_ticket_id', paymentTicketIds)
             .update({ current_owner_id: payment.people_id });
+
+          console.log('CURRENT OWNER ID ATUALIZADO:');
         }
 
         // Criar os TicketFields se fornecidos
-        if (ticketsData.some((ticket) => ticket.ticket_fields && ticket.ticket_fields.length > 0)) {
+        if (ticketsData.some(ticket => ticket.ticket_fields && ticket.ticket_fields.length > 0)) {
+          console.log('Criando TicketFields...');
           await this.createTicketFieldsFromTicketsData(paymentTicketIds, ticketsData);
+          console.log('TICKET FIELDS CRIADOS:');
         }
       }
     } catch (error) {
