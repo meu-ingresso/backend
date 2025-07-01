@@ -348,6 +348,93 @@ export default class MercadoPagoController {
     }
   }
 
+  public async refundPayment(context: HttpContextContract) {
+    try {
+      const paymentId = context.params.id;
+
+      console.log('PAYMENT ID:', paymentId);
+
+      const payment = await Payments.find(paymentId);
+
+      console.log('PAYMENT:', payment);
+
+      if (!payment) {
+        return utils.handleError(context, 404, 'PAYMENT_NOT_FOUND', 'Pagamento não encontrado');
+      }
+
+      if (!payment.external_id) {
+        return utils.handleError(context, 400, 'INVALID_PAYMENT', 'Pagamento não possui ID externo do Mercado Pago');
+      }
+
+      const approvedStatus = await this.statusesService.searchStatusByName('Aprovado', 'payment');
+
+      if (payment.status_id !== approvedStatus?.id) {
+        return utils.handleError(
+          context,
+          400,
+          'INVALID_PAYMENT_STATUS',
+          'Apenas pagamentos aprovados podem ser reembolsados'
+        );
+      }
+
+      const result = await this.mercadoPagoService.refundPayment(payment.external_id);
+
+      if (!result.success) {
+        return utils.handleError(context, 400, 'REFUND_ERROR', `Erro ao processar reembolso: ${result.error}`);
+      }
+
+      const refundedStatus = await this.statusesService.searchStatusByName('Reembolsado', 'payment');
+
+      if (!refundedStatus) {
+        return utils.handleError(context, 500, 'STATUS_NOT_FOUND', 'Status "Reembolsado" não encontrado');
+      }
+
+      const updatedResponseData = {
+        ...payment.response_data,
+        refund_data: result.data,
+        refunded_at: DateTime.local().toISO(),
+      };
+
+      await payment
+        .merge({
+          status_id: refundedStatus.id,
+          external_status: 'refunded',
+          response_data: updatedResponseData,
+        })
+        .save();
+
+      try {
+        const cancelledStatus = await this.statusesService.searchStatusByName('Cancelado', 'customer_ticket');
+
+        if (cancelledStatus) {
+          const paymentTickets = await PaymentTickets.query().where('payment_id', payment.id);
+          const paymentTicketIds = paymentTickets.map((pt) => pt.id);
+
+          if (paymentTicketIds.length > 0) {
+            await CustomerTickets.query()
+              .whereIn('payment_ticket_id', paymentTicketIds)
+              .update({ status_id: cancelledStatus.id });
+          }
+        }
+      } catch (error) {
+        console.error('Erro ao atualizar status dos CustomerTickets:', error);
+      }
+
+      return utils.handleSuccess(
+        context,
+        {
+          payment_id: payment.id,
+          external_id: payment.external_id,
+          status: 'refunded',
+        },
+        'REFUND_SUCCESS',
+        200
+      );
+    } catch (error) {
+      return utils.handleError(context, 400, 'REFUND_ERROR', `${error}`);
+    }
+  }
+
   private async createTicketFieldsFromTicketsData(paymentTicketIds: string[], ticketsData: any[]): Promise<void> {
     const trx = await Database.transaction();
 
@@ -416,9 +503,7 @@ export default class MercadoPagoController {
   }
 
   private async processApprovedPayment(payment: Payments, ticketsData: any[]): Promise<void> {
-
     try {
-
       if (!payment) {
         throw new Error('Pagamento não encontrado');
       }
@@ -446,7 +531,7 @@ export default class MercadoPagoController {
       if (existingCustomerTickets.length === 0 && ticketsData && ticketsData.length > 0) {
         console.log('Criando CustomerTickets...');
         const availableStatus = await this.statusesService.searchStatusByName('Disponível', 'customer_ticket');
-        
+
         if (!availableStatus) {
           throw new Error('Status "Disponível" não encontrado para customer_ticket');
         }
