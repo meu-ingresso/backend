@@ -53,6 +53,9 @@ export default class PaymentTickets extends BaseModel {
   @column()
   public total_final_value: number;
 
+  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  public updated_at: DateTime;
+
   @column.dateTime({ autoCreate: true })
   public created_at: DateTime;
 

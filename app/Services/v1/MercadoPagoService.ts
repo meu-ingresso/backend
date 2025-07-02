@@ -1,10 +1,11 @@
-import { MercadoPagoConfig, Payment } from 'mercadopago';
+import { MercadoPagoConfig, Payment, PaymentRefund } from 'mercadopago';
 import Env from '@ioc:Adonis/Core/Env';
 import Logger from '@ioc:Adonis/Core/Logger';
 
 export default class MercadoPagoService {
   private client;
   private payment;
+  private paymentRefund;
 
   constructor() {
     this.client = new MercadoPagoConfig({
@@ -12,6 +13,7 @@ export default class MercadoPagoService {
       options: { timeout: 5000 },
     });
     this.payment = new Payment(this.client);
+    this.paymentRefund = new PaymentRefund(this.client);
   }
 
   /**
@@ -99,8 +101,9 @@ export default class MercadoPagoService {
         };
       }
 
-      const refundResult = await this.payment.refund({
-        id: paymentId,
+      const refundResult = await this.paymentRefund.create({
+        payment_id: paymentId,
+        body: {},
       });
 
       return {
@@ -111,9 +114,10 @@ export default class MercadoPagoService {
       };
     } catch (error) {
       Logger.error('Erro ao processar reembolso do pagamento: %o', error);
+
       return {
         success: false,
-        error: error.message,
+        error: error.message || 'Erro ao processar reembolso',
       };
     }
   }

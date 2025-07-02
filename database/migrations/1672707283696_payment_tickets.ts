@@ -9,6 +9,8 @@ export default class CreatePaymentTicketsTable extends BaseSchema {
       table.uuid('payment_id').notNullable().references('id').inTable('payments').onDelete('CASCADE');
       table.uuid('ticket_id').notNullable().references('id').inTable('tickets').onDelete('CASCADE');
       table.integer('quantity').notNullable().defaultTo(1);
+
+      table.string('ticket_original_name', 255).nullable()
       
       // Valores originais do ingresso no momento da compra
       table.decimal('ticket_original_price', 12, 2).notNullable();
