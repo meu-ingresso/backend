@@ -4,6 +4,14 @@ export default class AddUniqueIndexToEventsSchema extends BaseSchema {
   protected tableName = 'events';
 
   public async up() {
+
+    // Cria o status de "Reprovado" se não existir
+    await this.db.rawQuery(`
+      INSERT INTO statuses (id, name, module, description, deleted_at)
+      VALUES (gen_random_uuid(), 'Reprovado', 'event', 'Evento reprovado pela equipe Meu Ingresso', NULL)
+    `);
+
+
     // Primeiro busca o ID do status "Reprovado"
     const status = await this.db
       .rawQuery(
