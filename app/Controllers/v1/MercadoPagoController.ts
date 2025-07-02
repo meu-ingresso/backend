@@ -352,11 +352,7 @@ export default class MercadoPagoController {
     try {
       const paymentId = context.params.id;
 
-      console.log('PAYMENT ID:', paymentId);
-
       const payment = await Payments.find(paymentId);
-
-      console.log('PAYMENT:', payment);
 
       if (!payment) {
         return utils.handleError(context, 404, 'PAYMENT_NOT_FOUND', 'Pagamento não encontrado');
@@ -383,10 +379,10 @@ export default class MercadoPagoController {
         return utils.handleError(context, 400, 'REFUND_ERROR', `Erro ao processar reembolso: ${result.error}`);
       }
 
-      const refundedStatus = await this.statusesService.searchStatusByName('Reembolsado', 'payment');
+      const refundedStatus = await this.statusesService.searchStatusByName('Estornado', 'payment');
 
       if (!refundedStatus) {
-        return utils.handleError(context, 500, 'STATUS_NOT_FOUND', 'Status "Reembolsado" não encontrado');
+        return utils.handleError(context, 500, 'STATUS_NOT_FOUND', 'Status "Estornado" não encontrado');
       }
 
       const updatedResponseData = {
@@ -452,35 +448,40 @@ export default class MercadoPagoController {
       // Processar os ticket_fields para cada tipo de ticket
       for (const ticketData of ticketsData) {
         if (ticketData.ticket_fields && ticketData.ticket_fields.length > 0 && ticketData.quantity > 0) {
-          
           // Buscar customer_tickets deste tipo de ticket
-          const customerTicketsForThisTicket = customerTickets.filter(ct => 
-            ct.paymentTickets.ticket_id === ticketData.ticket_id
+          const customerTicketsForThisTicket = customerTickets.filter(
+            (ct) => ct.paymentTickets.ticket_id === ticketData.ticket_id
           );
 
           console.log('CUSTOMER TICKETS FOR THIS TICKET:', customerTicketsForThisTicket);
 
           // Calcular quantos campos por ingresso
           const fieldsPerTicket = ticketData.ticket_fields.length / ticketData.quantity;
-          
-          console.log(`FIELDS PER TICKET: ${fieldsPerTicket} (total: ${ticketData.ticket_fields.length}, quantity: ${ticketData.quantity})`);
+
+          console.log(
+            `FIELDS PER TICKET: ${fieldsPerTicket} (total: ${ticketData.ticket_fields.length}, quantity: ${ticketData.quantity})`
+          );
 
           // Para cada customer_ticket, aplicar seus campos correspondentes
           for (let i = 0; i < customerTicketsForThisTicket.length; i++) {
             const customerTicket = customerTicketsForThisTicket[i];
-            
+
             // Calcular o índice inicial dos campos para este ingresso
             const startIndex = i * fieldsPerTicket;
             const endIndex = startIndex + fieldsPerTicket;
-            
-            console.log(`CUSTOMER TICKET ${i}: ${customerTicket.id}, campos [${startIndex}-${endIndex-1}]`);
+
+            console.log(`CUSTOMER TICKET ${i}: ${customerTicket.id}, campos [${startIndex}-${endIndex - 1}]`);
 
             // Aplicar os campos específicos deste ingresso
-            for (let fieldIndex = startIndex; fieldIndex < endIndex && fieldIndex < ticketData.ticket_fields.length; fieldIndex++) {
+            for (
+              let fieldIndex = startIndex;
+              fieldIndex < endIndex && fieldIndex < ticketData.ticket_fields.length;
+              fieldIndex++
+            ) {
               const fieldData = ticketData.ticket_fields[fieldIndex];
-              
+
               console.log(`CREATING FIELD [${fieldIndex}] FOR CUSTOMER TICKET ${customerTicket.id}:`, fieldData);
-              
+
               await TicketFields.create(
                 {
                   customer_ticket_id: customerTicket.id,
@@ -518,12 +519,11 @@ export default class MercadoPagoController {
       }
 
       // Verificar se já existem CustomerTickets para este pagamento
-      const paymentTicketIds = paymentTickets.map(pt => pt.id);
+      const paymentTicketIds = paymentTickets.map((pt) => pt.id);
 
       console.log('PAYMENT TICKET IDS:', paymentTicketIds);
 
-      const existingCustomerTickets = await CustomerTickets.query()
-        .whereIn('payment_ticket_id', paymentTicketIds);
+      const existingCustomerTickets = await CustomerTickets.query().whereIn('payment_ticket_id', paymentTicketIds);
 
       console.log('EXISTING CUSTOMER TICKETS:', existingCustomerTickets);
 
@@ -543,7 +543,6 @@ export default class MercadoPagoController {
 
         // Atualizar o current_owner_id dos CustomerTickets criados
         if (payment.people_id) {
-
           console.log('ATUALIZANDO CURRENT OWNER ID...');
 
           await CustomerTickets.query()
@@ -554,7 +553,7 @@ export default class MercadoPagoController {
         }
 
         // Criar os TicketFields se fornecidos
-        if (ticketsData.some(ticket => ticket.ticket_fields && ticket.ticket_fields.length > 0)) {
+        if (ticketsData.some((ticket) => ticket.ticket_fields && ticket.ticket_fields.length > 0)) {
           console.log('Criando TicketFields...');
           await this.createTicketFieldsFromTicketsData(paymentTicketIds, ticketsData);
           console.log('TICKET FIELDS CRIADOS:');
