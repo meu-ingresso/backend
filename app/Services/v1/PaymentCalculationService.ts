@@ -67,6 +67,8 @@ interface TicketCalculation {
   total_coupon_discount: number;
   total_service_fee: number;
   total_final_value: number;
+  event_absorb_service_fee: boolean;
+  event_platform_fee: number;
 }
 
 interface PaymentCalculation {
@@ -228,7 +230,9 @@ export default class PaymentCalculationService {
         total_original_value: totalOriginalValue,
         total_coupon_discount: totalCouponDiscountValue,
         total_service_fee: totalServiceFeeValue,
-        total_final_value: totalFinalValue
+        total_final_value: totalFinalValue,
+        event_absorb_service_fee: event.absorb_service_fee,
+        event_platform_fee: serviceFeePercentage
       });
 
       // Somar aos totais gerais
@@ -366,7 +370,9 @@ export default class PaymentCalculationService {
         total_original_value: ticketCalc.total_original_value,
         total_coupon_discount: ticketCalc.total_coupon_discount,
         total_service_fee: ticketCalc.total_service_fee,
-        total_final_value: ticketCalc.total_final_value
+        total_final_value: ticketCalc.total_final_value,
+        event_absorb_service_fee: ticketCalc.event_absorb_service_fee,
+        event_platform_fee: ticketCalc.event_platform_fee
       });
     }
 
