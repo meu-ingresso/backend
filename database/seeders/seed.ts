@@ -1,7 +1,6 @@
 import BaseSeeder from '@ioc:Adonis/Lucid/Seeder';
 import { DateTime } from 'luxon';
 import { v4 as uuidv4 } from 'uuid';
-import Hash from '@ioc:Adonis/Core/Hash';
 import Role from 'App/Models/Access/Roles';
 import Permission from 'App/Models/Access/Permissions';
 import RolePermission from 'App/Models/Access/RolePermissions';
@@ -128,7 +127,7 @@ export default class DatabaseSeeder extends BaseSeeder {
         people_id: people[0].id,
         email: 'jean@gmail.com',
         alias: 'jean-promotor',
-        password: await Hash.make('123456'),
+        password: '123456',
         role_id: roles[1].id,
       },
       {
@@ -136,7 +135,7 @@ export default class DatabaseSeeder extends BaseSeeder {
         people_id: people[1].id,
         email: 'admin@gmail.com',
         alias: 'system-administrator',
-        password: await Hash.make('123456'),
+        password: '123456',
         role_id: roles[0].id,
       },
       {
@@ -144,7 +143,7 @@ export default class DatabaseSeeder extends BaseSeeder {
         people_id: people[2].id,
         email: 'cliente@gmail.com',
         alias: 'cliente-final',
-        password: await Hash.make('123456'),
+        password: '123456',
         role_id: roles[2].id,
       },
     ]);
@@ -206,7 +205,6 @@ export default class DatabaseSeeder extends BaseSeeder {
         description: 'Evento publicado pelo promoter, mas aguardando aprovaçnao da Equipe Meu Ingresso)',
         module: 'event',
       },
-      { id: uuidv4(), name: 'Reprovado', description: 'Evento reprovado pela equipe Meu Ingresso', module: 'event' },
       {
         id: uuidv4(),
         name: 'Aguardando',
@@ -232,6 +230,18 @@ export default class DatabaseSeeder extends BaseSeeder {
       { id: uuidv4(), name: 'Disponível', description: 'PDV Disponível para uso', module: 'pdv' },
       { id: uuidv4(), name: 'Fechado', description: 'PDV Fechado', module: 'pdv' },
     ]);
+
+    // Se status "Reprovado" não existir, cria
+    const status = await Status.query().where('name', 'Reprovado').where('module', 'event').whereNull('deleted_at').first();
+    if (!status) {
+      await Status.create({
+        id: uuidv4(),
+        name: 'Reprovado',
+        module: 'event',
+        description: 'Evento reprovado pela equipe Meu Ingresso',
+        deleted_at: null,
+      });
+    }
 
     console.log('Statuses created');
 

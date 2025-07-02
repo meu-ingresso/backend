@@ -8,6 +8,9 @@ export default class TicketReservationsSchema extends BaseSchema {
       table.uuid('id').primary();
       table.uuid('ticket_id').notNullable().references('id').inTable('tickets').onDelete('CASCADE');
       table.integer('quantity').notNullable().defaultTo(1);
+      table.decimal('current_ticket_price', 12, 2).notNullable();
+      table.boolean('event_absorb_service_fee').notNullable().defaultTo(false);
+      table.decimal('event_platform_fee', 12, 2).notNullable().defaultTo(0);
       table.dateTime('expires_time').notNullable();
       table.timestamp('created_at', { useTz: true }).defaultTo(this.now());
     });

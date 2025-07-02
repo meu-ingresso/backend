@@ -15,6 +15,7 @@ export default class CustomerTicketsSchema extends BaseSchema {
       table.uuid('validated_by').nullable().references('id').inTable('users').onDelete('SET NULL');
       table.timestamp('validated_at', { useTz: true }).nullable();
       table.timestamp('created_at', { useTz: true }).defaultTo(this.now());
+      table.timestamp('updated_at', { useTz: true }).defaultTo(this.now());
     });
   }
 
