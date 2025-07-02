@@ -33,6 +33,10 @@ export default class CreatePaymentTicketsTable extends BaseSchema {
       table.decimal('total_service_fee', 12, 2).nullable().defaultTo(0);
       table.decimal('total_final_value', 12, 2).notNullable();
 
+      // Evento absorve a taxa de serviço e valor dessa taxa
+      table.boolean('event_absorb_service_fee').notNullable().defaultTo(false);
+      table.decimal('event_platform_fee', 12, 2).notNullable().defaultTo(0);
+
       table.timestamp('created_at', { useTz: true }).defaultTo(this.now());
       table.timestamp('updated_at', { useTz: true }).defaultTo(this.now());
     });
