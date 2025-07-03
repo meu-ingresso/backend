@@ -27,11 +27,17 @@ interface DuplicateOptions {
 
 export default class EventService {
   public async getTotalizers(event_id: string): Promise<any> {
-    const totalizers = await Database.from('customer_tickets')
-      .join('payment_tickets', 'customer_tickets.payment_ticket_id', 'payment_tickets.id')
+    const totalizers = await Database.from('payment_tickets')
       .join('payments', 'payment_tickets.payment_id', 'payments.id')
+      .join('statuses', 'statuses.id', 'payments.status_id')
       .where('payments.event_id', event_id)
-      .select('payments.net_value as net_value', 'customer_tickets.created_at as created_at');
+      .where('statuses.name', 'Aprovado')
+      .where('statuses.module', 'payment')
+      .select(
+        'payments.net_value as net_value', 
+        'payment_tickets.created_at as created_at',
+        'payment_tickets.quantity as quantity'
+      );
 
     const today = DateTime.now().startOf('day');
 
@@ -46,13 +52,15 @@ export default class EventService {
     };
 
     for (const totalizer of totalizers) {
-      total.totalSales += 1;
+      const quantity = Number(totalizer.quantity) || 1;
+      
+      total.totalSales += quantity;
       total.totalSalesAmount += Number(totalizer.net_value);
 
       const createdAt = DateTime.fromJSDate(totalizer.created_at).startOf('day');
 
       if (createdAt.equals(today)) {
-        total.totalSalesToday += 1;
+        total.totalSalesToday += quantity;
         total.totalSalesAmountToday += Number(totalizer.net_value);
       }
     }

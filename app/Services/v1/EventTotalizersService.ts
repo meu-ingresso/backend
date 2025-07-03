@@ -2,31 +2,35 @@ import Database from '@ioc:Adonis/Lucid/Database';
 import { DateTime } from 'luxon';
 
 interface EventTotals {
-  totalSales: number;              // Número de vendas confirmadas (customer_tickets)
-  totalSalesToday: number;         // Vendas confirmadas hoje
-  totalSalesAmount: number;        // Valor total das vendas confirmadas
-  totalSalesAmountToday: number;   // Valor das vendas confirmadas hoje
+  totalSales: number;              // Número de vendas aprovadas (payment_tickets)
+  totalSalesToday: number;         // Vendas aprovadas hoje
+  totalSalesAmount: number;        // Valor total das vendas aprovadas
+  totalSalesAmountToday: number;   // Valor das vendas aprovadas hoje
   totalViews: number;              // Visualizações do evento
 }
 
 export default class EventTotalizersService {
   /**
    * Calcula os totalizadores para um evento específico
-   * Segue exatamente a mesma lógica do EventService.getTotalizers
-   * Considera apenas vendas confirmadas (customer_tickets)
+   * Considera apenas pagamentos aprovados (payment_tickets + payments com status "Aprovado")
    */
   public async calculateEventTotals(eventId: string): Promise<EventTotals> {
     try {
       const today = DateTime.now().startOf('day');
 
-      // Buscar vendas confirmadas usando a mesma lógica do EventService
-      // customer_tickets = ingressos com vendas confirmadas/aprovadas
+      // Buscar vendas confirmadas usando pagamentos aprovados
       const totalizers = await Database
-        .from('customer_tickets')
-        .join('payment_tickets', 'customer_tickets.payment_ticket_id', 'payment_tickets.id')
+        .from('payment_tickets')
         .join('payments', 'payment_tickets.payment_id', 'payments.id')
+        .join('statuses', 'statuses.id', 'payments.status_id')
         .where('payments.event_id', eventId)
-        .select('payments.net_value as net_value', 'customer_tickets.created_at as created_at');
+        .where('statuses.name', 'Aprovado')
+        .where('statuses.module', 'payment')
+        .select(
+          'payments.net_value as net_value', 
+          'payment_tickets.created_at as created_at',
+          'payment_tickets.quantity as quantity'
+        );
 
       // Buscar visualizações do evento
       const totalViews = await Database
@@ -45,13 +49,15 @@ export default class EventTotalizersService {
 
       // Processar cada venda confirmada
       for (const totalizer of totalizers) {
-        total.totalSales += 1;
+        const quantity = Number(totalizer.quantity) || 1;
+        
+        total.totalSales += quantity;
         total.totalSalesAmount += Number(totalizer.net_value);
 
         const createdAt = DateTime.fromJSDate(totalizer.created_at).startOf('day');
 
         if (createdAt.equals(today)) {
-          total.totalSalesToday += 1;
+          total.totalSalesToday += quantity;
           total.totalSalesAmountToday += Number(totalizer.net_value);
         }
       }
@@ -73,7 +79,7 @@ export default class EventTotalizersService {
 
   /**
    * Calcula os totalizadores para múltiplos eventos de uma vez (otimização de performance)
-   * Segue a mesma lógica do EventService.getTotalizers mas em lote
+   * Considera apenas pagamentos aprovados (payment_tickets + payments com status "Aprovado")
    */
   public async calculateMultipleEventTotals(eventIds: string[]): Promise<Record<string, EventTotals>> {
     if (eventIds.length === 0) return {};
@@ -81,16 +87,19 @@ export default class EventTotalizersService {
     try {
       const today = DateTime.now().startOf('day');
 
-      // Buscar vendas confirmadas em lote usando customer_tickets
+      // Buscar vendas confirmadas em lote usando pagamentos aprovados
       const salesQuery = await Database
-        .from('customer_tickets')
-        .join('payment_tickets', 'customer_tickets.payment_ticket_id', 'payment_tickets.id')
+        .from('payment_tickets')
         .join('payments', 'payment_tickets.payment_id', 'payments.id')
+        .join('statuses', 'statuses.id', 'payments.status_id')
         .whereIn('payments.event_id', eventIds)
+        .where('statuses.name', 'Aprovado')
+        .where('statuses.module', 'payment')
         .select(
           'payments.event_id',
           'payments.net_value as net_value',
-          'customer_tickets.created_at as created_at'
+          'payment_tickets.created_at as created_at',
+          'payment_tickets.quantity as quantity'
         );
 
       // Buscar visualizações em lote
@@ -124,14 +133,15 @@ export default class EventTotalizersService {
       // Processar cada venda
       for (const sale of salesQuery) {
         const eventId = sale.event_id;
+        const quantity = Number(sale.quantity) || 1;
         
         if (result[eventId]) {
-          result[eventId].totalSales += 1;
+          result[eventId].totalSales += quantity;
           result[eventId].totalSalesAmount += Number(sale.net_value);
 
           const createdAt = DateTime.fromJSDate(sale.created_at).startOf('day');
           if (createdAt.equals(today)) {
-            result[eventId].totalSalesToday += 1;
+            result[eventId].totalSalesToday += quantity;
             result[eventId].totalSalesAmountToday += Number(sale.net_value);
           }
         }
@@ -158,7 +168,7 @@ export default class EventTotalizersService {
 
   /**
    * Adiciona totalizadores aos eventos de um grupo
-   * Usa a mesma lógica do EventService.getTotalizers
+   * Considera apenas pagamentos aprovados (payment_tickets + payments com status "Aprovado")
    */
   public async addTotalizersToEvents(eventGroupData: any[]): Promise<any[]> {
     const processedData: any[] = [];

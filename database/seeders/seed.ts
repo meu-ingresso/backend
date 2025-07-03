@@ -125,7 +125,7 @@ export default class DatabaseSeeder extends BaseSeeder {
       {
         id: uuidv4(),
         people_id: people[0].id,
-        email: 'jean@gmail.com',
+        email: 'produtor@gmail.com',
         alias: 'jean-promotor',
         password: '123456',
         role_id: roles[1].id,
