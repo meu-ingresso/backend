@@ -395,6 +395,7 @@ export default class MercadoPagoController {
         .merge({
           status_id: refundedStatus.id,
           external_status: 'refunded',
+          refunded_at: DateTime.local(),
           response_data: updatedResponseData,
         })
         .save();

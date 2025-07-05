@@ -1,5 +1,6 @@
 import { DateTime } from 'luxon';
-import { v4 as uuidv4 } from 'uuid';import { BaseModel, column, beforeCreate, belongsTo, BelongsTo, hasMany, HasMany } from '@ioc:Adonis/Lucid/Orm';
+import { v4 as uuidv4 } from 'uuid';
+import { BaseModel, column, beforeCreate, belongsTo, BelongsTo, hasMany, HasMany } from '@ioc:Adonis/Lucid/Orm';
 import People from './People';
 import Statuses from './Statuses';
 import Coupons from './Coupons';
@@ -10,6 +11,9 @@ import PaymentTickets from './PaymentTickets';
 export default class Payments extends BaseModel {
   @column({ isPrimary: true })
   public id: string;
+
+  @column()
+  public identifier: string;
 
   @column()
   public event_id: string;
@@ -43,6 +47,9 @@ export default class Payments extends BaseModel {
 
   @column.dateTime({ autoCreate: true, autoUpdate: true })
   public updated_at: DateTime;
+
+  @column.dateTime()
+  public refunded_at: DateTime | null;
 
   @column.dateTime()
   public deleted_at: DateTime | null;
@@ -105,5 +112,37 @@ export default class Payments extends BaseModel {
   @beforeCreate()
   public static assignUuid(payment: Payments) {
     payment.id = uuidv4();
+  }
+
+  @beforeCreate()
+  public static async generateIdentifier(payment: Payments) {
+    let isUnique = false;
+    let attempts = 0;
+
+    while (!isUnique && attempts < 10) {
+      const identifier = Payments.generateRandomIdentifier();
+
+      const existingPayment = await Payments.query()
+        .where('identifier', identifier)
+        .where('event_id', payment.event_id)
+        .first();
+
+      if (!existingPayment) {
+        isUnique = true;
+        payment.identifier = identifier;
+      }
+
+      attempts++;
+    }
+
+    if (!isUnique) {
+      throw new Error('Failed to generate unique identifier');
+    }
+  }
+
+  private static generateRandomIdentifier(length = 12): string {
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+
+    return Array.from({ length }, () => chars.charAt(Math.floor(Math.random() * chars.length))).join('');
   }
 }
