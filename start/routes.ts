@@ -203,6 +203,8 @@ Route.group(() => {
     Route.post('/payment', 'v1/PaymentsController.create');
     Route.patch('/payment', 'v1/PaymentsController.update');
     Route.delete('/payment/:id', 'v1/PaymentsController.delete');
+    Route.post('/payment/refund/:id', 'v1/MercadoPagoController.refundPayment');
+    Route.post('/payment/pdv', 'v1/PaymentsController.processPdvPayment');
   }).middleware(['auth']);
 
   // ROTAS SEM AUTENTICAÇÃO
@@ -211,9 +213,7 @@ Route.group(() => {
 
     Route.post('/payment/card', 'v1/MercadoPagoController.processCardPayment');
     Route.post('/payment/pix', 'v1/MercadoPagoController.processPixPayment');
-    Route.post('/payment/pdv', 'v1/PaymentsController.processPdvPayment');
     Route.get('/payment/:id', 'v1/MercadoPagoController.getPayment');
-    Route.post('/payment/refund/:id', 'v1/MercadoPagoController.refundPayment');
 
     Route.get('/categories', 'v1/CategoriesController.search');
     Route.get('/statuses', 'v1/StatusesController.search');
