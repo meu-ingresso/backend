@@ -6,8 +6,9 @@ export default class PaymentsSchema extends BaseSchema {
   public async up() {
     this.schema.createTable(this.tableName, (table) => {
       table.uuid('id').primary();
+      table.string('identifier', 255).notNullable();
       table.uuid('people_id').nullable().references('id').inTable('people').onDelete('CASCADE');
-      table.uuid('event_id').nullable().references('id').inTable('events').onDelete('CASCADE')
+      table.uuid('event_id').nullable().references('id').inTable('events').onDelete('CASCADE');
       table.uuid('status_id').notNullable().references('id').inTable('statuses').onDelete('SET NULL');
       table.string('payment_method', 50).notNullable();
       table.decimal('gross_value', 10, 2).notNullable();
@@ -27,7 +28,10 @@ export default class PaymentsSchema extends BaseSchema {
 
       table.timestamp('created_at', { useTz: true }).defaultTo(this.now());
       table.timestamp('updated_at', { useTz: true }).defaultTo(this.now());
+      table.timestamp('refunded_at', { useTz: true }).nullable();
       table.timestamp('deleted_at', { useTz: true }).nullable();
+
+      table.unique(['identifier', 'event_id']);
     });
   }
 
