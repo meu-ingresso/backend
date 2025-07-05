@@ -389,6 +389,7 @@ export default class MercadoPagoController {
         ...payment.response_data,
         refund_data: result.data,
         refunded_at: DateTime.local().toISO(),
+        refunded_by: context.auth.user?.id,
       };
 
       await payment
