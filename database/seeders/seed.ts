@@ -359,7 +359,7 @@ export default class DatabaseSeeder extends BaseSeeder {
         email: 'produtor@gmail.com',
         alias: 'jean-promotor',
         password: '123456',
-        role_id: roles[1].id,
+        role_id: roles.find(role => role.name === 'Produtor')?.id,
       },
       {
         id: uuidv4(),
@@ -367,7 +367,7 @@ export default class DatabaseSeeder extends BaseSeeder {
         email: 'admin@gmail.com',
         alias: 'system-administrator',
         password: '123456',
-        role_id: roles[0].id,
+        role_id: roles.find(role => role.name === 'Admin')?.id,
       },
       {
         id: uuidv4(),
@@ -375,7 +375,7 @@ export default class DatabaseSeeder extends BaseSeeder {
         email: 'cliente@gmail.com',
         alias: 'cliente-final',
         password: '123456',
-        role_id: roles[2].id,
+        role_id: roles.find(role => role.name === 'Cliente')?.id,
       },
     ]);
 
