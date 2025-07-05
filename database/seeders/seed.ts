@@ -312,7 +312,9 @@ export default class DatabaseSeeder extends BaseSeeder {
       { id: uuidv4(), role_id: roles.find(role => role.name === 'Produtor')?.id, permission_id: permissions.find(permission => permission.name === 'delete-events-orders-pdv')?.id },
       { id: uuidv4(), role_id: roles.find(role => role.name === 'Produtor')?.id, permission_id: permissions.find(permission => permission.name === 'export-events')?.id },
 
-      // Admin tem tudo
+      // Cliente nasce podendo criar eventos. Posteriormente ele pode ver eventos que é produtor até ser aceito de fato como role Produtor
+      { id: uuidv4(), role_id: roles.find(role => role.name === 'Cliente')?.id, permission_id: permissions.find(permission => permission.name === 'create-events')?.id },
+
     ]);
 
 
