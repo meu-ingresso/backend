@@ -140,6 +140,7 @@ export default class PaymentCalculationService {
     const serviceFeePercentage = eventFee?.platform_fee || 0;
     const ticketCalculations: TicketCalculation[] = [];
     const absorveServiceFee = event.absorb_service_fee;
+    const paymentMethod = paymentData.payment_method;
     
     let totalOriginal = 0;
     let totalCouponDiscount = 0;
@@ -196,7 +197,11 @@ export default class PaymentCalculationService {
       let serviceFeePercentageUsed: number | null = null;
       let serviceFeeFixedUsed: number | null = null;
 
-      if (priceAfterCoupon < 30) {
+      // Se o pagamento for via PDV, não aplica a taxa de serviço
+      if (paymentMethod === 'pdv') {
+        serviceFeePercentageUsed = 0;
+        serviceFeeFixedUsed = 0;
+      } else if (priceAfterCoupon < 30) {
         // Taxa fixa de R$ 3 para ingressos abaixo de R$ 30
         // Se o evento absorve a taxa de serviço, não aplica a taxa
         serviceFeeApplied = absorveServiceFee ? 0 : 3;
@@ -333,8 +338,8 @@ export default class PaymentCalculationService {
     payment.people_id = peopleId;
     payment.status_id = paymentData.status_id || '';
     payment.payment_method = paymentData.payment_method || 'pending';
-    payment.gross_value = calculation.totals.original_value;
-    payment.net_value = calculation.totals.final_value;
+    payment.gross_value = calculation.totals.final_value;
+    payment.net_value = calculation.totals.original_value;
     payment.coupon_id = calculation.coupon_applied.id;
     payment.pdv_id = paymentData.pdv_id || null;
 
