@@ -103,6 +103,7 @@ export default class MercadoPagoController {
         context,
         {
           payment_id: resultProcessPayment.payment.id,
+          identifier: resultProcessPayment.payment.identifier,
           status: resultMercadoPago.status,
           external_id: resultMercadoPago.external_id,
         },
@@ -195,6 +196,7 @@ export default class MercadoPagoController {
         context,
         {
           payment_id: resultProcessPayment.payment.id,
+          identifier: resultProcessPayment.payment.identifier,
           status: result.status,
           external_id: result.external_id,
           qr_code: result.qr_code,
