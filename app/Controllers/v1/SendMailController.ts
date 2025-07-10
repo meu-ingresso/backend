@@ -6,7 +6,9 @@ export default class SendMailController {
   private sendMailService = new SendMailService();
 
   public async sendMail(context: HttpContextContract) {
-    await this.sendMailService.sendMail();
+    const { to, subject, html } = context.request.body();
+
+    await this.sendMailService.sendMail({ to, subject, html });
 
     return utils.handleSuccess(context, 'E-mail enviado com sucesso', 'SEND_SUCCESS', 200);
   }

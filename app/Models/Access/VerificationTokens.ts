@@ -2,7 +2,6 @@ import { DateTime } from 'luxon';
 import { v4 as uuidv4 } from 'uuid';
 import { BaseModel, column, beforeCreate, belongsTo, BelongsTo } from '@ioc:Adonis/Lucid/Orm';
 import Users from './Users';
-import crypto from 'crypto';
 
 export type TokenType = 'email_verification' | 'password_reset';
 
