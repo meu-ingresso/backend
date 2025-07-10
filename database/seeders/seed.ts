@@ -447,6 +447,7 @@ export default class DatabaseSeeder extends BaseSeeder {
       { id: uuidv4(), name: 'Gastronômico' },
       { id: uuidv4(), name: 'Religioso e espiritual' },
       { id: uuidv4(), name: 'E-sports' },
+      { id: uuidv4(), name: 'Ecossistema de Inovação, Tecnologia e Startups' },
       { id: uuidv4(), name: 'Outros' },
     ]);
 
