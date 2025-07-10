@@ -95,6 +95,7 @@ export default class EventTotalizersService {
         .whereIn('payments.event_id', eventIds)
         .where('statuses.name', 'Aprovado')
         .where('statuses.module', 'payment')
+        .where('payments.payment_method', '!=', 'pdv')
         .select(
           'payments.event_id',
           'payments.net_value as net_value',

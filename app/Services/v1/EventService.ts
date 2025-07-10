@@ -32,6 +32,7 @@ export default class EventService {
       .join('statuses', 'statuses.id', 'payments.status_id')
       .where('payments.event_id', event_id)
       .where('statuses.name', 'Aprovado')
+      .where('payments.payment_method', '!=', 'pdv')
       .where('statuses.module', 'payment')
       .select(
         'payments.net_value as net_value', 
