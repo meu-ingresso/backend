@@ -2,10 +2,12 @@ import { HttpContextContract } from '@ioc:Adonis/Core/HttpContext';
 import QueryModelValidator from 'App/Validators/v1/QueryModelValidator';
 import { CreateUserValidator, UpdateUserValidator } from 'App/Validators/v1/UsersValidator';
 import DynamicService from 'App/Services/v1/DynamicService';
+import VerificationService from 'App/Services/v1/VerificationService';
 import utils from 'Utils/utils';
 
 export default class UsersController {
   private dynamicService: DynamicService = new DynamicService();
+  private verificationService = new VerificationService();
 
   public async create(context: HttpContextContract) {
     const payload = await context.request.validate(CreateUserValidator);
@@ -18,6 +20,16 @@ export default class UsersController {
 
     if (result[0].error) {
       return utils.handleError(context, 400, 'CREATE_ERROR', `${result[0].error}`);
+    }
+
+    for (const user of result) {
+      if (!user.error && user.email) {
+        try {
+          this.verificationService.createEmailVerificationToken(user.id);
+        } catch (error) {
+          console.error('Erro ao enviar email de verificação:', error);
+        }
+      }
     }
 
     return utils.handleSuccess(context, result, 'CREATE_SUCCESS', 201);

@@ -11,6 +11,7 @@ Route.group(() => {
 });
 
 Route.group(() => {
+  // ROTAS SEM AUTENTICAÇÃO
   Route.post('/login', 'v1/AuthController.login');
   Route.post('/google-login', 'v1/AuthController.googleLogin');
   Route.post('/people', 'v1/PeopleController.create');
@@ -21,6 +22,28 @@ Route.group(() => {
   Route.post('/event/view', 'v1/EventViewsController.create');
 
   Route.post('/payment/webhook', 'v1/MercadoPagoController.handleWebhook');
+
+  Route.post('/ticket-reservation', 'v1/TicketReservationsController.create');
+
+  Route.post('/payment/card', 'v1/MercadoPagoController.processCardPayment');
+  Route.post('/payment/pix', 'v1/MercadoPagoController.processPixPayment');
+  Route.get('/payment/:id', 'v1/MercadoPagoController.getPayment');
+
+  Route.get('/categories', 'v1/CategoriesController.search');
+  Route.get('/statuses', 'v1/StatusesController.search');
+  Route.get('/promoter/:alias/events', 'v1/EventsController.getByPromoterAlias');
+  Route.get('/events/top-active-by-category', 'v1/EventsController.topActiveByCategory');
+
+  Route.post('/send-mail', 'v1/SendMailController.sendMail');
+
+  // Validação de cupom sem autenticação
+  Route.post('/coupon/validate', 'v1/CouponsController.validateCoupon').middleware(['rateLimit']);
+
+  // Rotas de verificação de email e recuperação de senha
+  Route.post('/verify-email', 'v1/VerificationController.verifyEmail');
+  Route.post('/forgot-password', 'v1/VerificationController.forgotPassword');
+  Route.post('/reset-password', 'v1/VerificationController.resetPassword');
+  Route.post('/resend-verification', 'v1/VerificationController.resendVerification');
 
   // ROTAS COM AUTENTICAÇÃO
   Route.group(() => {
@@ -206,23 +229,4 @@ Route.group(() => {
     Route.post('/payment/refund/:id', 'v1/MercadoPagoController.refundPayment');
     Route.post('/payment/pdv', 'v1/PaymentsController.processPdvPayment');
   }).middleware(['auth']);
-
-  // ROTAS SEM AUTENTICAÇÃO
-  Route.group(() => {
-    Route.post('/ticket-reservation', 'v1/TicketReservationsController.create');
-
-    Route.post('/payment/card', 'v1/MercadoPagoController.processCardPayment');
-    Route.post('/payment/pix', 'v1/MercadoPagoController.processPixPayment');
-    Route.get('/payment/:id', 'v1/MercadoPagoController.getPayment');
-
-    Route.get('/categories', 'v1/CategoriesController.search');
-    Route.get('/statuses', 'v1/StatusesController.search');
-    Route.get('/promoter/:alias/events', 'v1/EventsController.getByPromoterAlias');
-    Route.get('/events/top-active-by-category', 'v1/EventsController.topActiveByCategory');
-
-    Route.post('/send-mail', 'v1/SendMailController.sendMail');
-
-    // Validação de cupom sem autenticação
-    Route.post('/coupon/validate', 'v1/CouponsController.validateCoupon').middleware(['rateLimit']);
-  });
 }).prefix('v1');
